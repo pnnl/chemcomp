@@ -1,5 +1,7 @@
 # ChemComp - Chemical Compiler Tool
 
+ChemComp is set to implement compilation flow that converts mathematical operations to chemical/biological operations of well-known reaction behavior, providing translation of relevant classes of ODEs.
+
 # License
 
 This project is made available under the BSD2 License. See the LICENSE.txt file for more details.
