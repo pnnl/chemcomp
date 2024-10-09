@@ -6,8 +6,8 @@
 //
 //===---------------------------------------------------------------------===//
 
-#ifndef PYTHON_BINDINGS_STANDALONE_OPS
-#define PYTHON_BINDINGS_STANDALONE_OPS
+#ifndef PYTHON_BINDINGS_ACR_OPS
+#define PYTHON_BINDINGS_ACR_OPS
 
 include "Standalone/StandaloneOps.td"
 

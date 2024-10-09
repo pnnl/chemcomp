@@ -20,6 +20,14 @@ declare_mlir_dialect_python_bindings(
     dialects/standalone.py
   DIALECT_NAME standalone)
 
+declare_mlir_dialect_python_bindings(
+  ADD_TO_PARENT StandalonePythonSources
+  ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mlir_standalone"
+  TD_FILE dialects/ACROps.td
+  SOURCES
+    dialects/acr.py
+  DIALECT_NAME acr)
+
 declare_mlir_python_extension(StandalonePythonSources.Extension
   MODULE_NAME _standaloneDialects
   ADD_TO_PARENT StandalonePythonSources

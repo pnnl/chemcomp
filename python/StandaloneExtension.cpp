@@ -27,4 +27,17 @@ PYBIND11_MODULE(_standaloneDialects, m) {
         }
       },
       py::arg("context") = py::none(), py::arg("load") = true);
+
+  auto acrM = m.def_submodule("acr");
+
+  acrM.def(
+      "register_dialect",
+      [](MlirContext context, bool load) {
+        MlirDialectHandle handle = mlirGetDialectHandle__acr__();
+        mlirDialectHandleRegisterDialect(handle, context);
+        if (load) {
+          mlirDialectHandleLoadDialect(handle, context);
+        }
+      },
+      py::arg("context") = py::none(), py::arg("load") = true);
 }
