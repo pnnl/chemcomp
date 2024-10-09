@@ -13,16 +13,14 @@
 #include "mlir/Pass/Pass.h"
 #include <memory>
 
-namespace mlir
-{
-    namespace acr
-    {
+namespace mlir {
+namespace acr {
 #define GEN_PASS_DECL
 #include "Standalone/Dialect/ACR/ACRPasses.h.inc"
 
 #define GEN_PASS_REGISTRATION
 #include "Standalone/Dialect/ACR/ACRPasses.h.inc"
-    } // namespace acr
+} // namespace acr
 } // namespace mlir
 
 #endif

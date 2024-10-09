@@ -19,8 +19,7 @@ using namespace mlir::acr;
 // ACR dialect.
 //===----------------------------------------------------------------------===//
 
-void ACRDialect::initialize()
-{
+void ACRDialect::initialize() {
   addOperations<
 #define GET_OP_LIST
 #include "Standalone/Dialect/ACR/ACROps.cpp.inc"

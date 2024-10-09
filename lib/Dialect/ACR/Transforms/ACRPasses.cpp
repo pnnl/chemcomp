@@ -13,44 +13,34 @@
 
 #include "Standalone/Dialect/ACR/ACRPasses.h"
 
-namespace mlir::acr
-{
+namespace mlir::acr {
 #define GEN_PASS_DEF_ACRSWITCHBARFOO
 #include "Standalone/Dialect/ACR/ACRPasses.h.inc"
 
-  namespace
-  {
-    class ACRSwitchBarFooRewriter : public OpRewritePattern<func::FuncOp>
-    {
-    public:
-      using OpRewritePattern<func::FuncOp>::OpRewritePattern;
-      LogicalResult matchAndRewrite(func::FuncOp op,
-                                    PatternRewriter &rewriter) const final
-      {
-        if (op.getSymName() == "bar")
-        {
-          rewriter.modifyOpInPlace(op, [&op]()
-                                   { op.setSymName("foo"); });
-          return success();
-        }
-        return failure();
-      }
-    };
+namespace {
+class ACRSwitchBarFooRewriter : public OpRewritePattern<func::FuncOp> {
+public:
+  using OpRewritePattern<func::FuncOp>::OpRewritePattern;
+  LogicalResult matchAndRewrite(func::FuncOp op,
+                                PatternRewriter &rewriter) const final {
+    if (op.getSymName() == "bar") {
+      rewriter.modifyOpInPlace(op, [&op]() { op.setSymName("foo"); });
+      return success();
+    }
+    return failure();
+  }
+};
 
-    class ACRSwitchBarFoo
-        : public impl::ACRSwitchBarFooBase<ACRSwitchBarFoo>
-    {
-    public:
-      using impl::ACRSwitchBarFooBase<
-          ACRSwitchBarFoo>::ACRSwitchBarFooBase;
-      void runOnOperation() final
-      {
-        RewritePatternSet patterns(&getContext());
-        patterns.add<ACRSwitchBarFooRewriter>(&getContext());
-        FrozenRewritePatternSet patternSet(std::move(patterns));
-        if (failed(applyPatternsAndFoldGreedily(getOperation(), patternSet)))
-          signalPassFailure();
-      }
-    };
-  } // namespace
-} // namespace mlir::standalone
+class ACRSwitchBarFoo : public impl::ACRSwitchBarFooBase<ACRSwitchBarFoo> {
+public:
+  using impl::ACRSwitchBarFooBase<ACRSwitchBarFoo>::ACRSwitchBarFooBase;
+  void runOnOperation() final {
+    RewritePatternSet patterns(&getContext());
+    patterns.add<ACRSwitchBarFooRewriter>(&getContext());
+    FrozenRewritePatternSet patternSet(std::move(patterns));
+    if (failed(applyPatternsAndFoldGreedily(getOperation(), patternSet)))
+      signalPassFailure();
+  }
+};
+} // namespace
+} // namespace mlir::acr

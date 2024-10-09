@@ -18,8 +18,7 @@ using namespace mlir::acr;
 #define GET_TYPEDEF_CLASSES
 #include "Standalone/Dialect/ACR/ACROpsTypes.cpp.inc"
 
-void ACRDialect::registerTypes()
-{
+void ACRDialect::registerTypes() {
   addTypes<
 #define GET_TYPEDEF_LIST
 #include "Standalone/Dialect/ACR/ACROpsTypes.cpp.inc"

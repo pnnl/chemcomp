@@ -18,15 +18,15 @@
 #include "Standalone/Dialect/ACR/ACRDialect.h"
 #include "Standalone/Dialect/ACR/ACRPasses.h"
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   mlir::registerAllPasses();
   mlir::standalone::registerPasses();
   // TODO: Register standalone passes here.
 
   mlir::DialectRegistry registry;
-  registry.insert<mlir::standalone::StandaloneDialect,
-                  mlir::arith::ArithDialect, mlir::func::FuncDialect, mlir::acr::ACRDialect>();
+  registry
+      .insert<mlir::standalone::StandaloneDialect, mlir::arith::ArithDialect,
+              mlir::func::FuncDialect, mlir::acr::ACRDialect>();
   // Add the following to include *all* MLIR Core dialects, or selectively
   // include what you need like above. You only need to register dialects that
   // will be *parsed* by the tool, not the one generated
