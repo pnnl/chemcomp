@@ -6,6 +6,7 @@ set(LIBS
         MLIRArithDialect
         MLIROptLib
         MLIRStandalone
+        MLIRACR
         )
 add_llvm_executable(standalone-opt standalone-opt.cpp)
 
