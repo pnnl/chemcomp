@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/StandaloneOps.h"
-#include "Standalone/StandaloneDialect.h"
+#include "Standalone/Dialect/Standalone/StandaloneOps.h"
+#include "Standalone/Dialect/Standalone/StandaloneDialect.h"
 
 #define GET_OP_CLASSES
-#include "Standalone/StandaloneOps.cpp.inc"
+#include "Standalone/Dialect/Standalone/StandaloneOps.cpp.inc"

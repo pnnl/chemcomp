@@ -8,18 +8,18 @@
 #ifndef STANDALONE_STANDALONEPASSES_H
 #define STANDALONE_STANDALONEPASSES_H
 
-#include "Standalone/StandaloneDialect.h"
-#include "Standalone/StandaloneOps.h"
+#include "Standalone/Dialect/Standalone/StandaloneDialect.h"
+#include "Standalone/Dialect/Standalone/StandaloneOps.h"
 #include "mlir/Pass/Pass.h"
 #include <memory>
 
 namespace mlir {
 namespace standalone {
 #define GEN_PASS_DECL
-#include "Standalone/StandalonePasses.h.inc"
+#include "Standalone/Dialect/Standalone/StandalonePasses.h.inc"
 
 #define GEN_PASS_REGISTRATION
-#include "Standalone/StandalonePasses.h.inc"
+#include "Standalone/Dialect/Standalone/StandalonePasses.h.inc"
 } // namespace standalone
 } // namespace mlir
 

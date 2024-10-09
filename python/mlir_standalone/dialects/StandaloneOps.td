@@ -9,6 +9,6 @@
 #ifndef PYTHON_BINDINGS_ACR_OPS
 #define PYTHON_BINDINGS_ACR_OPS
 
-include "Standalone/StandaloneOps.td"
+include "Standalone/Dialect/Standalone/StandaloneOps.td"
 
 #endif

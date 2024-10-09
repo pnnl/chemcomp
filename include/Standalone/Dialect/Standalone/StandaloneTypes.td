@@ -10,7 +10,7 @@
 #define STANDALONE_TYPES
 
 include "mlir/IR/AttrTypeBase.td"
-include "Standalone/StandaloneDialect.td"
+include "Standalone/Dialect/Standalone/StandaloneDialect.td"
 
 //===----------------------------------------------------------------------===//
 // Standalone type definitions

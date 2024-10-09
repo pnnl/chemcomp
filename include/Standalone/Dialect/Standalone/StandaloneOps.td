@@ -9,7 +9,7 @@
 #ifndef STANDALONE_OPS
 #define STANDALONE_OPS
 
-include "Standalone/StandaloneTypes.td"
+include "Standalone/Dialect/Standalone/StandaloneTypes.td"
 include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 

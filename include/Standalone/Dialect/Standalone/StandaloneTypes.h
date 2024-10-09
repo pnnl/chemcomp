@@ -12,6 +12,6 @@
 #include "mlir/IR/BuiltinTypes.h"
 
 #define GET_TYPEDEF_CLASSES
-#include "Standalone/StandaloneOpsTypes.h.inc"
+#include "Standalone/Dialect/Standalone/StandaloneOpsTypes.h.inc"
 
 #endif // STANDALONE_STANDALONETYPES_H
