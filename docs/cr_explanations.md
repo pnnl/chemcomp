@@ -58,8 +58,6 @@ The MLIR dialect you design might abstract:
 
 ### Design principles for MLIR Infrastructure
 
-### Design principles for MLIR Infrastructure
-
 When designing MLIR operations for chemical reactions, it is essential to distinguish between elements that change (inputs) and elements that remain constant (constraints). For instance, in a chemical reaction, species concentrations and reaction rates might vary, while the stoichiometry of the reaction remains fixed. This separation allows for more flexible and efficient modeling and computation.
 
 ### Example of Abstract Chemical Reaction in ChemComp
@@ -67,41 +65,49 @@ When designing MLIR operations for chemical reactions, it is essential to distin
 In ChemComp, we create a dialect for abstract chemical reactions, called `acr`. Here is an example of how a chemical reaction might be represented in MLIR using the ChemComp dialect, where species concentrations and reaction rates are inputs, and stoichiometry is integrated as a constraint:
 
 ```mlir
-acr.reaction @reaction_1(%h2: !acr.Molecule, %o2: !acr.Molecule, %rate_constant: f32) -> (!acr.Molecule) {
+// Define reaction 1: 2H2 + O2 -> 2H2O
+// Reaction 1 adjusts concentrations of H2, O2, and H2O
+acr.reaction @reaction_1(%h2: !acr.Molecule, %o2: !acr.Molecule, %h2o :!acr.Molecule, %rate_constant: f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule) {
   // Define the stoichiometry: 2H2 + O2 -> 2H2O
   %h2_stoich = acr.stoich_coeff 2 : f32
   %o2_stoich = acr.stoich_coeff 1 : f32
   %h2o_stoich = acr.stoich_coeff 2 : f32
 
-  %h2o = acr.react(%h2, %o2, %h2_stoich, %o2_stoich, %h2o_stoich, %rate_constant) : (!acr.Molecule, !acr.Molecule, f32, f32, f32, f32) -> !acr.Molecule
-  return %h2o
+  %h2_o, %o2_o, %h2o_o = acr.react(%h2, %o2, %h2o, %h2_stoich, %o2_stoich, %h2o_stoich, %rate_constant) : (!acr.Molecule, !acr.Molecule, f32, f32, f32, f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule)
+  return %h2_o, %o2_o, %h2o_o
 }
 ```
 
-A more elaborate example is related to a network of multiple reactions.
+A more elaborate example is related to a network of multiple reactions, a chemical reaction network.
 
 ```mlir
-acr.crn @reaction_network(%h2: !acr.Molecule, %o2: !acr.Molecule, %co: !acr.Molecule, %rate_1: f32, %rate_2: f32) -> (!acr.Molecule, !acr.Molecule) {
-  // Instantiate reaction 1 with the rate constant as an input
-  %h2o = acr.reaction_instance @reaction_1(%h2, %o2, %rate_1) : (!acr.Molecule, !acr.Molecule, f32) -> !acr.Molecule
 
-  // Define and instantiate reaction 2 with the rate constant as an input
-  // This can happen inside the network definition or outside, in the module that contains this crn operation
-  acr.reaction @reaction_2(%co: !acr.Molecule, %o2: !acr.Molecule, %rate_2: f32) -> (!acr.Molecule) {
-    %co_stoich = acr.stoich_coeff 1 : f32
-    %o2_stoich = acr.stoich_coeff 1 : f32
-    %co2_stoich = acr.stoich_coeff 1 : f32
+// Declare a reaction that was defined elsewhere
+acr.reaction private @reaction_1(%h2: !acr.Molecule, %o2: !acr.Molecule, %h2o :!acr.Molecule, %rate_constant: f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule)
 
-    // React with the provided rate constant
-    %co2 = acr.react(%co, %o2, %co_stoich, %o2_stoich, %co2_stoich, %rate_2) : (!acr.Molecule, !acr.Molecule, f32, f32, f32, f32) -> !acr.Molecule
-    return %co2
-  }
+acr.reaction @reaction_2(%co: !acr.Molecule, %o2: !acr.Molecule, %co2: !acr.Molecule, %rate_2: f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule) {
+  // Define reaction 2: CO + O2 -> CO2
+  // This adjusts concentrations of CO, O2, and CO2
+  %co_stoich = acr.stoich_coeff 1 : f32
+  %o2_stoich = acr.stoich_coeff 1 : f32
+  %co2_stoich = acr.stoich_coeff 1 : f32
+
+  // React with the provided rate constant, adjusting CO, O2, and CO2
+  %co_o, %o2_o, %co2_o = acr.react(%co, %o2, %co2, %co_stoich, %o2_stoich, %co2_stoich, %rate_2) : (!acr.Molecule, !acr.Molecule, !acr.Molecule, f32, f32, f32, f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule)
+  return %co_o, %o2_o, %co2_o
+}
+
+acr.crn @reaction_network(%h2: !acr.Molecule, %o2: !acr.Molecule, %co: !acr.Molecule, %h2o: !acr.Molecule, %co2: !acr.Molecule, %rate_1: f32, %rate_2: f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule, !acr.Molecule, !acr.Molecule) {
+  
+  // Instantiate reaction 1: 2H2 + O2 -> 2H2O
+  // Reaction 1 adjusts concentrations of H2, O2, and H2O
+  %h2_o, %o2_o, %h2o_o = acr.reaction_instance @reaction_1(%h2, %o2, %h2o, %rate_1) : (!acr.Molecule, !acr.Molecule, !acr.Molecule, f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule)
 
   // Instantiate reaction 2 within the network
-  %co2 = acr.reaction_instance @reaction_2(%co, %o2, %rate_2) : (!acr.Molecule, !acr.Molecule, f32) -> !acr.Molecule
+  %co_o, %o2_o_final, %co2_o = acr.reaction_instance @reaction_2(%co, %o2_o, %co2, %rate_2) : (!acr.Molecule, !acr.Molecule, !acr.Molecule, f32) -> (!acr.Molecule, !acr.Molecule, !acr.Molecule)
 
-  // Return the results of the network
-  return %h2o, %co2
+  // Return updated concentrations for all molecules: H2, O2, H2O, CO, and CO2
+  return %h2_o, %o2_o_final, %h2o_o, %co_o, %co2_o
 }
 ```
 
@@ -110,29 +116,65 @@ In this example, the `acr.crn` operation defines a network of reactions involvin
 
 ### Alternative representation
 
-Another way to use the acr.crn operation is with vectors of molecules and rate constants, which can be useful for simulating large reaction networks:
+Another way to use the `acr.crn` operation is with vectors of molecules and rate constants, which can be useful for simulating large reaction networks:
 
 ```mlir
-acr.reaction @reaction_1(%species_vec: vector<!acr.Molecule>, %rate_constant: f32) -> (vector<!acr.Molecule>) {
+
+// ----------------
+// Define reactions
+
+acr.reaction @reaction_1(%species_vec: vector<3x!acr.Molecule>, %rate_constant: f32) -> (vector<3x!acr.Molecule>) {
   // Define the stoichiometry: 2H2 + O2 -> 2H2O
-  %h2_stoich = acr.stoich_coeff 2 : f32
-  %o2_stoich = acr.stoich_coeff 1 : f32
-  %h2o_stoich = acr.stoich_coeff 2 : f32
+  %stoich_coeffs = vector.from_elements [2, 1, 2] : vector<3xf32>
 
-  %h2o = acr.react(%species_vec[0], %species_vec[1], %h2_stoich, %o2_stoich, %h2o_stoich, %rate_constant) : (!acr.Molecule, !acr.Molecule, f32, f32, f32, f32) -> !acr.Molecule
+  // Perform the reaction using the species vector and stoichiometry coefficients
+  %species_vec_out = acr.react(%species_vec, %stoich_coeffs, %rate_constant) : (vector<3x!acr.Molecule>, vector<3xf32>, f32) -> vector<3x!acr.Molecule>
 
-  // Update the species vector with the output as the last element
-    %species_vec_out = vector.update %species_vec, %h2o, 2 : vector<!acr.Molecule>, !acr.Molecule, index -> vector<!acr.Molecule>
   return %species_vec_out
 }
 
-acr.crn @reaction_network(%species_vec: vector<!acr.Molecule>, %rate_vec: vector<f32>) -> (vector<!acr.Molecule>) {
+acr.reaction @reaction_2(%subvector: vector<3x!acr.Molecule>, %rate_constant: f32) -> (vector<3x!acr.Molecule>) {
+  // Define the stoichiometry: CO + O2 -> CO2
+  %stoich_coeffs = vector.from_elements [1, 1, 1] : vector<3xf32>
+
+  // React with the provided rate constant
+  %subvector_out = acr.react(%subvector, %stoich_coeffs, %rate_constant) : (vector<3x!acr.Molecule>, vector<3xf32>, f32) -> vector<3x!acr.Molecule>
+
+  return %subvector_out
+}
+
+// ------------------------
+// Define the CRN operation
+
+acr.crn @reaction_network(%species_vec: vector<5x!acr.Molecule>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.Molecule>) {
+  // For these 5 species: H2, H2O, O2, CO, CO2 
+  // Define the stoichiometry: 2H2 + O2 -> 2H2O
+  //    and the stoichiometry: CO + O2 -> CO2
+
+  // Select the subvector for reaction 1
+  %subvector_r1 = vector.gather %species_vec, [0, 1, 2] : vector<5x!acr.Molecule>, vector<3xindex>
   // Instantiate reaction 1 with the rate constant as an input
-  %species_vec_out = acr.reaction_instance @reaction_1(%species_vec, %rate_vec[0]) : (vector<!acr.Molecule>, f32) -> vector<!acr.Molecule>
+  %subvector_r1_out = acr.reaction_instance @reaction_1(%subvector_r1, %rate_vec[0]) : (vector<3x!acr.Molecule>, f32) -> vector<3x!acr.Molecule>
+  // Update the original species vector with the output subvector
+  %species_vec_out1 = vector.scatter %species_vec, %subvector_r1_out, [0, 1, 2] : vector<5x!acr.Molecule>, vector<3x!acr.Molecule>, vector<3xindex>
+  
+  // Select the subvector for reaction 2
+  %subvector_r2 = vector.gather %species_vec_out1, [3, 1, 4] : vector<5x!acr.Molecule>, vector<3xindex>
+  // Instantiate reaction 2 with the rate constant as an input
+  %subvector_r2_out = acr.reaction_instance @reaction_2(%subvector_r2, %rate_vec[1]) : (vector<3x!acr.Molecule>, f32) -> vector<3x!acr.Molecule>
+  // Update the original species vector with the output subvector
+  %species_vec_out = vector.scatter %species_vec_out1, %subvector_r2_out, [3, 1, 4] : vector<5x!acr.Molecule>, vector<3x!acr.Molecule>, vector<3xindex>
 
   return %species_vec_out
 }
 ```
+
+### Dialect rationale
+
+The `acr` dialect operations have in their argument list elements that change and in the body elements that remain constant. For example, for a given reaction, `acr.reaction`, the species and the rate constant are arguments, while the stoichiometry is constant. This separation allows for more flexible and efficient modeling and computation.
+
+When composing mathematical expressions with chemical reactions, fine-grained operations are issued in a pattern-matching fashion. For example, the mathematical equation \( f(x) \) is a pattern that can be matched with a chemical reaction where a species represents \( f(x) \).
+
 
 
 ### Final Considerations
@@ -143,3 +185,10 @@ When building MLIR infrastructure for chemical reactions:
 - **Parallelism**: Explore how to parallelize the evaluation of large reaction networks, since many reactions might occur independently.
 
 The infrastructure could potentially integrate with external libraries for chemical informatics (e.g., RDKit, Open Babel) to handle the representation of chemical structures and reactions at a more detailed level.
+
+
+### TODO: 
+
+- Should we use tensor.insert?
+    - It returns a copy of dest with the indexed position updated to the value of scalar
+    - or tensor.scatter or tensor.gather?
