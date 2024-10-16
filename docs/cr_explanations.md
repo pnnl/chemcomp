@@ -71,8 +71,8 @@ In ChemComp, we create a dialect for abstract chemical reactions, called `acr`. 
 // Reaction 1 adjusts concentrations of H2, O2, and H2O
 acr.reaction @reaction_1(%h2: !acr.species, %o2: !acr.species, %h2o :!acr.species, %rate_constant: f32) -> (!acr.species, !acr.species, !acr.species) {
   // Define the stoichiometry: 2H2 + O2 -> 2H2O
-  %h2_stoich = acr.stoich_coeff 2 : f32
-  %o2_stoich = acr.stoich_coeff 1 : f32
+  %h2_stoich = acr.stoich_coeff -2 : f32
+  %o2_stoich = acr.stoich_coeff -1 : f32
   %h2o_stoich = acr.stoich_coeff 2 : f32
 
   %h2_o, %o2_o, %h2o_o = acr.react(%h2, %o2, %h2o, %h2_stoich, %o2_stoich, %h2o_stoich, %rate_constant) : (!acr.species, !acr.species, f32, f32, f32, f32) -> (!acr.species, !acr.species, !acr.species)
@@ -90,8 +90,8 @@ acr.reaction private @reaction_1(%h2: !acr.species, %o2: !acr.species, %h2o :!ac
 acr.reaction @reaction_2(%co: !acr.species, %o2: !acr.species, %co2: !acr.species, %rate_2: f32) -> (!acr.species, !acr.species, !acr.species) {
   // Define reaction 2: CO + O2 -> CO2
   // This adjusts concentrations of CO, O2, and CO2
-  %co_stoich = acr.stoich_coeff 1 : f32
-  %o2_stoich = acr.stoich_coeff 1 : f32
+  %co_stoich = acr.stoich_coeff -1 : f32
+  %o2_stoich = acr.stoich_coeff -1 : f32
   %co2_stoich = acr.stoich_coeff 1 : f32
 
   // React with the provided rate constant, adjusting CO, O2, and CO2
@@ -127,7 +127,7 @@ Another way to use the `acr.crn` operation is with vectors of molecules and rate
 
 acr.reaction @reaction_1(%species_vec: vector<3x!acr.species>, %rate_constant: f32) -> (vector<3x!acr.species>) {
   // Define the stoichiometry: 2H2 + O2 -> 2H2O
-  %stoich_coeffs = vector.from_elements [2, 1, -2] : vector<3xf32>
+  %stoich_coeffs = vector.from_elements [-2, -1, 2] : vector<3xf32>
 
   // Perform the reaction using the species vector and stoichiometry coefficients
   %species_vec_out = acr.react(%species_vec, %stoich_coeffs, %rate_constant) : (vector<3x!acr.species>, vector<3xf32>, f32) -> vector<3x!acr.species>
@@ -137,7 +137,7 @@ acr.reaction @reaction_1(%species_vec: vector<3x!acr.species>, %rate_constant: f
 
 acr.reaction @reaction_2(%subvector: vector<3x!acr.species>, %rate_constant: f32) -> (vector<3x!acr.species>) {
   // Define the stoichiometry: CO + O2 -> CO2
-  %stoich_coeffs = vector.from_elements [1, 1, -1] : vector<3xf32>
+  %stoich_coeffs = vector.from_elements [-1, -1, 1] : vector<3xf32>
 
   // React with the provided rate constant
   %subvector_out = acr.react(%subvector, %stoich_coeffs, %rate_constant) : (vector<3x!acr.species>, vector<3xf32>, f32) -> vector<3x!acr.species>
@@ -180,8 +180,8 @@ acr.crn_generic {stoich_matrix =
 [
     // With the following order of species:
     // H2, H2O, O2, CO, CO2 
-    [2, 1,-2, 0, 0], //2H2 + O2 -> 2H2O
-    [0, 1, 0, 1,-1]  //CO + O2 -> CO2
+    [-2,-1, 2, 0, 0], //2H2 + O2 -> 2H2O
+    [ 0,-1, 0,-1, 1]  //CO + O2 -> CO2
 ] : tensor<5x2x>
  } (%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) 
 ```
