@@ -1,0 +1,32 @@
+{
+    // Reactions are written in a list.
+    "reactions": [
+        {
+            // 2H2 + O2 -> 2H2O
+            // 2A + B -> 2C
+            "species"   : ["A", "B", "C", "D", "E"],
+            "reactants" : [2, 0, 1, 0, 0],
+            "products"  : [0, 2, 0, 0, 0],
+            "rate": 0.1,
+            "name": "R1"
+        },
+        {
+            // 2CO + O2 -> CO2
+            // 2D + C -> 2E
+            "species"   : ["A", "B", "C", "D", "E"],
+            "reactants" : [0, 0, 1, 2, 0],
+            "products"  : [0, 0, 0, 0, 2],
+            "rate": 0.05,
+            "name": "R2"
+        }
+    ],
+
+    // Initial populations
+    "populations": {
+        "A": 1, "B": 0, "C": 1, "D": 1, "E": 0
+    },
+
+    // List of species to track on the simulator, 
+    // this is the concentration that should implement our ODE
+    "tracked_species": ["O2"]
+}
