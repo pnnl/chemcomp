@@ -35,4 +35,29 @@ def ACR_CRType : ACR_Type<"CR", "cr"> {
     let assemblyFormat = "`<` $numSpecies `>`";
 }
 
+//===----------------------------------------------------------------------===//
+// ACR type definitions
+//===----------------------------------------------------------------------===//
+
+// Define the species type which encapsulates an fp32 value.
+def ACR_SpeciesType : ACR_Type<"Species", "species"> {
+  let summary = "Species type encapsulating an fp32 value";
+  let description = [{
+    Species types represent the concentration of a species in a chemical reaction.
+  }];
+  // Define a single parameter for the type, which is the fp32 value, representing species and its concentration.
+  // TODO: Should be float
+  let parameters = (ins "int":$value);
+
+  // Define the textual format of the type declaratively.
+  let assemblyFormat = "`<` $value `>`";
+
+  // Indicate that our type will add additional verification to the parameters.
+  // TODO
+  // let genVerifyDecl = 1;
+}
+
+def I32OrF32 : Type<CPred<"$_self.isInteger(32) || $_self.isF32()">,
+                    "32-bit integer or floating-point type">;
+
 #endif // ACR_TYPES
