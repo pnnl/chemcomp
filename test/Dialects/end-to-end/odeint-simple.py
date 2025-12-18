@@ -5,12 +5,6 @@
 # Extracted from: 
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
 
-import numpy as np
-import chemcomp
-import chemcomp.lang as cl
-from scipy.integrate import odeint
-import matplotlib.pyplot as plt
-
 # Example Simple ODE
 
 import numpy as np
