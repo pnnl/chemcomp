@@ -1,9 +1,11 @@
 // RUN: standalone-opt -split-input-file -verify-diagnostics %s | FileCheck %s
 
-// CHECK: func private @species_type(!acr.species) -> ()
-func.func private @species_type(!acr.species<>) -> ()
+// Verify that !acr.species parses and prints without angle brackets.
 
-//----
+// CHECK: func.func private @species_func(!acr.species)
+func.func private @species_func(!acr.species) -> ()
 
-// CHECK: func private @species_type(!acr.species) -> ()
-func.func private @vector_species_type(vector<2x!acr.species>) -> ()
+// -----
+
+// CHECK: func.func private @multi_species(%arg0: !acr.species, %arg1: !acr.species) -> !acr.species
+func.func private @multi_species(%arg0: !acr.species, %arg1: !acr.species) -> !acr.species
