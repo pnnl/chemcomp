@@ -13,6 +13,7 @@ add_mlir_dialect_library(MLIRACR
 
         LINK_LIBS PUBLIC
         MLIRIR
-        MLIRInferTypeOpInterface
+        MLIRFunctionInterfaces
+        MLIRCallInterfaces
         MLIRFuncDialect
         )
