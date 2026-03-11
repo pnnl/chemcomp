@@ -40,7 +40,7 @@ llvm_config.use_default_substitutions()
 # subdirectories contain auxiliary inputs for various tests in their parent
 # directories.
 config.excludes = ["Inputs", "Examples", "CMakeLists.txt", "README.txt", "LICENSE.txt",
-                   "Dialects/ACRN"]
+                   "ACRN", "ODE", "Transform", "translate"]
 
 # test_exec_root: The root path where tests should be run.
 config.test_exec_root = os.path.join(config.standalone_obj_root, "test")
