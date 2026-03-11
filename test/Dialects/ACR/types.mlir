@@ -7,5 +7,5 @@ func.func private @species_func(!acr.species) -> ()
 
 // -----
 
-// CHECK: func.func private @multi_species(%arg0: !acr.species, %arg1: !acr.species) -> !acr.species
+// CHECK: func.func private @multi_species(!acr.species, !acr.species) -> !acr.species
 func.func private @multi_species(%arg0: !acr.species, %arg1: !acr.species) -> !acr.species
