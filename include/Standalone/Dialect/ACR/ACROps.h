@@ -9,10 +9,13 @@
 #ifndef ACR_ACROPS_H
 #define ACR_ACROPS_H
 
+#include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpDefinition.h"
-#include "mlir/Interfaces/InferTypeOpInterface.h"
+#include "mlir/Interfaces/CallInterfaces.h"
+#include "mlir/Interfaces/ControlFlowInterfaces.h"
+#include "mlir/Interfaces/FunctionInterfaces.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
 #define GET_OP_CLASSES

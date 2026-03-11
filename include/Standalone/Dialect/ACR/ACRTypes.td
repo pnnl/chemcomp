@@ -21,43 +21,24 @@ class ACR_Type<string name, string typeMnemonic, list<Trait> traits = []>
   let mnemonic = typeMnemonic;
 }
 
-def ACR_CustomType : ACR_Type<"Custom", "custom"> {
-    let summary = "ACR custom type";
-    let description = "Custom type in acr dialect";
-    let parameters = (ins StringRefParameter<"the custom value">:$value);
-    let assemblyFormat = "`<` $value `>`";
-}
-
-def ACR_CRType : ACR_Type<"CR", "cr"> {
-    let summary = "ACR chemical reaction type";
-    let description = "Type representing the number of species in a chemical reaction";
-    let parameters = (ins "uint64_t":$numSpecies);
-    let assemblyFormat = "`<` $numSpecies `>`";
-}
-
-//===----------------------------------------------------------------------===//
-// ACR type definitions
-//===----------------------------------------------------------------------===//
-
-// Define the species type which encapsulates an fp32 value.
+// The species type represents the concentration of a chemical species.
+// It is a zero-parameter type that prints as `!acr.species`.
 def ACR_SpeciesType : ACR_Type<"Species", "species"> {
-  let summary = "Species type encapsulating an fp32 value";
+  let summary = "Type representing the concentration of a chemical species";
   let description = [{
-    Species types represent the concentration of a species in a chemical reaction.
+    The `!acr.species` type represents the dynamic concentration of a chemical
+    species in an abstract chemical reaction. Concentrations can be passed as
+    individual values or grouped into vectors for bulk operations.
+
+    Example:
+    ```mlir
+    // Single species argument
+    acr.reaction @r(%h2: !acr.species, %o2: !acr.species) -> !acr.species
+    // Vector of species
+    acr.reaction @r(%sv: vector<3x!acr.species>) -> vector<3x!acr.species>
+    ```
   }];
-  // Define a single parameter for the type, which is the fp32 value, representing species and its concentration.
-  // TODO: Should be float
-  let parameters = (ins "int":$value);
-
-  // Define the textual format of the type declaratively.
-  let assemblyFormat = "`<` $value `>`";
-
-  // Indicate that our type will add additional verification to the parameters.
-  // TODO
-  // let genVerifyDecl = 1;
+  // Zero parameters — prints as `!acr.species` with no angle brackets.
 }
-
-def I32OrF32 : Type<CPred<"$_self.isInteger(32) || $_self.isF32()">,
-                    "32-bit integer or floating-point type">;
 
 #endif // ACR_TYPES
