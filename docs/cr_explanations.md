@@ -286,9 +286,3 @@ When building MLIR infrastructure for chemical reactions:
 
 The infrastructure could potentially integrate with external libraries for chemical informatics (e.g., RDKit, Open Babel) to handle the representation of chemical structures and reactions at a more detailed level.
 
-
-### TODO: 
-
-- Should we use tensor.insert?
-    - It returns a copy of dest with the indexed position updated to the value of scalar
-    - or tensor.scatter or tensor.gather?
