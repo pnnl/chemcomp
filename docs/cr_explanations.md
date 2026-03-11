@@ -182,7 +182,7 @@ acr.crn_generic {stoich_matrix =
     // H2, H2O, O2, CO, CO2 
     [-2,-1, 2, 0, 0], //2H2 + O2 -> 2H2O
     [ 0,-1, 0,-1, 1]  //CO + O2 -> CO2
-] : tensor<5x2x>
+] : tensor<5x2xi32>
  } (%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) 
 ```
 
@@ -217,7 +217,7 @@ acr.crn @generic_network(%species_vec: vector<5x!acr.species>, %rate_vec: vector
     // H2, H2O, O2, CO, CO2 
     [2, 1,-2, 0, 0], //2H2 + O2 -> 2H2O
     [0, 1, 0, 1,-1]  //CO + O2 -> CO2
-] : tensor<5x2x>
+] : tensor<5x2xi32>
  } (%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) 
   return %species_vec_out
 }
