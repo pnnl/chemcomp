@@ -54,15 +54,15 @@ def ACR_StoichCoeffOp : ACR_Op<"stoich_coeff", [Pure]> {
 // Two calling conventions are supported (distinguished by operand types):
 //
 //  Scalar  – individual !acr.species + individual f32 stoich values + f32 rate
-//  Vector  – vector<Nx!acr.species>  + vector<Nxf32> stoich        + f32 rate
+//  Tensor  – tensor<Nx!acr.species>  + tensor<Nxf32> stoich        + f32 rate
 //
 // Example (scalar):
 //   %h2_o, %o2_o = acr.react(%h2, %o2, %hs, %os, %k)
 //       : (!acr.species, !acr.species, f32, f32, f32) -> (!acr.species, !acr.species)
 //
-// Example (vector):
+// Example (tensor):
 //   %sv_out = acr.react(%sv, %stoich, %k)
-//       : (vector<3x!acr.species>, vector<3xf32>, f32) -> vector<3x!acr.species>
+//       : (tensor<3x!acr.species>, tensor<3xf32>, f32) -> tensor<3x!acr.species>
 //===----------------------------------------------------------------------===//
 
 def ACR_ReactOp : ACR_Op<"react"> {
@@ -73,9 +73,9 @@ def ACR_ReactOp : ACR_Op<"react"> {
 
     The operation accepts either individual `!acr.species` SSA values together
     with matching individual `f32` stoichiometric coefficients and a `f32`
-    rate constant (scalar form), or a `vector<Nx!acr.species>` species vector
-    together with a `vector<Nxf32>` stoichiometry vector and a `f32` rate
-    (vector form).
+    rate constant (scalar form), or a `tensor<Nx!acr.species>` species tensor
+    together with a `tensor<Nxf32>` stoichiometry tensor and a `f32` rate
+    (tensor form).
   }];
 
   let arguments = (ins Variadic<AnyType>:$inputs);
@@ -84,6 +84,8 @@ def ACR_ReactOp : ACR_Op<"react"> {
   let assemblyFormat = [{
     `(` $inputs `)` `:` functional-type($inputs, results) attr-dict
   }];
+
+  let hasVerifier = 1;
 }
 
 //===----------------------------------------------------------------------===//
@@ -96,9 +98,13 @@ def ACR_ReactOp : ACR_Op<"react"> {
 //
 // Supports an optional `private` visibility keyword (same as func.func).
 //
-// Example (definition):
+// Example (scalar definition):
 //   acr.reaction @r1(%h2: !acr.species, %o2: !acr.species, %k: f32)
 //       -> (!acr.species, !acr.species) { ... }
+//
+// Example (tensor definition):
+//   acr.reaction @r1(%sv: tensor<3x!acr.species>, %k: f32)
+//       -> tensor<3x!acr.species> { ... }
 //
 // Example (external declaration):
 //   acr.reaction private @r1(%h2: !acr.species, %o2: !acr.species, %k: f32)
@@ -205,12 +211,19 @@ def ACR_ReactionInstanceOp : ACR_Op<"reaction_instance", [
 // A module-level, function-like operation that defines a Chemical Reaction
 // Network (CRN) by composing multiple acr.reaction_instance calls.
 //
-// Example:
+// Example (scalar):
 //   acr.crn @net(%h2: !acr.species, %o2: !acr.species, %k: f32)
 //       -> (!acr.species, !acr.species) {
 //     %h2_o, %o2_o = acr.reaction_instance @r1(%h2, %o2, %k)
 //         : (!acr.species, !acr.species, f32) -> (!acr.species, !acr.species)
-//     return %h2_o, %o2_o : !acr.species, !acr.species
+//     acr.return %h2_o, %o2_o : !acr.species, !acr.species
+//   }
+//
+// Example (tensor):
+//   acr.crn @net(%sv: tensor<3x!acr.species>, %k: f32)
+//       -> tensor<3x!acr.species> {
+//     ...
+//     acr.return %sv_out : tensor<3x!acr.species>
 //   }
 //===----------------------------------------------------------------------===//
 
@@ -258,21 +271,28 @@ def ACR_CRNOp : ACR_Op<"crn", [
 // each column is a species (reactions × species, i.e. ChemComp transposed
 // convention).
 //
-// Example (inside acr.crn body):
+// Example (tensor form, inside acr.crn body):
 //   %out = acr.crn_generic
 //       {stoich_matrix = dense<[[-2,-1,2,0,0],[0,-1,0,-1,1]]>
 //           : tensor<2x5xi32>}
 //       (%species_vec, %rate_vec) :
-//       (vector<5x!acr.species>, vector<2xf32>) -> vector<5x!acr.species>
+//       (tensor<5x!acr.species>, tensor<2xf32>) -> tensor<5x!acr.species>
+//
+// Example (scalar form):
+//   %out0, %out1, %out2 = acr.crn_generic
+//       {stoich_matrix = dense<[[-2, -1, 2], [0, -1, 1]]> : tensor<2x3xi32>}
+//       (%s0, %s1, %s2, %r0, %r1)
+//           : (!acr.species, !acr.species, !acr.species, f32, f32)
+//          -> (!acr.species, !acr.species, !acr.species)
 //===----------------------------------------------------------------------===//
 
 def ACR_CRNGenericOp : ACR_Op<"crn_generic"> {
   let summary = "Compact CRN using a stoichiometric matrix attribute";
   let description = [{
     `acr.crn_generic` encodes an entire CRN via a 2-D `stoich_matrix`
-    tensor attribute (reactions × species). It takes a vector of species
-    concentrations and a vector of rate constants as runtime arguments, and
-    returns the updated species concentrations.
+    tensor attribute (reactions × species). It takes species concentrations
+    and rate constants as runtime arguments (either as tensors or individual
+    scalars), and returns the updated species concentrations.
 
     This operation is the target of canonicalization from `acr.crn` /
     `acr.reaction_instance` chains.
@@ -285,10 +305,12 @@ def ACR_CRNGenericOp : ACR_Op<"crn_generic"> {
   // Printed as:
   //   {stoich_matrix = dense<...> : tensor<2x5xi32>}
   //       (%species_vec, %rate_vec) :
-  //       (vector<5x!acr.species>, vector<2xf32>) -> vector<5x!acr.species>
+  //       (tensor<5x!acr.species>, tensor<2xf32>) -> tensor<5x!acr.species>
   let assemblyFormat = [{
     attr-dict `(` $inputs `)` `:` functional-type($inputs, results)
   }];
+
+  let hasVerifier = 1;
 }
 
 //===----------------------------------------------------------------------===//
@@ -296,8 +318,11 @@ def ACR_CRNGenericOp : ACR_Op<"crn_generic"> {
 //
 // Terminator for acr.reaction and acr.crn region bodies.
 //
-// Example:
+// Example (scalar):
 //   acr.return %h2_o, %o2_o : !acr.species, !acr.species
+//
+// Example (tensor):
+//   acr.return %sv_out : tensor<3x!acr.species>
 //===----------------------------------------------------------------------===//
 
 def ACR_ReturnOp : ACR_Op<"return", [Pure, ReturnLike, Terminator]> {

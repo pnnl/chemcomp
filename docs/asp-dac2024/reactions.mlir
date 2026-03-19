@@ -1,3 +1,9 @@
+// DEPRECATED
+// Dialect design has substantially changed since this example was written. 
+//Please refer to the latest documentation for the current design of reactions 
+// and CRNs in the ACR dialect.
+
+
 // Define reaction 1: 2H2 + O2 -> 2H2O
 // Reaction 1 adjusts concentrations of H2, O2, and H2O
 acr.reaction @reaction_1(%h2: !acr.species, 

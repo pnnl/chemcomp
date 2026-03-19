@@ -123,3 +123,58 @@ acr.crn @generic_network(%s0: !acr.species, %s1: !acr.species, %s2: !acr.species
          -> (!acr.species, !acr.species, !acr.species)
   acr.return %out0, %out1, %out2 : !acr.species, !acr.species, !acr.species
 }
+
+// -----
+
+//===----------------------------------------------------------------------===//
+// acr.react — tensor form
+//===----------------------------------------------------------------------===//
+
+// CHECK-LABEL: func.func @test_react_tensor
+func.func @test_react_tensor(%sv: tensor<3x!acr.species>, %stoich: tensor<3xf32>,
+                              %k: f32) {
+  // CHECK: acr.react
+  // CHECK-SAME: tensor<3x!acr.species>, tensor<3xf32>, f32
+  // CHECK-SAME: -> tensor<3x!acr.species>
+  %sv_out = acr.react(%sv, %stoich, %k)
+      : (tensor<3x!acr.species>, tensor<3xf32>, f32) -> tensor<3x!acr.species>
+  return
+}
+
+// -----
+
+//===----------------------------------------------------------------------===//
+// acr.crn_generic — tensor form
+//===----------------------------------------------------------------------===//
+
+// CHECK-LABEL: acr.crn @generic_network_tensor
+acr.crn @generic_network_tensor(%sv: tensor<3x!acr.species>, %rv: tensor<2xf32>)
+    -> tensor<3x!acr.species> {
+  // CHECK: acr.crn_generic
+  // CHECK-SAME: stoich_matrix
+  // CHECK-SAME: tensor<2x3xi32>
+  // CHECK-SAME: tensor<3x!acr.species>, tensor<2xf32>
+  // CHECK-SAME: -> tensor<3x!acr.species>
+  %out = acr.crn_generic
+      {stoich_matrix = dense<[[-2, -1, 2], [0, -1, 1]]> : tensor<2x3xi32>}
+      (%sv, %rv) : (tensor<3x!acr.species>, tensor<2xf32>) -> tensor<3x!acr.species>
+  acr.return %out : tensor<3x!acr.species>
+}
+
+// -----
+
+//===----------------------------------------------------------------------===//
+// acr.reaction — tensor form definition
+//===----------------------------------------------------------------------===//
+
+// CHECK-LABEL: acr.reaction @reaction_tensor
+// CHECK-SAME: (%{{.*}}: tensor<3x!acr.species>, %{{.*}}: f32)
+acr.reaction @reaction_tensor(%sv: tensor<3x!acr.species>, %k: f32)
+    -> tensor<3x!acr.species> {
+  %stoich = arith.constant dense<[-2.0, -1.0, 2.0]> : tensor<3xf32>
+  // CHECK: acr.react
+  %sv_out = acr.react(%sv, %stoich, %k)
+      : (tensor<3x!acr.species>, tensor<3xf32>, f32) -> tensor<3x!acr.species>
+  // CHECK: acr.return
+  acr.return %sv_out : tensor<3x!acr.species>
+}

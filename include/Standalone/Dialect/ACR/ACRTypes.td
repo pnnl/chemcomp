@@ -10,6 +10,7 @@
 #define ACR_TYPES
 
 include "mlir/IR/AttrTypeBase.td"
+include "mlir/IR/BuiltinTypeInterfaces.td"
 include "Standalone/Dialect/ACR/ACRDialect.td"
 
 //===----------------------------------------------------------------------===//
@@ -28,17 +29,24 @@ def ACR_SpeciesType : ACR_Type<"Species", "species"> {
   let description = [{
     The `!acr.species` type represents the dynamic concentration of a chemical
     species in an abstract chemical reaction. Concentrations can be passed as
-    individual values or grouped into vectors for bulk operations.
+    individual values or grouped into tensors for bulk operations.
 
     Example:
     ```mlir
     // Single species argument
     acr.reaction @r(%h2: !acr.species, %o2: !acr.species) -> !acr.species
-    // Vector of species
-    acr.reaction @r(%sv: vector<3x!acr.species>) -> vector<3x!acr.species>
+    // Tensor of species
+    acr.reaction @r(%sv: tensor<3x!acr.species>) -> tensor<3x!acr.species>
     ```
   }];
   // Zero parameters — prints as `!acr.species` with no angle brackets.
 }
+
+// A 1-D ranked tensor whose element type is !acr.species.
+def ACR_SpeciesTensor : 1DTensorOf<[ACR_SpeciesType]>;
+
+// Matches either a scalar !acr.species or a 1-D tensor of species.
+def ACR_SpeciesLike : AnyTypeOf<[ACR_SpeciesType, ACR_SpeciesTensor],
+                                 "species scalar or tensor">;
 
 #endif // ACR_TYPES
