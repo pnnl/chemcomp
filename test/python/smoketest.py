@@ -10,10 +10,10 @@ with Context():
         """
     %0 = arith.constant 2 : i32
     %1 = standalone.foo %0 : i32
-    %2 = acr.foo %0 : i32
+    %2 = acr.stoich_coeff -2 : f32
     """
     )
     # CHECK: %[[C:.*]] = arith.constant 2 : i32
     # CHECK: standalone.foo %[[C]] : i32
-    # CHECK: acr.foo %[[C]] : i32
+    # CHECK: acr.stoich_coeff -2 : f32
     print(str(module))
