@@ -75,8 +75,8 @@ acr.reaction @reaction_1(%h2: !acr.species, %o2: !acr.species, %h2o :!acr.specie
   %o2_stoich = acr.stoich_coeff -1 : f32
   %h2o_stoich = acr.stoich_coeff 2 : f32
 
-  %h2_o, %o2_o, %h2o_o = acr.react(%h2, %o2, %h2o, %h2_stoich, %o2_stoich, %h2o_stoich, %rate_constant) : (!acr.species, !acr.species, f32, f32, f32, f32) -> (!acr.species, !acr.species, !acr.species)
-  return %h2_o, %o2_o, %h2o_o
+  %h2_o, %o2_o, %h2o_o = acr.react(%h2, %o2, %h2o, %h2_stoich, %o2_stoich, %h2o_stoich, %rate_constant) : (!acr.species, !acr.species, !acr.species, f32, f32, f32, f32) -> (!acr.species, !acr.species, !acr.species)
+  acr.return %h2_o, %o2_o, %h2o_o : !acr.species, !acr.species, !acr.species
 }
 ```
 
@@ -85,7 +85,7 @@ A more elaborate example is related to a network of multiple reactions, a chemic
 ```mlir
 
 // Declare a reaction that was defined elsewhere
-acr.reaction private @reaction_1(%h2: !acr.species, %o2: !acr.species, %h2o :!acr.species, %rate_constant: f32) -> (!acr.species, !acr.species, !acr.species)
+acr.reaction private @reaction_1(!acr.species, !acr.species, !acr.species, f32) -> (!acr.species, !acr.species, !acr.species)
 
 acr.reaction @reaction_2(%co: !acr.species, %o2: !acr.species, %co2: !acr.species, %rate_2: f32) -> (!acr.species, !acr.species, !acr.species) {
   // Define reaction 2: CO + O2 -> CO2
@@ -96,11 +96,11 @@ acr.reaction @reaction_2(%co: !acr.species, %o2: !acr.species, %co2: !acr.specie
 
   // React with the provided rate constant, adjusting CO, O2, and CO2
   %co_o, %o2_o, %co2_o = acr.react(%co, %o2, %co2, %co_stoich, %o2_stoich, %co2_stoich, %rate_2) : (!acr.species, !acr.species, !acr.species, f32, f32, f32, f32) -> (!acr.species, !acr.species, !acr.species)
-  return %co_o, %o2_o, %co2_o
+  acr.return %co_o, %o2_o, %co2_o : !acr.species, !acr.species, !acr.species
 }
 
 acr.crn @reaction_network(%h2: !acr.species, %o2: !acr.species, %co: !acr.species, %h2o: !acr.species, %co2: !acr.species, %rate_1: f32, %rate_2: f32) -> (!acr.species, !acr.species, !acr.species, !acr.species, !acr.species) {
-  
+
   // Instantiate reaction 1: 2H2 + O2 -> 2H2O
   // Reaction 1 adjusts concentrations of H2, O2, and H2O
   %h2_o, %o2_o, %h2o_o = acr.reaction_instance @reaction_1(%h2, %o2, %h2o, %rate_1) : (!acr.species, !acr.species, !acr.species, f32) -> (!acr.species, !acr.species, !acr.species)
@@ -109,7 +109,7 @@ acr.crn @reaction_network(%h2: !acr.species, %o2: !acr.species, %co: !acr.specie
   %co_o, %o2_o_final, %co2_o = acr.reaction_instance @reaction_2(%co, %o2_o, %co2, %rate_2) : (!acr.species, !acr.species, !acr.species, f32) -> (!acr.species, !acr.species, !acr.species)
 
   // Return updated concentrations for all molecules: H2, O2, H2O, CO, and CO2
-  return %h2_o, %o2_o_final, %h2o_o, %co_o, %co2_o
+  acr.return %h2_o, %o2_o_final, %h2o_o, %co_o, %co2_o : !acr.species, !acr.species, !acr.species, !acr.species, !acr.species
 }
 ```
 
@@ -118,56 +118,46 @@ In this example, the `acr.crn` operation defines a network of reactions involvin
 
 ### Alternative representation
 
-Another way to use the `acr.crn` operation is with vectors of molecules and rate constants, which can be useful for simulating large reaction networks:
+Another way to use the `acr.crn` operation is with tensors of molecules and rate constants, which can be useful for simulating large reaction networks:
 
 ```mlir
 
 // ----------------
 // Define reactions
 
-acr.reaction @reaction_1(%species_vec: vector<3x!acr.species>, %rate_constant: f32) -> (vector<3x!acr.species>) {
+acr.reaction @reaction_1(%species_vec: tensor<3x!acr.species>, %rate_constant: f32) -> tensor<3x!acr.species> {
   // Define the stoichiometry: 2H2 + O2 -> 2H2O
-  %stoich_coeffs = vector.from_elements [-2, -1, 2] : vector<3xf32>
+  %stoich_coeffs = arith.constant dense<[-2.0, -1.0, 2.0]> : tensor<3xf32>
 
-  // Perform the reaction using the species vector and stoichiometry coefficients
-  %species_vec_out = acr.react(%species_vec, %stoich_coeffs, %rate_constant) : (vector<3x!acr.species>, vector<3xf32>, f32) -> vector<3x!acr.species>
+  // Perform the reaction using the species tensor and stoichiometry coefficients
+  %species_vec_out = acr.react(%species_vec, %stoich_coeffs, %rate_constant) : (tensor<3x!acr.species>, tensor<3xf32>, f32) -> tensor<3x!acr.species>
 
-  return %species_vec_out
+  acr.return %species_vec_out : tensor<3x!acr.species>
 }
 
-acr.reaction @reaction_2(%subvector: vector<3x!acr.species>, %rate_constant: f32) -> (vector<3x!acr.species>) {
+acr.reaction @reaction_2(%subvector: tensor<3x!acr.species>, %rate_constant: f32) -> tensor<3x!acr.species> {
   // Define the stoichiometry: CO + O2 -> CO2
-  %stoich_coeffs = vector.from_elements [-1, -1, 1] : vector<3xf32>
+  %stoich_coeffs = arith.constant dense<[-1.0, -1.0, 1.0]> : tensor<3xf32>
 
   // React with the provided rate constant
-  %subvector_out = acr.react(%subvector, %stoich_coeffs, %rate_constant) : (vector<3x!acr.species>, vector<3xf32>, f32) -> vector<3x!acr.species>
+  %subvector_out = acr.react(%subvector, %stoich_coeffs, %rate_constant) : (tensor<3x!acr.species>, tensor<3xf32>, f32) -> tensor<3x!acr.species>
 
-  return %subvector_out
+  acr.return %subvector_out : tensor<3x!acr.species>
 }
 
 // ------------------------
-// Define the CRN operation
+// Define the CRN operation using acr.crn_generic with tensor form
 
-acr.crn @reaction_network(%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) {
-  // For these 5 species: H2, H2O, O2, CO, CO2 
-  // Define the stoichiometry: 2H2 + O2 -> 2H2O
-  //    and the stoichiometry: CO + O2 -> CO2
+acr.crn @reaction_network(%species_vec: tensor<5x!acr.species>, %rate_vec: tensor<2xf32>) -> tensor<5x!acr.species> {
+  // For these 5 species: H2, H2O, O2, CO, CO2
+  // Stoichiometric matrix encodes both reactions:
+  //   2H2 + O2 -> 2H2O  and  CO + O2 -> CO2
+  %species_vec_out = acr.crn_generic
+      {stoich_matrix = dense<[[-2, -1, 2, 0, 0], [0, -1, 0, -1, 1]]> : tensor<2x5xi32>}
+      (%species_vec, %rate_vec)
+          : (tensor<5x!acr.species>, tensor<2xf32>) -> tensor<5x!acr.species>
 
-  // Select the subvector for reaction 1
-  %subvector_r1 = vector.gather %species_vec, [0, 1, 2] : vector<5x!acr.species>, vector<3xindex>
-  // Instantiate reaction 1 with the rate constant as an input
-  %subvector_r1_out = acr.reaction_instance @reaction_1(%subvector_r1, %rate_vec[0]) : (vector<3x!acr.species>, f32) -> vector<3x!acr.species>
-  // Update the original species vector with the output subvector
-  %species_vec_out1 = vector.scatter %species_vec, %subvector_r1_out, [0, 1, 2] : vector<5x!acr.species>, vector<3x!acr.species>, vector<3xindex>
-  
-  // Select the subvector for reaction 2
-  %subvector_r2 = vector.gather %species_vec_out1, [3, 1, 4] : vector<5x!acr.species>, vector<3xindex>
-  // Instantiate reaction 2 with the rate constant as an input
-  %subvector_r2_out = acr.reaction_instance @reaction_2(%subvector_r2, %rate_vec[1]) : (vector<3x!acr.species>, f32) -> vector<3x!acr.species>
-  // Update the original species vector with the output subvector
-  %species_vec_out = vector.scatter %species_vec_out1, %subvector_r2_out, [3, 1, 4] : vector<5x!acr.species>, vector<3x!acr.species>, vector<3xindex>
-
-  return %species_vec_out
+  acr.return %species_vec_out : tensor<5x!acr.species>
 }
 ```
 
@@ -176,14 +166,15 @@ acr.crn @reaction_network(%species_vec: vector<5x!acr.species>, %rate_vec: vecto
 The internals of an `acr.crn` can be further canonicalized with an operation that more compactly represents a chemical reaction network `acr.crn_generic`. This operation takes the same inputs, but instead of defining reaction instances in its body, the operation uses a stoichiometric matrix in its attribute to represent the entire reaction network in a compact and efficient manner. The operation can then be exported to a JSON file for further analysis or integration with other tools.
 
 ```mlir
-acr.crn_generic {stoich_matrix = 
-[
-    // With the following order of species:
-    // H2, H2O, O2, CO, CO2 
-    [-2,-1, 2, 0, 0], //2H2 + O2 -> 2H2O
-    [ 0,-1, 0,-1, 1]  //CO + O2 -> CO2
-] : tensor<5x2xi32>
- } (%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) 
+%species_out = acr.crn_generic
+    {stoich_matrix = dense<[
+        // With the following order of species:
+        // H2, H2O, O2, CO, CO2
+        [-2,-1, 2, 0, 0], // 2H2 + O2 -> 2H2O
+        [ 0,-1, 0,-1, 1]  // CO + O2 -> CO2
+    ]> : tensor<2x5xi32>}
+    (%species_vec, %rate_vec)
+        : (tensor<5x!acr.species>, tensor<2xf32>) -> tensor<5x!acr.species>
 ```
 
 **Important**: Traditional CRN representations consider reactions as columns, and species as rows in the stoichiometric matrix. In ChemComp we take the transposed approach. In ChemComp `stoich_matrix` attribute has **reactions as rows**, with different **species in each column**. This representation allows for efficient composition of the stoihiometric matrix with individual species vector of `acr.reaction_instance` operations during canonicalization.
@@ -207,19 +198,20 @@ A mathematical function `f(x)` can be represented by more complex chemical proce
 
 The `acr.crn` operation can be transformed or canonicalized into a more generic form, using `acr.crn_generic` operation(s). This operation uses a stoichiometric matrix to represent the entire reaction network in a compact and efficient manner.
 
-The `acr.crn_generic` operation has an attribute that sets up the stoichiometric matrix as a tensor, where rows represent reactions and columns represent species involved in the reactions. It takes as input the vector of species (concentrations) and the vector of rates.
+The `acr.crn_generic` operation has an attribute that sets up the stoichiometric matrix as a tensor, where rows represent reactions and columns represent species involved in the reactions. It takes as input a tensor of species (concentrations) and a tensor of rates.
 
 ```mlir
-acr.crn @generic_network(%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) {
-  %species_vec_out = acr.crn_generic {stoich_matrix = 
-[
-    // With the following order of species:
-    // H2, H2O, O2, CO, CO2 
-    [2, 1,-2, 0, 0], //2H2 + O2 -> 2H2O
-    [0, 1, 0, 1,-1]  //CO + O2 -> CO2
-] : tensor<5x2xi32>
- } (%species_vec: vector<5x!acr.species>, %rate_vec: vector<2xf32>) -> (vector<5x!acr.species>) 
-  return %species_vec_out
+acr.crn @generic_network(%species_vec: tensor<5x!acr.species>, %rate_vec: tensor<2xf32>) -> tensor<5x!acr.species> {
+  %species_vec_out = acr.crn_generic
+      {stoich_matrix = dense<[
+          // With the following order of species:
+          // H2, H2O, O2, CO, CO2
+          [-2,-1, 2, 0, 0], // 2H2 + O2 -> 2H2O
+          [ 0,-1, 0,-1, 1]  // CO + O2 -> CO2
+      ]> : tensor<2x5xi32>}
+      (%species_vec, %rate_vec)
+          : (tensor<5x!acr.species>, tensor<2xf32>) -> tensor<5x!acr.species>
+  acr.return %species_vec_out : tensor<5x!acr.species>
 }
 ```
 
