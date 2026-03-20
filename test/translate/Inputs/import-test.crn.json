@@ -1,0 +1,20 @@
+{
+    "reactions": [
+        {
+            "species": ["S0", "S1", "S2"],
+            "reactants": [2, 1, 0],
+            "products": [0, 0, 2],
+            "rate": 0.1,
+            "name": "R1"
+        },
+        {
+            "species": ["S0", "S1", "S2"],
+            "reactants": [0, 1, 0],
+            "products": [0, 0, 1],
+            "rate": 0.05,
+            "name": "R2"
+        }
+    ],
+    "populations": { "S0": 1, "S1": 1, "S2": 1 },
+    "tracked_species": []
+}

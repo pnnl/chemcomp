@@ -184,16 +184,12 @@ For inspiration on how a complex tablegen MLIR dialect are implemented look into
 
 ### Ongoing tests
 
-These tests are currently being implemented and will fail on check-standalone cmake target. Make sure they match the design and that they pass by the end of the implementation.
-
 - READ /workspaces/chemical-compiler/chemcomp/test/Dialects/ACR/roundtrip.mlir
 - READ /workspaces/chemical-compiler/chemcomp/test/Dialects/ACR/types.mlir
-- READ /workspaces/chemical-compiler/chemcomp/test/Dialects/ACRN/roundtrip.mlir
+- More in the test directory
 
-## Implementing the chemical reaction dialect
+## Development
 
-- Provide a plan
-- Make sure tests in /workspaces/chemical-compiler/chemcomp/test/Dialects reflect the discussed design
-- Implement the chemical reaction dialect in the include/Standalone/Dialect/ACR directory. This will involve updating the necessary TableGen files to define the dialect, its operations, and its types. A fast way to check for compilation errors is to run `cmake --build /workspaces/chemical-compiler/builds/chemcomp/build/ --target MLIRACR` after making changes to the dialect.
-- Implement the necessary definitions in the lib/Dialect/ACR directory. This will involve implementing the logic for the dialect, its operations, and its types when need. A fast way to check for compilation errors is to run `cmake --build /workspaces/chemical-compiler/builds/chemcomp/build/ --target MLIRACR` after making changes to the implementation.
+- Updates to the the chemical reaction dialect in the include/Standalone/Dialect/ACR directory. This will involve updating the necessary TableGen files to define the dialect, its operations, and its types. A fast way to check for compilation errors is to run `cmake --build /workspaces/chemical-compiler/builds/chemcomp/build/ --target MLIRACR` after making changes to the dialect.
+- Updates to definitions in the lib/Dialect/ACR directorys will involve implementing the logic for the dialect, its operations, and its types when need. A fast way to check for compilation errors is to run `cmake --build /workspaces/chemical-compiler/builds/chemcomp/build/ --target MLIRACR` after making changes to the implementation.
 - Make sure all tests pass by running `cmake --build /workspaces/chemical-compiler/builds/chemcomp/build/ --target check-standalone`
