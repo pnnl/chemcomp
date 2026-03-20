@@ -13,10 +13,12 @@ target_link_libraries(standalone-translate
   PRIVATE
   ${dialect_libs}
   ${translation_libs}
+  MLIRACR
   MLIRIR
   MLIRParser
   MLIRPass
   MLIRSPIRVDialect
+  MLIRTargetJSON
   MLIRTranslateLib
   MLIRSupport
   )
