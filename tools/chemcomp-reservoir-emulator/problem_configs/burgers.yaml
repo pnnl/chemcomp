@@ -1,0 +1,15 @@
+# Burgers' equation (nonlinear advection + viscous diffusion)
+# u_t = -u * u_x + nu * u_xx
+
+type: pde
+name: BurgersEquation
+parameters:
+  nu: 0.01
+equation: "-u*u_x + nu*u_xx"
+x_domain: [0, 1]
+t_span: [0, 0.5]
+n_spatial: 50
+initial_condition: "sin(2*pi*x)"
+boundary_conditions:
+  left: [dirichlet, 0]
+  right: [dirichlet, 0]

@@ -1,0 +1,16 @@
+# Fisher's equation (reaction-diffusion with bistable front)
+# u_t = D*u_xx + r*u*(1-u)
+
+type: pde
+name: FisherEquation
+parameters:
+  D: 0.1
+  r: 1.0
+equation: "D*u_xx + r*u*(1 - u)"
+x_domain: [0, 1]
+t_span: [0, 5]
+n_spatial: 40
+initial_condition: "exp(-50*(x - 0.2)**2)"
+boundary_conditions:
+  left: [neumann, 0]
+  right: [neumann, 0]

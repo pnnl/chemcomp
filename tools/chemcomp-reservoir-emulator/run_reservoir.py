@@ -233,6 +233,8 @@ def main():
         epilog=__doc__,
     )
     parser.add_argument("--problem", type=str, help="Problem name (see --list-problems)")
+    parser.add_argument("--problem-file", type=str, default=None,
+                        help="Path to a YAML file defining a custom ODE/PDE problem")
     parser.add_argument("--network", type=str, help="Path to reaction network JSON")
     parser.add_argument("-o", "--output", type=str, default=None,
                         help="Output directory (default: results/<problem>_<network>_<timestamp>)")
@@ -267,13 +269,10 @@ def main():
         list_networks(config_dir)
         return
 
-    if not args.problem or not args.network:
-        parser.error("--problem and --network are required (use --list-problems / --list-networks)")
-
-    if args.problem not in PROBLEMS:
-        print(f"Unknown problem '{args.problem}'.")
-        list_problems()
-        sys.exit(1)
+    if not args.problem and not args.problem_file:
+        parser.error("--problem or --problem-file is required (use --list-problems)")
+    if not args.network:
+        parser.error("--network is required (use --list-networks)")
 
     # Resolve the network JSON path; relative paths are anchored to the project root
     network_path = Path(args.network)
@@ -290,12 +289,28 @@ def main():
     else:
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         net_stem = network_path.stem
-        outdir = script_dir / "results" / f"{args.problem}_{net_stem}_{ts}"
+        prob_name = args.problem or Path(args.problem_file).stem
+        outdir = script_dir / "results" / f"{prob_name}_{net_stem}_{ts}"
     outdir.mkdir(parents=True, exist_ok=True)
 
     # ---- Create problem ----
-    kind, factory = PROBLEMS[args.problem]
-    problem = factory()
+    if args.problem_file:
+        from chemical_reservoir.custom_problems import load_problem_from_yaml
+        prob_path = Path(args.problem_file)
+        if not prob_path.is_absolute():
+            prob_path = script_dir / prob_path
+        if not prob_path.exists():
+            print(f"Problem file not found: {prob_path}")
+            sys.exit(1)
+        problem = load_problem_from_yaml(prob_path)
+        kind = "PDE" if hasattr(problem, 'pde_func') else "ODE"
+    else:
+        if args.problem not in PROBLEMS:
+            print(f"Unknown problem '{args.problem}'.")
+            list_problems()
+            sys.exit(1)
+        kind, factory = PROBLEMS[args.problem]
+        problem = factory()
     print(f"Problem:  {problem.name}  ({kind})")
     print(f"Network:  {network_path.name}")
     print(f"Output:   {outdir}")

@@ -1,0 +1,14 @@
+# Van der Pol oscillator
+# dx/dt = v
+# dv/dt = mu*(1 - x^2)*v - x
+
+type: ode
+name: VanDerPol
+variables: [x, v]
+parameters:
+  mu: 1.5
+equations:
+  - "v"
+  - "mu*(1 - x**2)*v - x"
+initial_conditions: [2.0, 0.0]
+t_span: [0, 20]

@@ -1,0 +1,18 @@
+# Lorenz chaotic system
+# dx/dt = sigma*(y - x)
+# dy/dt = x*(rho - z) - y
+# dz/dt = x*y - beta*z
+
+type: ode
+name: Lorenz
+variables: [x, y, z]
+parameters:
+  sigma: 10.0
+  rho: 28.0
+  beta: 2.6667
+equations:
+  - "sigma*(y - x)"
+  - "x*(rho - z) - y"
+  - "x*y - beta*z"
+initial_conditions: [1.0, 1.0, 1.0]
+t_span: [0, 10]

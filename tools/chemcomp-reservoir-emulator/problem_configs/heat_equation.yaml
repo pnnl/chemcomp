@@ -1,0 +1,15 @@
+# 1D Heat equation
+# u_t = D * u_xx
+
+type: pde
+name: HeatEquation
+parameters:
+  D: 0.1
+equation: "D*u_xx"
+x_domain: [0, 1]
+t_span: [0, 2]
+n_spatial: 30
+initial_condition: "sin(pi*x)"
+boundary_conditions:
+  left: [dirichlet, 0]
+  right: [dirichlet, 0]

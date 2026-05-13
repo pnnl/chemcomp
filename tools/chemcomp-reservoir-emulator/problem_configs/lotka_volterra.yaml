@@ -1,0 +1,17 @@
+# Lotka-Volterra predator-prey model
+# dprey/dt = alpha*prey - beta*prey*predator
+# dpredator/dt = delta*prey*predator - gamma*predator
+
+type: ode
+name: LotkaVolterra
+variables: [prey, predator]
+parameters:
+  alpha: 1.1
+  beta: 0.4
+  gamma: 0.4
+  delta: 0.1
+equations:
+  - "alpha*prey - beta*prey*predator"
+  - "delta*prey*predator - gamma*predator"
+initial_conditions: [10.0, 5.0]
+t_span: [0, 15]

@@ -183,8 +183,8 @@ python -c "import chemical_reservoir; print(chemical_reservoir.__version__)"
 ### Dependencies
 
 numpy ≥ 1.21, scipy ≥ 1.7, scikit-learn ≥ 1.0, matplotlib ≥ 3.4,
-networkx ≥ 2.6, pandas ≥ 1.3.  The `[notebooks]` extra adds JupyterLab and
-ipywidgets.
+networkx ≥ 2.6, pandas ≥ 1.3, sympy ≥ 1.10, pyyaml ≥ 6.0.  The `[notebooks]`
+extra adds JupyterLab and ipywidgets.
 
 ---
 
@@ -236,6 +236,9 @@ python run_reservoir.py --problem vanderpol --network network_configs/cascade.js
 # Solve a PDE (open-loop is automatic for PDEs)
 python run_reservoir.py --problem heat_equation --network network_configs/dense.json -o my_results
 
+# Use a custom problem defined in a YAML file
+python run_reservoir.py --problem-file problem_configs/lorenz.yaml --network network_configs/cascade.json
+
 # List all available problems and networks
 python run_reservoir.py --list-problems
 python run_reservoir.py --list-networks
@@ -245,7 +248,8 @@ python run_reservoir.py --list-networks
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--problem` | *(required)* | Problem name (see `--list-problems`) |
+| `--problem` | — | Built-in problem name (see `--list-problems`) |
+| `--problem-file` | — | Path to a YAML file defining a custom ODE/PDE |
 | `--network` | *(required)* | Path to a reaction-network JSON file |
 | `-o` / `--output` | `results/<problem>_<network>_<timestamp>/` | Output directory |
 | `--n-train` | 800 | Number of training time-points |
@@ -254,6 +258,60 @@ python run_reservoir.py --list-networks
 | `--features` | `delayed` | Feature expansion: `none`, `quadratic`, `delayed` |
 | `--mode` | `closed-loop` | Prediction mode: `open-loop` or `closed-loop` |
 | `--feedback-scale` | `0.5` | Output-to-input feedback strength (closed-loop only) |
+
+### Custom problem files (YAML + SymPy)
+
+Instead of using built-in problems, you can define your own ODE or PDE in a
+YAML file.  Equations are written as SymPy-compatible expressions and parsed
+at load time.
+
+**ODE example** (`problem_configs/lotka_volterra.yaml`):
+
+```yaml
+type: ode
+name: LotkaVolterra
+variables: [prey, predator]
+parameters:
+  alpha: 1.1
+  beta: 0.4
+  gamma: 0.4
+  delta: 0.1
+equations:
+  - "alpha*prey - beta*prey*predator"
+  - "delta*prey*predator - gamma*predator"
+initial_conditions: [10.0, 5.0]
+t_span: [0, 15]
+```
+
+**PDE example** (`problem_configs/burgers.yaml`):
+
+```yaml
+type: pde
+name: BurgersEquation
+parameters:
+  nu: 0.01
+equation: "-u*u_x + nu*u_xx"
+x_domain: [0, 1]
+t_span: [0, 0.5]
+n_spatial: 50
+initial_condition: "sin(2*pi*x)"
+boundary_conditions:
+  left: [dirichlet, 0]
+  right: [dirichlet, 0]
+```
+
+**Supported expression features:** standard arithmetic (`+`, `-`, `*`, `/`,
+`**`), functions (`sin`, `cos`, `exp`, `log`, `sqrt`, `tanh`, `abs`),
+constants (`pi`, `e`), and implicit multiplication (`2x` → `2*x`).
+
+**Python API:**
+
+```python
+from chemical_reservoir.custom_problems import load_problem_from_yaml
+
+problem = load_problem_from_yaml("problem_configs/lorenz.yaml")
+results = reservoir.solve_ode_closed_loop(problem, n_train=400, n_test=200)
+```
 
 ---
 
@@ -270,6 +328,7 @@ chemcomp-emulation/
 │   ├── __init__.py               # Public API & version (1.0.0)
 │   ├── config.py                 # OutputConfig dataclass
 │   ├── constraints.py            # Physical & measurement constraints
+│   ├── custom_problems.py        # YAML + SymPy problem loader
 │   ├── io.py                     # JSON load / save / validation for networks
 │   ├── metrics.py                # RMSE, R², MAE, correlation metrics
 │   ├── networks.py               # Built-in reaction network definitions
@@ -292,6 +351,13 @@ chemcomp-emulation/
 │   ├── multisubnet_n{4,6,8,10,12}_*.json
 │   ├── oscillatory.json
 │   └── simple_autocatalytic.json
+├── problem_configs/              # YAML custom problem definitions
+│   ├── vanderpol.yaml
+│   ├── lorenz.yaml
+│   ├── lotka_volterra.yaml
+│   ├── heat_equation.yaml
+│   ├── burgers.yaml
+│   └── fisher.yaml
 ├── notebooks/                    # Tutorial & demonstration notebooks
 │   ├── 01_mathematical_foundations.ipynb
 │   ├── 02_quickstart_tutorial.ipynb
