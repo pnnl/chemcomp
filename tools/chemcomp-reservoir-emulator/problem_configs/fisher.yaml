@@ -3,6 +3,7 @@
 
 type: pde
 name: FisherEquation
+variables: [u]
 parameters:
   D: 0.1
   r: 1.0

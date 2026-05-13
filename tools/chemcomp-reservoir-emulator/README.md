@@ -288,6 +288,7 @@ t_span: [0, 15]
 ```yaml
 type: pde
 name: BurgersEquation
+variables: [u]
 parameters:
   nu: 0.01
 equation: "-u*u_x + nu*u_xx"

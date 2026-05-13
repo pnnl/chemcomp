@@ -3,6 +3,7 @@
 
 type: pde
 name: HeatEquation
+variables: [u]
 parameters:
   D: 0.1
 equation: "D*u_xx"
