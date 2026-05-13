@@ -4,16 +4,15 @@ The emulation module of the **ChemComp** software package. Solves ordinary and
 partial differential equations using chemical reaction networks as a reservoir
 computing substrate.
 
-A chemical reaction network is driven by an external input signal derived from
-the target ODE/PDE solution.  The resulting species concentrations evolve
-according to mass-action kinetics, producing rich, nonlinear dynamics.  A
-ridge-regression readout layer is then trained on the recorded concentration
-trajectories to map reservoir state back to the target solution — including
-forecasting into unseen time intervals.
-
 ---
 
-## How it works
+## Algorithm overview
+
+The emulator exploits the rich nonlinear dynamics of chemical reaction networks
+(CRNs) to approximate the solutions of differential equations without
+traditional numerical integration of the target system during prediction.
+
+### Pipeline
 
 ```
                 ┌──────────────────┐
@@ -43,15 +42,116 @@ forecasting into unseen time intervals.
                Predicted ODE/PDE solution
 ```
 
-| Concept | Description |
-|---------|-------------|
-| **Reservoir** | A chemical reaction network whose mass-action kinetics generate nonlinear, high-dimensional dynamics from a low-dimensional input signal. |
-| **Input encoding** | The target solution is encoded into species production rates.  Four modes are available: `constant`, `sinusoidal`, `mixed` (default), and `multiharmonic` (8 harmonics). |
-| **Feature expansion** | Raw reservoir concentrations can be augmented before readout: `none` (concentrations only), `quadratic` (all pairwise cross-terms), or `delayed` (time-delay embedding with delays [1, 2, 4, 8] — recommended for generalisation). |
-| **Readout** | A cross-validated ridge regression (`sklearn.linear_model.RidgeCV`) maps features to the target solution. |
-| **Prediction mode** | **Open-loop**: encoding drives the reservoir over the full time domain; predictions in one pass. **Closed-loop** (default): training uses teacher forcing; testing feeds predicted outputs back to modulate the encoding, enabling autonomous attractor tracking. |
-| **Bayesian optimisation** | Gaussian-process–based search over input rates and initial concentrations to tune reservoir performance. |
-| **Sensitivity analysis** | Perturbation studies over concentrations, input rates, measurement sets, and local kinetic parameters. |
+### Step-by-step
+
+1. **Target generation** — The true ODE/PDE solution is computed on a training
+   time interval using `scipy.integrate.solve_ivp` (ODEs) or the method of
+   lines with finite differences (PDEs).
+
+2. **Input encoding** — The known solution is encoded into time-varying species
+   production rates that externally drive the CRN.  Four encoding strategies
+   are available:
+   - `constant` — uniform injection rate
+   - `sinusoidal` — harmonic modulation of rates
+   - `mixed` (default) — combination of constant and sinusoidal components
+   - `multiharmonic` — 8 Fourier harmonics for richer spectral content
+
+3. **Reservoir dynamics** — The CRN is numerically integrated under mass-action
+   kinetics.  Each species concentration c_i(t) evolves according to:
+
+       dc_i/dt = Σ_j ν_ij · k_j · ∏_l c_l^α_lj  +  S_i(t)
+
+   where ν_ij are stoichiometric coefficients, k_j are rate constants, and
+   S_i(t) is the external input encoding.  The resulting concentration
+   trajectories form a high-dimensional, nonlinear expansion of the input
+   signal — this is the reservoir state matrix.
+
+4. **Feature expansion** — The raw concentration time series can optionally be
+   augmented:
+   - `none` — use concentrations directly
+   - `quadratic` — append all pairwise cross-products c_i · c_j
+   - `delayed` (recommended) — append time-shifted copies at delays [1, 2, 4, 8]
+
+5. **Readout training** — A ridge regression (`sklearn.linear_model.RidgeCV`)
+   maps the feature matrix to the target solution values over the training
+   window.  The regularisation parameter α is selected by leave-one-out
+   cross-validation over 50 log-spaced candidates.
+
+6. **Prediction** — The trained readout is applied to reservoir features on the
+   test time interval to produce predictions of the ODE/PDE solution.
+
+### Open-loop vs. closed-loop prediction
+
+The emulator supports two fundamentally different prediction strategies:
+
+#### Open-loop (`solve_ode` / `solve_pde`)
+
+In open-loop mode the full input encoding is pre-computed and used to drive the
+reservoir over **both** training and test intervals in a single forward pass.
+The readout then maps reservoir states to the target solution.
+
+```
+  Known solution ──▶ encode full [0, T] ──▶ integrate CRN ──▶ readout
+```
+
+**Characteristics:**
+- No feedback — the reservoir never sees its own predictions.
+- The input signal for the test interval must still be derived from the true
+  solution (or an approximation of it), so open-loop mode is best suited to
+  **interpolation** or problems where the driving signal is known ahead of time
+  (e.g., PDEs solved via method of lines where spatial modes are known).
+- Numerically stable regardless of prediction quality.
+- Typically achieves high accuracy for smooth, periodic systems and PDEs.
+
+#### Closed-loop (`solve_ode_closed_loop`)
+
+In closed-loop mode the reservoir is trained using **teacher forcing** (the
+true solution drives the encoding during training).  At test time the true
+solution is no longer available — instead, the reservoir's own predicted
+outputs are fed back to modulate the input encoding at each time step:
+
+```
+  Training:  true y(t) ──▶ encode ──▶ CRN ──▶ readout ──▶ train weights
+
+  Testing:   ŷ(t) ──▶ encode ──▶ CRN ──▶ readout ──▶ ŷ(t+Δt) ──┐
+              ▲                                                    │
+              └────────────────── feedback ─────────────────────────┘
+```
+
+**Characteristics:**
+- Enables **autonomous prediction** beyond the training window — the
+  reservoir generates its own driving signal, making it suitable for
+  forecasting chaotic attractors (e.g., Lorenz system).
+- A `feedback_scale` parameter (default 0.5) controls how strongly the
+  predicted output modulates the input rates.
+- More susceptible to error accumulation — small prediction errors are fed
+  back and can amplify over time.
+- Best suited for **oscillatory** and **chaotic** ODE systems where the
+  attractor structure constrains the dynamics.
+
+#### When to use which
+
+| Scenario | Recommended mode |
+|----------|-----------------|
+| PDE solutions (heat, advection, Burgers, Fisher) | Open-loop |
+| Periodic ODEs with known forcing | Open-loop |
+| Autonomous ODE forecasting (no future forcing data) | Closed-loop |
+| Chaotic attractors (Lorenz) | Closed-loop |
+| Limit cycles (Van der Pol, Brusselator) | Closed-loop |
+
+### Multi-subnetwork architecture
+
+For challenging problems (high-dimensional chaotic systems, steep PDE
+gradients), the emulator supports a **multi-subnetwork** architecture:
+
+- Multiple weakly-coupled Brusselator modules share a common fuel species.
+- Inter-module **leakage** with a tunable rate allows information flow between
+  subnetworks without tight coupling.
+- A constant **fuel feed** drives all modules, mimicking an open reactor.
+- Scaling studies show that 4–6 subnetworks at standard complexity provides
+  the best trade-off between expressiveness and trainability.
+
+Network generators in `scripts/` produce these architectures parametrically.
 
 ---
 
@@ -127,13 +227,13 @@ The `run_reservoir.py` script provides a one-command interface that runs a
 problem, generates plots, and saves all outputs to a timestamped directory:
 
 ```bash
-# Solve the Van der Pol oscillator with the cascade network
+# Solve the Van der Pol oscillator with the cascade network (closed-loop)
 python run_reservoir.py --problem vanderpol --network network_configs/cascade.json
 
-# Use open-loop mode instead of the default closed-loop
+# Use open-loop mode instead
 python run_reservoir.py --problem vanderpol --network network_configs/cascade.json --mode open-loop
 
-# Solve a PDE with a custom output directory
+# Solve a PDE (open-loop is automatic for PDEs)
 python run_reservoir.py --problem heat_equation --network network_configs/dense.json -o my_results
 
 # List all available problems and networks
@@ -155,49 +255,55 @@ python run_reservoir.py --list-networks
 | `--mode` | `closed-loop` | Prediction mode: `open-loop` or `closed-loop` |
 | `--feedback-scale` | `0.5` | Output-to-input feedback strength (closed-loop only) |
 
-**Outputs saved:** `prediction_overlay.pdf/.png`, `error_over_time.pdf`,
-`phase_portrait.pdf` (2-D+ ODEs), `pde_comparison.pdf/.png` (PDEs),
-`reservoir_trajectories.pdf`, `reaction_network*.pdf`, `metrics.json`,
-`reservoir_params.json`, `network_config.json`.
-
 ---
 
 ## Project structure
 
 ```
-chemical_reservoir/
-├── pyproject.toml            # Package metadata & build config (BSD-3-Clause)
-├── environment.yml           # Conda environment specification (chemcomp)
+chemcomp-emulation/
+├── pyproject.toml                # Package metadata & build config (BSD-3-Clause)
+├── environment.yml               # Conda environment (chemcomp)
 ├── README.md
-├── run_reservoir.py          # CLI driver script (see above)
-├── chemical_reservoir/       # Installable Python package
-│   ├── __init__.py           # Public API & version (1.0.0)
-│   ├── config.py             # OutputConfig dataclass
-│   ├── constraints.py        # Physical & measurement constraints
-│   ├── io.py                 # JSON load / save / validation for networks
-│   ├── metrics.py            # RMSE, R², MAE, correlation metrics
-│   ├── networks.py           # Built-in reaction network definitions
-│   ├── network_viz.py        # Bipartite reaction-network graph visualisation
-│   ├── optimization.py       # Bayesian optimiser (GP + acquisition functions)
-│   ├── problems.py           # ODE & PDE problem dataclasses and factories
-│   ├── reservoir.py          # ConstrainedChemicalReservoir (core engine)
-│   ├── run_analysis.py       # High-level analysis pipelines
-│   ├── sensitivity.py        # Sensitivity & perturbation analysis
-│   └── visualization.py      # Multi-panel result dashboards
-├── network_configs/          # JSON reaction-network definitions
+├── LICENSE
+├── run_reservoir.py              # CLI driver script
+├── chemical_reservoir/           # Installable Python package
+│   ├── __init__.py               # Public API & version (1.0.0)
+│   ├── config.py                 # OutputConfig dataclass
+│   ├── constraints.py            # Physical & measurement constraints
+│   ├── io.py                     # JSON load / save / validation for networks
+│   ├── metrics.py                # RMSE, R², MAE, correlation metrics
+│   ├── networks.py               # Built-in reaction network definitions
+│   ├── network_viz.py            # Bipartite reaction-network graph visualisation
+│   ├── optimization.py           # Bayesian optimiser (GP + acquisition functions)
+│   ├── problems.py               # ODE & PDE problem dataclasses and factories
+│   ├── reservoir.py              # ConstrainedChemicalReservoir (core engine)
+│   ├── run_analysis.py           # High-level analysis pipelines
+│   ├── sensitivity.py            # Sensitivity & perturbation analysis
+│   └── visualization.py          # Multi-panel result dashboards
+├── network_configs/              # JSON reaction-network definitions (18 networks)
 │   ├── cascade.json
+│   ├── complex_pathways.json
+│   ├── dense.json
+│   ├── feedback.json
 │   ├── high_dimensional_random.json
+│   ├── linear_chain.json
 │   ├── minimal.json
-│   └── ...  (9 networks total)
-├── notebooks/                # Tutorial & demonstration notebooks
+│   ├── multi_subnet_leaky.json
+│   ├── multisubnet_n{4,6,8,10,12}_*.json
+│   ├── oscillatory.json
+│   └── simple_autocatalytic.json
+├── notebooks/                    # Tutorial & demonstration notebooks
 │   ├── 01_mathematical_foundations.ipynb
 │   ├── 02_quickstart_tutorial.ipynb
 │   ├── 03_advanced_examples.ipynb
 │   ├── 04_api_reference.ipynb
 │   └── 05_open_vs_closed_loop.ipynb
-├── scripts/                  # Utility scripts
-│   └── gen_highdim_network.py
-└── tests/                    # Pytest test suite (9 tests)
+├── scripts/                      # Network generation utilities
+│   ├── gen_highdim_network.py          # 20-species random Brusselator network
+│   ├── gen_multisubnet_network.py      # 6-subnet leaky architecture
+│   ├── gen_parameterized_network.py    # Parameterised width/depth generator
+│   └── gen_pde_figures.py              # PDE comparison figure generation
+└── tests/                        # Pytest test suite (9 tests)
     └── test_basic.py
 ```
 
@@ -218,14 +324,15 @@ chemical_reservoir/
 ### PDE problems (1-D, method of lines)
 
 PDEs are semi-discretised in space onto a 1-D grid and solved as a coupled
-ODE system.
+ODE system.  The reservoir observes the full spatiotemporal field and the
+readout reconstructs the solution at each grid point.
 
-| Problem | Factory function | Type |
-|---------|-----------------|------|
-| Heat equation | `create_heat_equation_problem()` | Parabolic diffusion |
-| Advection–diffusion | `create_advection_diffusion_problem()` | Parabolic transport |
-| Fisher equation | `create_fisher_equation_problem()` | Reaction–diffusion |
-| Burgers equation | `create_burgers_equation_problem()` | Nonlinear hyperbolic |
+| Problem | Factory function | Type | Key physics |
+|---------|-----------------|------|-------------|
+| Heat equation | `create_heat_equation_problem()` | Parabolic | Diffusive decay |
+| Advection–diffusion | `create_advection_diffusion_problem()` | Parabolic | Traveling wave + dispersion |
+| Fisher equation | `create_fisher_equation_problem()` | Reaction–diffusion | Propagating front |
+| Burgers equation | `create_burgers_equation_problem()` | Nonlinear hyperbolic | Shock/steep gradient formation |
 
 ---
 
@@ -233,8 +340,7 @@ ODE system.
 
 ### Built-in networks (defined in code)
 
-These are available via `chemical_reservoir.networks.list_builtin_networks()` and
-can be instantiated without a JSON file.
+Available via `chemical_reservoir.networks.list_builtin_networks()`.
 
 | Network | Species | Reactions | Topology |
 |---------|---------|-----------|----------|
@@ -247,22 +353,26 @@ can be instantiated without a JSON file.
 | `dense` | 5 | 12 | Highly connected topology |
 | `complex_pathways` | 5 | 10 | Parallel reaction pathways |
 
-### High-dimensional network (JSON only)
+### High-dimensional and multi-subnetwork networks (JSON)
 
 | Network | Species | Reactions | Description |
 |---------|---------|-----------|-------------|
-| `high_dimensional_random` | 20 | 50 | 5 coupled Brusselator oscillator modules with weak inter-module coupling.  Produces limit-cycle dynamics well-suited for challenging problems like the Van der Pol oscillator. |
+| `high_dimensional_random` | 20 | 50 | 5 coupled Brusselator modules |
+| `multi_subnet_leaky` | 25 | 78 | 6 Brusselator modules + leakage + fuel |
+| `multisubnet_n4_standard` | 17 | 52 | 4 modules, standard complexity |
+| `multisubnet_n6_high` | 31 | 114 | 6 modules, high complexity (extra intermediates) |
+| `multisubnet_n10_high` | 51 | 190 | 10 modules, high complexity |
+| `multisubnet_n12_standard` | 49 | 156 | 12 modules, standard complexity |
 
 All networks are stored as JSON in `network_configs/` and loaded via
-`cr.io.load_reservoir_from_json()`.  You can also define your own network by
-writing a JSON file with the same schema (see the notebooks for examples).
+`cr.io.load_reservoir_from_json()`.  Custom networks can be defined by writing
+a JSON file with the same schema (see the notebooks for examples).
 
 ---
 
 ## Notebooks
 
-The `notebooks/` directory contains four Jupyter notebooks that progress from
-theory to advanced usage:
+Five Jupyter notebooks progress from theory to advanced usage:
 
 1. **Mathematical Foundations** — Reservoir computing theory, mass-action
    kinetics, ridge regression, and how they fit together.
@@ -272,6 +382,9 @@ theory to advanced usage:
    analysis, custom network design, and horizon comparison.
 4. **API Reference** — Class-by-class walkthrough with code examples for every
    public component.
+5. **Open vs. Closed Loop** — Systematic comparison of prediction modes across
+   all ODE/PDE problems, multi-subnetwork scaling study, and training
+   efficiency analysis.
 
 ---
 
