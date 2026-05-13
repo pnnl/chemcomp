@@ -47,3 +47,6 @@ Thumbs.db
 notebooks/my_results/
 notebooks/test_results/
 test_results_*/
+
+# Manuscript
+Manuscript/
