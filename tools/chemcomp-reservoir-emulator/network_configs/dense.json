@@ -1,0 +1,196 @@
+{
+  "name": "dense",
+  "description": "Built-in dense reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        2,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.9
+    },
+    {
+      "species": [
+        "C",
+        "D"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.8
+    },
+    {
+      "species": [
+        "D",
+        "E"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.7
+    },
+    {
+      "species": [
+        "E",
+        "A"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.6
+    },
+    {
+      "species": [
+        "A",
+        "C"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.5
+    },
+    {
+      "species": [
+        "B",
+        "D"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.4
+    },
+    {
+      "species": [
+        "C",
+        "E"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.3
+    },
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        2,
+        0
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.09
+    },
+    {
+      "species": [
+        "C",
+        "D"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.08
+    },
+    {
+      "species": [
+        "D",
+        "E"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.07
+    }
+  ],
+  "input_channels": [
+    "A",
+    "B"
+  ],
+  "output_channels": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ]
+}

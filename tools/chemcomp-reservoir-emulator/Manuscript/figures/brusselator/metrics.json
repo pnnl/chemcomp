@@ -1,0 +1,19 @@
+{
+  "problem": "Brusselator",
+  "network": "high_dimensional_random",
+  "n_train": 1600,
+  "n_test": 800,
+  "encoding": "mixed",
+  "feature_expansion": "delayed",
+  "mode": "closed-loop",
+  "feedback_scale": 0.5,
+  "n_species": 20,
+  "n_reactions": 50,
+  "n_features": 100,
+  "ridge_alpha": 2.329951810515367,
+  "train_rmse": 0.26150204588049447,
+  "test_rmse": 1.0024820071808156,
+  "test_r2": 0.5333499013941181,
+  "train_mae": 0.17595017100925234,
+  "test_mae": 0.8124682283809713
+}

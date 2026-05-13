@@ -1,0 +1,105 @@
+{
+  "name": "simple_autocatalytic",
+  "description": "Built-in simple_autocatalytic reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        2,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.8
+    },
+    {
+      "species": [
+        "C",
+        "A"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.6
+    },
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        2,
+        0
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.08
+    },
+    {
+      "species": [
+        "C",
+        "A"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.06
+    }
+  ],
+  "input_channels": [
+    "A",
+    "B"
+  ],
+  "output_channels": [
+    "A",
+    "B",
+    "C"
+  ]
+}

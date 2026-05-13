@@ -1,0 +1,135 @@
+{
+  "name": "linear_chain",
+  "description": "Built-in linear_chain reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.9
+    },
+    {
+      "species": [
+        "C",
+        "D"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.8
+    },
+    {
+      "species": [
+        "D",
+        "E"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.7
+    },
+    {
+      "species": [
+        "B",
+        "A"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "C",
+        "B"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.09
+    },
+    {
+      "species": [
+        "D",
+        "C"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.08
+    },
+    {
+      "species": [
+        "E",
+        "D"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.07
+    }
+  ],
+  "input_channels": [
+    "A"
+  ],
+  "output_channels": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ]
+}

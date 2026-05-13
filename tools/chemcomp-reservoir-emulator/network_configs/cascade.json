@@ -1,0 +1,151 @@
+{
+  "name": "cascade",
+  "description": "Built-in cascade reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        2,
+        0
+      ],
+      "rate": 1.2
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.9
+    },
+    {
+      "species": [
+        "C",
+        "A"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 0.7
+    },
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        2,
+        0
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.15
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.12
+    },
+    {
+      "species": [
+        "C",
+        "A"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.09
+    },
+    {
+      "species": [
+        "A",
+        "D"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.4
+    },
+    {
+      "species": [
+        "D",
+        "E"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.35
+    },
+    {
+      "species": [
+        "E",
+        "B"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.3
+    }
+  ],
+  "input_channels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "output_channels": [
+    "A",
+    "B",
+    "D"
+  ]
+}

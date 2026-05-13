@@ -1,0 +1,815 @@
+{
+  "name": "high_dimensional_random",
+  "description": "High-dimensional Brusselator network (20 species, 50 reactions) with 5 coupled oscillator modules for reservoir computing",
+  "reactions": [
+    {
+      "species": [
+        "X1"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X1",
+        "Y1"
+      ],
+      "reactants": [
+        2,
+        1
+      ],
+      "products": [
+        3,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B1",
+        "X1",
+        "Y1",
+        "D1"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X1",
+        "D1"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B1"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 6.0
+    },
+    {
+      "species": [
+        "B1"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 2.0
+    },
+    {
+      "species": [
+        "D1",
+        "B1"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "D1"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 0.05
+    },
+    {
+      "species": [
+        "X2"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X2",
+        "Y2"
+      ],
+      "reactants": [
+        2,
+        1
+      ],
+      "products": [
+        3,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B2",
+        "X2",
+        "Y2",
+        "D2"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X2",
+        "D2"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B2"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 5.0
+    },
+    {
+      "species": [
+        "B2"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 2.0
+    },
+    {
+      "species": [
+        "D2",
+        "B2"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "D2"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 0.05
+    },
+    {
+      "species": [
+        "X3"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 0.8
+    },
+    {
+      "species": [
+        "X3",
+        "Y3"
+      ],
+      "reactants": [
+        2,
+        1
+      ],
+      "products": [
+        3,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B3",
+        "X3",
+        "Y3",
+        "D3"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X3",
+        "D3"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B3"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 5.0
+    },
+    {
+      "species": [
+        "B3"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 2.0
+    },
+    {
+      "species": [
+        "D3",
+        "B3"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "D3"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 0.05
+    },
+    {
+      "species": [
+        "X4"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 1.2
+    },
+    {
+      "species": [
+        "X4",
+        "Y4"
+      ],
+      "reactants": [
+        2,
+        1
+      ],
+      "products": [
+        3,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B4",
+        "X4",
+        "Y4",
+        "D4"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X4",
+        "D4"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B4"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 7.0
+    },
+    {
+      "species": [
+        "B4"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 2.0
+    },
+    {
+      "species": [
+        "D4",
+        "B4"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "D4"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 0.05
+    },
+    {
+      "species": [
+        "X5"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 0.6
+    },
+    {
+      "species": [
+        "X5",
+        "Y5"
+      ],
+      "reactants": [
+        2,
+        1
+      ],
+      "products": [
+        3,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B5",
+        "X5",
+        "Y5",
+        "D5"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X5",
+        "D5"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B5"
+      ],
+      "reactants": [
+        0
+      ],
+      "products": [
+        1
+      ],
+      "rate": 4.0
+    },
+    {
+      "species": [
+        "B5"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 2.0
+    },
+    {
+      "species": [
+        "D5",
+        "B5"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.1
+    },
+    {
+      "species": [
+        "D5"
+      ],
+      "reactants": [
+        1
+      ],
+      "products": [
+        0
+      ],
+      "rate": 0.05
+    },
+    {
+      "species": [
+        "Y1",
+        "X2",
+        "X1",
+        "Y2"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.023745
+    },
+    {
+      "species": [
+        "Y2",
+        "X3",
+        "X2",
+        "Y3"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.029507
+    },
+    {
+      "species": [
+        "Y3",
+        "X4",
+        "X3",
+        "Y4"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.02732
+    },
+    {
+      "species": [
+        "Y4",
+        "X5",
+        "X4",
+        "Y5"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.025987
+    },
+    {
+      "species": [
+        "Y5",
+        "X1",
+        "X5",
+        "Y1"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.02156
+    },
+    {
+      "species": [
+        "X1",
+        "Y3",
+        "Y1",
+        "X3"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.01078
+    },
+    {
+      "species": [
+        "X2",
+        "Y4",
+        "Y2",
+        "X4"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.01029
+    },
+    {
+      "species": [
+        "X3",
+        "Y5",
+        "Y3",
+        "X5"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.014331
+    },
+    {
+      "species": [
+        "X4",
+        "Y1",
+        "Y4",
+        "X1"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.013006
+    },
+    {
+      "species": [
+        "X5",
+        "Y2",
+        "Y5",
+        "X2"
+      ],
+      "reactants": [
+        1,
+        1,
+        0,
+        0
+      ],
+      "products": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "rate": 0.01354
+    }
+  ],
+  "input_channels": [
+    "B1",
+    "B2",
+    "B3",
+    "B4",
+    "B5"
+  ],
+  "output_channels": [
+    "X1",
+    "Y1",
+    "B1",
+    "D1",
+    "X2",
+    "Y2",
+    "B2",
+    "D2",
+    "X3",
+    "Y3",
+    "B3",
+    "D3",
+    "X4",
+    "Y4",
+    "B4",
+    "D4",
+    "X5",
+    "Y5",
+    "B5",
+    "D5"
+  ]
+}

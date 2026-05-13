@@ -1,0 +1,105 @@
+{
+  "name": "oscillatory",
+  "description": "Built-in oscillatory reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "X"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X",
+        "Y"
+      ],
+      "reactants": [
+        2,
+        1
+      ],
+      "products": [
+        3,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B",
+        "X"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "X",
+        "C"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "Y",
+        "D"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.5
+    },
+    {
+      "species": [
+        "D",
+        "X"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.3
+    }
+  ],
+  "input_channels": [
+    "A",
+    "B"
+  ],
+  "output_channels": [
+    "X",
+    "Y",
+    "D"
+  ]
+}

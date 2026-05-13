@@ -1,0 +1,58 @@
+{
+  "name": "minimal",
+  "description": "Built-in minimal reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        2,
+        0
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "B",
+        "A"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.5
+    },
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        2,
+        0
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.1
+    }
+  ],
+  "input_channels": [
+    "A"
+  ],
+  "output_channels": [
+    "A",
+    "B"
+  ]
+}

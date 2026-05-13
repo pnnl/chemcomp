@@ -1,0 +1,19 @@
+{
+  "problem": "VanDerPol",
+  "network": "high_dimensional_random",
+  "n_train": 1600,
+  "n_test": 800,
+  "encoding": "mixed",
+  "feature_expansion": "delayed",
+  "mode": "closed-loop",
+  "feedback_scale": 0.5,
+  "n_species": 20,
+  "n_reactions": 50,
+  "n_features": 100,
+  "ridge_alpha": 1.0985411419875573,
+  "train_rmse": 0.3961749538251343,
+  "test_rmse": 0.8711817249350897,
+  "test_r2": 0.6397414777028665,
+  "train_mae": 0.29267723110122396,
+  "test_mae": 0.6333127971355426
+}

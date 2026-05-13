@@ -1,0 +1,135 @@
+{
+  "name": "feedback",
+  "description": "Built-in feedback reaction network",
+  "reactions": [
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        2,
+        0
+      ],
+      "rate": 1.2
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        2
+      ],
+      "rate": 1.0
+    },
+    {
+      "species": [
+        "C",
+        "A"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.8
+    },
+    {
+      "species": [
+        "A",
+        "B"
+      ],
+      "reactants": [
+        2,
+        0
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.2
+    },
+    {
+      "species": [
+        "B",
+        "C"
+      ],
+      "reactants": [
+        0,
+        2
+      ],
+      "products": [
+        1,
+        1
+      ],
+      "rate": 0.15
+    },
+    {
+      "species": [
+        "C",
+        "D"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.5
+    },
+    {
+      "species": [
+        "D",
+        "A"
+      ],
+      "reactants": [
+        1,
+        1
+      ],
+      "products": [
+        0,
+        0
+      ],
+      "rate": 0.3
+    },
+    {
+      "species": [
+        "D",
+        "E"
+      ],
+      "reactants": [
+        1,
+        0
+      ],
+      "products": [
+        0,
+        1
+      ],
+      "rate": 0.4
+    }
+  ],
+  "input_channels": [
+    "A",
+    "B"
+  ],
+  "output_channels": [
+    "A",
+    "C",
+    "D"
+  ]
+}
