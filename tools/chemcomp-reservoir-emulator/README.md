@@ -1,7 +1,8 @@
-# Chemical Reservoir Computing
+# ChemComp — Emulation Module
 
-A Python framework for solving ordinary and partial differential equations
-using chemical reaction networks as a reservoir computing substrate.
+The emulation module of the **ChemComp** software package. Solves ordinary and
+partial differential equations using chemical reaction networks as a reservoir
+computing substrate.
 
 A chemical reaction network is driven by an external input signal derived from
 the target ODE/PDE solution.  The resulting species concentrations evolve
@@ -61,8 +62,8 @@ Requires **Python ≥ 3.9**.
 ### With conda (recommended)
 
 ```bash
-conda env create -f environment.yml   # creates the "chemres" env
-conda activate chemres
+conda env create -f environment.yml   # creates the "chemcomp" env
+conda activate chemcomp
 # The package is installed in editable mode automatically
 ```
 
@@ -166,7 +167,7 @@ python run_reservoir.py --list-networks
 ```
 chemical_reservoir/
 ├── pyproject.toml            # Package metadata & build config (BSD-3-Clause)
-├── environment.yml           # Conda environment specification (chemres)
+├── environment.yml           # Conda environment specification (chemcomp)
 ├── README.md
 ├── run_reservoir.py          # CLI driver script (see above)
 ├── chemical_reservoir/       # Installable Python package

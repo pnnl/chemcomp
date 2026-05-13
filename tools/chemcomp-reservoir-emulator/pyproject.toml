@@ -3,14 +3,14 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chemical-reservoir"
+name = "chemcomp-emulation"
 version = "1.0.0"
-description = "Solve ODEs and PDEs using chemical reaction network-based reservoir computing"
+description = "ChemComp emulation module: solve ODEs and PDEs using chemical reaction network-based reservoir computing"
 readme = "README.md"
 license = {text = "BSD-3-Clause"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Chemical Computing Team"},
+    {name = "ChemComp Team"},
 ]
 keywords = [
     "reservoir computing",
@@ -62,12 +62,12 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pnnl/chemical-reservoir"
-Documentation = "https://chemical-reservoir.readthedocs.io"
-Repository = "https://github.com/pnnl/chemical-reservoir"
+Homepage = "https://github.com/pnnl/chemcomp"
+Documentation = "https://chemcomp.readthedocs.io"
+Repository = "https://github.com/pnnl/chemcomp"
 
 [project.scripts]
-chemres-smoke-test = "chemical_reservoir.scripts.smoke_test:main"
+chemcomp-smoke-test = "chemical_reservoir.scripts.smoke_test:main"
 
 [tool.setuptools.packages.find]
 include = ["chemical_reservoir*"]
