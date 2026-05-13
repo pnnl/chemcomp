@@ -26,6 +26,8 @@ Usage
 Options
 -------
     --problem         Name of the built-in problem (see --list-problems)
+    --problem-file    Path to a YAML custom problem definition
+    --config          Path to a YAML config file (overrides default_config.yaml)
     --network         Path to a reaction network JSON file
     -o / --output     Output directory (default: results/<problem>_<network>_<timestamp>)
     --n-train         Number of training points (default: 800)

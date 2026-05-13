@@ -1,6 +1,6 @@
 """
-Chemical Reservoir Computing
-============================
+Chemical Reservoir Computing (ChemComp Emulation Module)
+========================================================
 
 A framework for solving ODEs and PDEs using chemical reaction
 network-based reservoir computing with Bayesian optimization.
@@ -12,12 +12,21 @@ Core Components
 - :class:`BayesianOptimizer` -- Hyperparameter optimization
 - :class:`SensitivityAnalyzer` -- Robustness analysis
 
+Configuration
+-------------
+All tuneable parameters are stored in ``default_config.yaml`` and managed via:
+
+- :func:`load_config` -- Load a YAML config file
+- :func:`get_config` -- Access the active :class:`ChemCompConfig`
+- :func:`update_config` -- Modify individual parameters at runtime
+
 Quick Start
 -----------
 >>> import chemical_reservoir as cr
+>>> cr.load_config("my_config.yaml")  # optional: customise parameters
 >>> problem = cr.problems.create_vanderpol_problem()
->>> reservoir, config = cr.io.load_reservoir_from_json("network_configs/cascade.json")  # top-level dir
->>> results = reservoir.solve_ode(problem, n_train=400, n_test=200)
+>>> reservoir, config = cr.io.load_reservoir_from_json("network_configs/cascade.json")
+>>> results = reservoir.solve_ode(problem)  # uses config defaults for n_train, n_test, etc.
 """
 
 from .config import (

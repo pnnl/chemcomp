@@ -250,6 +250,7 @@ python run_reservoir.py --list-networks
 |------|---------|-------------|
 | `--problem` | — | Built-in problem name (see `--list-problems`) |
 | `--problem-file` | — | Path to a YAML file defining a custom ODE/PDE |
+| `--config` | `default_config.yaml` | Path to a YAML configuration file (see below) |
 | `--network` | *(required)* | Path to a reaction-network JSON file |
 | `-o` / `--output` | `results/<problem>_<network>_<timestamp>/` | Output directory |
 | `--n-train` | 800 | Number of training time-points |
@@ -258,6 +259,53 @@ python run_reservoir.py --list-networks
 | `--features` | `delayed` | Feature expansion: `none`, `quadratic`, `delayed` |
 | `--mode` | `closed-loop` | Prediction mode: `open-loop` or `closed-loop` |
 | `--feedback-scale` | `0.5` | Output-to-input feedback strength (closed-loop only) |
+
+### Configuration
+
+All tuneable parameters (training, reservoir readout, encoding, optimisation,
+metrics, sensitivity analysis) are centralised in a single YAML config file.
+The bundled `default_config.yaml` documents every parameter with comments.
+
+**Quick customisation:**
+
+```bash
+# Copy the defaults, then edit
+cp default_config.yaml my_config.yaml
+# Use it from the CLI
+python run_reservoir.py --config my_config.yaml --problem vanderpol --network network_configs/cascade.json
+```
+
+**Python API:**
+
+```python
+import chemical_reservoir as cr
+
+# Load a custom config (or call with no args for built-in defaults)
+cr.load_config("my_config.yaml")
+
+# Alternatively, update individual values at runtime
+cr.update_config(training__n_train=1000, optimization__n_iterations=100)
+
+# Access current settings anywhere
+cfg = cr.get_config()
+print(cfg.training.n_train)       # 1000
+print(cfg.reservoir.ridge_alpha)  # 0.0001
+```
+
+**Config sections:**
+
+| Section | Controls |
+|---------|----------|
+| `training` | n_train, n_test, test_horizon_factor, PDE equivalents |
+| `reservoir` | ridge_alpha, feature_expansion, delay lags, RidgeCV grid |
+| `encoding` | method, sinusoidal/mixed/multiharmonic coefficients |
+| `closed_loop` | feedback_scale, normalization epsilon |
+| `optimization` | BO iterations, GP kernel params, acquisition settings |
+| `metrics` | numerical epsilon for MAPE/NRMSE |
+| `sensitivity` | perturbation fractions, local epsilon, sample counts |
+| `output` | output_dir, figure_format, DPI, save/show flags |
+
+---
 
 ### Custom problem files (YAML + SymPy)
 
@@ -324,10 +372,11 @@ chemcomp-emulation/
 ├── environment.yml               # Conda environment (chemcomp)
 ├── README.md
 ├── LICENSE
+├── default_config.yaml           # All tuneable parameters (YAML)
 ├── run_reservoir.py              # CLI driver script
 ├── chemical_reservoir/           # Installable Python package
 │   ├── __init__.py               # Public API & version (1.0.0)
-│   ├── config.py                 # OutputConfig dataclass
+│   ├── config.py                 # ChemCompConfig dataclass hierarchy + load/update API
 │   ├── constraints.py            # Physical & measurement constraints
 │   ├── custom_problems.py        # YAML + SymPy problem loader
 │   ├── io.py                     # JSON load / save / validation for networks
@@ -339,6 +388,7 @@ chemcomp-emulation/
 │   ├── reservoir.py              # ConstrainedChemicalReservoir (core engine)
 │   ├── run_analysis.py           # High-level analysis pipelines
 │   ├── sensitivity.py            # Sensitivity & perturbation analysis
+│   ├── validate.py               # File validation utility (CLI + API)
 │   └── visualization.py          # Multi-panel result dashboards
 ├── network_configs/              # JSON reaction-network definitions (18 networks)
 │   ├── cascade.json
@@ -370,8 +420,9 @@ chemcomp-emulation/
 │   ├── gen_multisubnet_network.py      # 6-subnet leaky architecture
 │   ├── gen_parameterized_network.py    # Parameterised width/depth generator
 │   └── gen_pde_figures.py              # PDE comparison figure generation
-└── tests/                        # Pytest test suite (9 tests)
-    └── test_basic.py
+└── tests/                        # Pytest test suite (49 tests)
+    ├── test_basic.py             # Core imports, I/O, basic solve
+    └── test_validation.py        # Validation, custom problems, end-to-end
 ```
 
 ---
@@ -461,8 +512,36 @@ Five Jupyter notebooks progress from theory to advanced usage:
 python -m pytest tests/ -v
 ```
 
-All 9 tests cover imports, built-in network listing, problem factories, JSON
-I/O, and an end-to-end ODE solve.
+49 tests cover:
+- Core imports, built-in network listing, problem factories, JSON I/O
+- Network validation (structure, stoichiometry, rates, channels, integration)
+- Problem validation (YAML parsing, equations, ICs, boundary conditions)
+- Custom problem loading and numerical correctness (ODE/PDE)
+- End-to-end reservoir pipeline (open-loop, closed-loop, PDE)
+
+### Validating your own files
+
+Use the validation utility to check problem YAMLs and network JSONs before
+running a full solve:
+
+```bash
+# CLI
+python -m chemical_reservoir.validate problem_configs/my_ode.yaml network_configs/my_net.json
+
+# Or via the installed entry point
+chemcomp-validate problem_configs/my_ode.yaml
+```
+
+```python
+from chemical_reservoir.validate import validate_problem_file, validate_network_file
+
+errors = validate_problem_file("problem_configs/my_ode.yaml")
+if errors:
+    for e in errors:
+        print(f"  ✗ {e}")
+else:
+    print("  ✓ Valid")
+```
 
 ---
 
