@@ -70,6 +70,7 @@ Repository = "https://github.com/pnnl/chemcomp"
 
 [project.scripts]
 chemcomp-smoke-test = "chemical_reservoir.scripts.smoke_test:main"
+chemcomp-validate = "chemical_reservoir.validate:main"
 
 [tool.setuptools.packages.find]
 include = ["chemical_reservoir*"]

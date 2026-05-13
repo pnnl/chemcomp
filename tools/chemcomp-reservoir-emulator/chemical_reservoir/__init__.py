@@ -44,6 +44,7 @@ from . import problems  # noqa: F811 — re-export submodule
 from . import io
 from . import networks
 from . import custom_problems
+from . import validate
 
 __version__ = "1.0.0"
 __author__ = "Chemical Computing Team"
