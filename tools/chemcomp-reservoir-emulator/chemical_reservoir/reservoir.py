@@ -17,6 +17,7 @@ from sklearn.preprocessing import StandardScaler
 from typing import List, Dict, Callable, Optional, Tuple, Union
 import warnings
 
+from .config import get_config
 from .constraints import PhysicalConstraints, MeasurementConstraints
 from .optimization import BayesianOptimizer
 from .network_viz import ReactionNetworkVisualizer
@@ -89,9 +90,15 @@ class ConstrainedChemicalReservoir:
                  output_channels: List[str],
                  physical_constraints: Optional[PhysicalConstraints] = None,
                  measurement_constraints: Optional[MeasurementConstraints] = None,
-                 ridge_alpha: float = 1e-4,
-                 feature_expansion: str = 'quadratic'):
+                 ridge_alpha: Optional[float] = None,
+                 feature_expansion: Optional[str] = None):
         
+        cfg = get_config()
+        if ridge_alpha is None:
+            ridge_alpha = cfg.reservoir.ridge_alpha
+        if feature_expansion is None:
+            feature_expansion = cfg.reservoir.feature_expansion
+
         self._parse_reactions(reactions)
         
         self.input_channels = input_channels
@@ -214,6 +221,7 @@ class ConstrainedChemicalReservoir:
     def _create_input_function(self, t_range: np.ndarray,
                                encoding: str = 'mixed') -> Callable:
         """Create time-dependent input function."""
+        cfg = get_config().encoding
         t_min, t_max = t_range.min(), t_range.max()
         t_span = t_max - t_min if t_max > t_min else 1.0
         
@@ -228,17 +236,19 @@ class ConstrainedChemicalReservoir:
                 if encoding == 'constant':
                     rate = base_rate
                 elif encoding == 'sinusoidal':
-                    mod = 0.3 * np.sin(2 * np.pi * tau + i * np.pi / max(len(self.input_channels), 1))
+                    mod = cfg.sinusoidal_amplitude * np.sin(2 * np.pi * tau + i * np.pi / max(len(self.input_channels), 1))
                     rate = base_rate * (1 + mod)
                 elif encoding == 'mixed':
-                    mod = 0.2 * tau + 0.2 * np.sin(2*np.pi*tau + i) + 0.1 * np.exp(-((tau-0.5)**2)/0.1)
+                    mod = (cfg.mixed_linear_coeff * tau
+                           + cfg.mixed_sine_coeff * np.sin(2*np.pi*tau + i)
+                           + cfg.mixed_gaussian_coeff * np.exp(-((tau-0.5)**2)/cfg.mixed_gaussian_width))
                     rate = base_rate * (1 + mod)
                 elif encoding == 'multiharmonic':
                     n_ch = max(len(self.input_channels), 1)
                     phase = i * np.pi / n_ch
                     mod = sum(
-                        0.15 / (n + 1) * np.sin(2 * np.pi * (n + 1) * tau + phase * (n + 1))
-                        for n in range(8)
+                        cfg.multiharmonic_amplitude / (n + 1) * np.sin(2 * np.pi * (n + 1) * tau + phase * (n + 1))
+                        for n in range(cfg.multiharmonic_n_harmonics)
                     )
                     rate = base_rate * (1 + mod)
                 else:
@@ -268,7 +278,7 @@ class ConstrainedChemicalReservoir:
             return np.hstack(parts)
         elif self.feature_expansion == 'delayed':
             # Time-delay embedding: current + several delayed copies
-            delays = [1, 2, 4, 8]
+            delays = get_config().reservoir.delays
             parts = [measured]
             for d in delays:
                 delayed = np.zeros_like(measured)
@@ -298,7 +308,7 @@ class ConstrainedChemicalReservoir:
             
             return mse
         except:
-            return 1e10
+            return get_config().optimization.failure_penalty
     
     def set_initial_concentrations(self, concentrations: Union[np.ndarray, Dict]):
         """Set initial concentrations with validation."""
@@ -323,11 +333,16 @@ class ConstrainedChemicalReservoir:
         self.input_rates.update(validated)
     
     def optimize_with_bayesian(self, problem,
-                              n_iterations: int = 50,
-                              n_initial: int = 10,
+                              n_iterations: Optional[int] = None,
+                              n_initial: Optional[int] = None,
                               acquisition: str = 'EI',
                               verbose: bool = True) -> Dict:
         """Optimize using Bayesian optimization."""
+        cfg = get_config().optimization
+        if n_iterations is None:
+            n_iterations = cfg.n_iterations
+        if n_initial is None:
+            n_initial = cfg.n_initial
         bounds_lower, bounds_upper = self.physical_constraints.get_bounds_arrays(
             self.species_names, self.input_channels
         )
@@ -378,12 +393,12 @@ class ConstrainedChemicalReservoir:
         return self.optimization_results
     
     def solve_ode(self, problem,
-                  n_train: int = 500,
-                  n_test: int = 200,
-                  test_horizon_factor: float = 0.5,
-                  encoding: str = 'mixed',
+                  n_train: Optional[int] = None,
+                  n_test: Optional[int] = None,
+                  test_horizon_factor: Optional[float] = None,
+                  encoding: Optional[str] = None,
                   auto_optimize: bool = False,
-                  bo_iterations: int = 50) -> Dict:
+                  bo_iterations: Optional[int] = None) -> Dict:
         """Solve ODE in open-loop mode.
 
         The reservoir is driven by the input encoding over the full time
@@ -393,6 +408,18 @@ class ConstrainedChemicalReservoir:
         For closed-loop prediction with output feedback, use
         ``solve_ode_closed_loop`` instead.
         """
+        cfg = get_config()
+        if n_train is None:
+            n_train = cfg.training.n_train
+        if n_test is None:
+            n_test = cfg.training.n_test
+        if test_horizon_factor is None:
+            test_horizon_factor = cfg.training.test_horizon_factor
+        if encoding is None:
+            encoding = cfg.encoding.method
+        if bo_iterations is None:
+            bo_iterations = cfg.optimization.n_iterations
+
         if auto_optimize:
             print("Running Bayesian optimization...")
             self.optimize_with_bayesian(problem, n_iterations=bo_iterations)
@@ -413,7 +440,10 @@ class ConstrainedChemicalReservoir:
         
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.model = RidgeCV(alphas=np.logspace(-6, 2, 50))
+            rcfg = cfg.reservoir
+            self.model = RidgeCV(alphas=np.logspace(
+                rcfg.ridge_cv_alphas_log_min, rcfg.ridge_cv_alphas_log_max, rcfg.ridge_cv_alphas_n
+            ))
             self.model.fit(features_train, y_true_train)
         
         y_pred_train = self.model.predict(features_train)
@@ -446,13 +476,13 @@ class ConstrainedChemicalReservoir:
         }
     
     def solve_ode_closed_loop(self, problem,
-                              n_train: int = 500,
-                              n_test: int = 200,
-                              test_horizon_factor: float = 0.5,
-                              encoding: str = 'mixed',
-                              feedback_scale: float = 0.5,
+                              n_train: Optional[int] = None,
+                              n_test: Optional[int] = None,
+                              test_horizon_factor: Optional[float] = None,
+                              encoding: Optional[str] = None,
+                              feedback_scale: Optional[float] = None,
                               auto_optimize: bool = False,
-                              bo_iterations: int = 50) -> Dict:
+                              bo_iterations: Optional[int] = None) -> Dict:
         """Solve ODE with closed-loop (autonomous) prediction.
         
         Training phase uses teacher forcing: the reservoir is driven by the
@@ -473,6 +503,20 @@ class ConstrainedChemicalReservoir:
             auto_optimize: Whether to run Bayesian optimization first
             bo_iterations: Number of BO iterations
         """
+        cfg = get_config()
+        if n_train is None:
+            n_train = cfg.training.n_train
+        if n_test is None:
+            n_test = cfg.training.n_test
+        if test_horizon_factor is None:
+            test_horizon_factor = cfg.training.test_horizon_factor
+        if encoding is None:
+            encoding = cfg.encoding.method
+        if feedback_scale is None:
+            feedback_scale = cfg.closed_loop.feedback_scale
+        if bo_iterations is None:
+            bo_iterations = cfg.optimization.n_iterations
+
         if auto_optimize:
             print("Running Bayesian optimization...")
             self.optimize_with_bayesian(problem, n_iterations=bo_iterations)
@@ -496,7 +540,10 @@ class ConstrainedChemicalReservoir:
         
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.model = RidgeCV(alphas=np.logspace(-6, 2, 50))
+            rcfg = cfg.reservoir
+            self.model = RidgeCV(alphas=np.logspace(
+                rcfg.ridge_cv_alphas_log_min, rcfg.ridge_cv_alphas_log_max, rcfg.ridge_cv_alphas_n
+            ))
             self.model.fit(features_train_scaled, y_true_train)
         
         y_pred_train = self.model.predict(features_train_scaled)
@@ -504,14 +551,14 @@ class ConstrainedChemicalReservoir:
         # Normalization statistics for the feedback signal so that the
         # feedback modulation is O(1) regardless of problem scale
         y_train_mean = y_true_train.mean(axis=0)
-        y_train_std = y_true_train.std(axis=0) + 1e-8
+        y_train_std = y_true_train.std(axis=0) + cfg.closed_loop.normalization_eps
         
         # ---- Test phase (closed-loop with output feedback) ----
         # Step through test time points one at a time.
         # The input is the SAME encoding used in training, plus a feedback
         # correction from the predicted output.  This keeps the reservoir
         # in a consistent input regime while the feedback steers it.
-        max_delay = 8 if self.feature_expansion == 'delayed' else 0
+        max_delay = max(cfg.reservoir.delays) if self.feature_expansion == 'delayed' else 0
         buffer_size = max_delay + 1
         
         # Seed the state buffer with the tail of the training trajectory
@@ -608,10 +655,18 @@ class ConstrainedChemicalReservoir:
         }
     
     def solve_pde(self, problem,
-                  n_train_time: int = 100,
-                  n_test_time: int = 50,
-                  test_horizon_factor: float = 0.3) -> Dict:
+                  n_train_time: Optional[int] = None,
+                  n_test_time: Optional[int] = None,
+                  test_horizon_factor: Optional[float] = None) -> Dict:
         """Solve PDE with configurable horizon."""
+        cfg = get_config().training
+        if n_train_time is None:
+            n_train_time = cfg.n_train_time
+        if n_test_time is None:
+            n_test_time = cfg.n_test_time
+        if test_horizon_factor is None:
+            test_horizon_factor = cfg.pde_test_horizon_factor
+
         t_train, t_test, t_all = problem.get_train_test_times(
             n_train_time, n_test_time, test_horizon_factor
         )

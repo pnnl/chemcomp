@@ -20,7 +20,12 @@ Quick Start
 >>> results = reservoir.solve_ode(problem, n_train=400, n_test=200)
 """
 
-from .config import OutputConfig, set_output_directory, get_output_config
+from .config import (
+    OutputConfig, set_output_directory, get_output_config,
+    ChemCompConfig, get_config, load_config, update_config,
+    TrainingConfig, ReservoirConfig, EncodingConfig, ClosedLoopConfig,
+    OptimizationConfig, MetricsConfig, SensitivityConfig,
+)
 from .constraints import (
     SpeciesBounds,
     PhysicalConstraints,

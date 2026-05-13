@@ -7,6 +7,8 @@ from typing import Dict, List, Optional
 from itertools import combinations
 import warnings
 
+from .config import get_config
+
 
 class SensitivityAnalyzer:
     """
@@ -29,11 +31,16 @@ class SensitivityAnalyzer:
     
     def analyze_concentration_sensitivity(self,
                                          perturbation_fractions: List[float] = None,
-                                         n_samples: int = 5,
-                                         n_train: int = 300) -> Dict:
+                                         n_samples: int = None,
+                                         n_train: int = None) -> Dict:
         """Analyze sensitivity to initial concentration perturbations."""
+        scfg = get_config().sensitivity
         if perturbation_fractions is None:
-            perturbation_fractions = [0.01, 0.05, 0.1, 0.2, 0.5]
+            perturbation_fractions = scfg.perturbation_fractions
+        if n_samples is None:
+            n_samples = scfg.n_samples
+        if n_train is None:
+            n_train = get_config().training.n_train
         
         original_conc = self.reservoir.initial_concentrations.copy()
         
@@ -110,11 +117,16 @@ class SensitivityAnalyzer:
     
     def analyze_input_rate_sensitivity(self,
                                       perturbation_fractions: List[float] = None,
-                                      n_samples: int = 5,
-                                      n_train: int = 300) -> Dict:
+                                      n_samples: int = None,
+                                      n_train: int = None) -> Dict:
         """Analyze sensitivity to input rate perturbations."""
+        scfg = get_config().sensitivity
         if perturbation_fractions is None:
-            perturbation_fractions = [0.01, 0.05, 0.1, 0.2, 0.5]
+            perturbation_fractions = scfg.perturbation_fractions
+        if n_samples is None:
+            n_samples = scfg.n_samples
+        if n_train is None:
+            n_train = get_config().training.n_train
         
         original_rates = self.reservoir.input_rates.copy()
         
@@ -133,7 +145,7 @@ class SensitivityAnalyzer:
             for _ in range(n_samples):
                 perturbed_rates = {}
                 for ch in self.reservoir.input_channels:
-                    base_rate = original_rates.get(ch, 0.5)
+                    base_rate = original_rates.get(ch, scfg.base_val_floor)
                     perturbed = base_rate * (1 + frac * (2 * np.random.rand() - 1))
                     bounds = self.reservoir.physical_constraints.get_bounds(ch)
                     perturbed_rates[ch] = bounds.clip_input_rate(perturbed)
@@ -160,7 +172,7 @@ class SensitivityAnalyzer:
                 
                 for direction in [-1, 1]:
                     perturbed_rates = original_rates.copy()
-                    base_rate = original_rates.get(channel, 0.5)
+                    base_rate = original_rates.get(channel, scfg.base_val_floor)
                     perturbed = base_rate * (1 + direction * frac)
                     bounds = self.reservoir.physical_constraints.get_bounds(channel)
                     perturbed_rates[channel] = bounds.clip_input_rate(perturbed)
@@ -185,8 +197,11 @@ class SensitivityAnalyzer:
         self.sensitivity_results['input_rate'] = results
         return results
     
-    def analyze_measurement_sensitivity(self, n_train: int = 300) -> Dict:
+    def analyze_measurement_sensitivity(self, n_train: int = None) -> Dict:
         """Analyze how different measurement selections affect performance."""
+        if n_train is None:
+            n_train = get_config().training.n_train
+        scfg = get_config().sensitivity
         original_outputs = self.reservoir.output_channels.copy()
         measurable = self.reservoir.measurement_constraints.get_measurable_set(
             self.reservoir.species_names
@@ -213,9 +228,9 @@ class SensitivityAnalyzer:
                 )
                 if valid:
                     valid_combos.append(list(combo_set))
-                    if len(valid_combos) >= 30:
+                    if len(valid_combos) >= scfg.max_measurement_combos:
                         break
-            if len(valid_combos) >= 30:
+            if len(valid_combos) >= scfg.max_measurement_combos:
                 break
         
         for meas_set in valid_combos:
@@ -250,8 +265,13 @@ class SensitivityAnalyzer:
         self.sensitivity_results['measurement'] = results
         return results
     
-    def compute_local_sensitivity(self, epsilon: float = 0.01, n_train: int = 300) -> Dict:
+    def compute_local_sensitivity(self, epsilon: float = None, n_train: int = None) -> Dict:
         """Compute local sensitivity at optimal configuration."""
+        scfg = get_config().sensitivity
+        if epsilon is None:
+            epsilon = scfg.local_epsilon
+        if n_train is None:
+            n_train = get_config().training.n_train
         n_inputs = len(self.reservoir.input_channels)
         
         original_rates = self.reservoir.input_rates.copy()
@@ -273,7 +293,7 @@ class SensitivityAnalyzer:
         # Rate sensitivities
         for ch in self.reservoir.input_channels:
             param_name = f"rate_{ch}"
-            base_val = original_rates.get(ch, 0.5)
+            base_val = original_rates.get(ch, scfg.base_val_floor)
             
             perturbed_rates = original_rates.copy()
             perturbed_rates[ch] = base_val * (1 + epsilon)
@@ -290,16 +310,16 @@ class SensitivityAnalyzer:
                 warnings.simplefilter("ignore")
                 res_minus = self.reservoir.solve_ode(self.problem, n_train=n_train)
             
-            sensitivity = (res_plus['test_rmse'] - res_minus['test_rmse']) / (2 * epsilon * base_val + 1e-10)
+            sensitivity = (res_plus['test_rmse'] - res_minus['test_rmse']) / (2 * epsilon * base_val + scfg.stability_eps)
             sensitivities[param_name] = sensitivity
-            normalized_sensitivities[param_name] = (base_val / (baseline_rmse + 1e-10)) * sensitivity
+            normalized_sensitivities[param_name] = (base_val / (baseline_rmse + scfg.stability_eps)) * sensitivity
         
         self.reservoir.set_input_rates(original_rates)
         
         # Concentration sensitivities
         for i, sp in enumerate(self.reservoir.species_names):
             param_name = f"conc_{sp}"
-            base_val = max(original_conc[i], 0.1)
+            base_val = max(original_conc[i], scfg.base_val_floor)
             
             perturbed_conc = original_conc.copy()
             perturbed_conc[i] = base_val * (1 + epsilon)
@@ -327,9 +347,9 @@ class SensitivityAnalyzer:
                 warnings.simplefilter("ignore")
                 res_minus = self.reservoir.solve_ode(self.problem, n_train=n_train)
             
-            sensitivity = (res_plus['test_rmse'] - res_minus['test_rmse']) / (2 * epsilon * base_val + 1e-10)
+            sensitivity = (res_plus['test_rmse'] - res_minus['test_rmse']) / (2 * epsilon * base_val + scfg.stability_eps)
             sensitivities[param_name] = sensitivity
-            normalized_sensitivities[param_name] = (base_val / (baseline_rmse + 1e-10)) * sensitivity
+            normalized_sensitivities[param_name] = (base_val / (baseline_rmse + scfg.stability_eps)) * sensitivity
         
         # Restore
         self.reservoir.set_initial_concentrations(

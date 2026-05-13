@@ -12,6 +12,8 @@ from typing import Callable, Dict, List, Tuple
 import warnings
 import time
 
+from .config import get_config
+
 
 class AcquisitionFunction(ABC):
     """Base class for acquisition functions."""
@@ -33,7 +35,7 @@ class ExpectedImprovement(AcquisitionFunction):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             mu, sigma = gp.predict(X, return_std=True)
-        sigma = np.maximum(sigma, 1e-9)
+        sigma = np.maximum(sigma, get_config().optimization.sigma_floor)
         
         imp = y_best - mu - self.xi
         Z = imp / sigma
@@ -54,7 +56,7 @@ class ProbabilityOfImprovement(AcquisitionFunction):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             mu, sigma = gp.predict(X, return_std=True)
-        sigma = np.maximum(sigma, 1e-9)
+        sigma = np.maximum(sigma, get_config().optimization.sigma_floor)
         
         Z = (y_best - mu - self.xi) / sigma
         return norm.cdf(Z)
@@ -88,8 +90,8 @@ class BayesianOptimizer:
                  variable_names: List[str],
                  acquisition: str = 'EI',
                  kernel: str = 'matern',
-                 n_initial: int = 10,
-                 random_state: int = 42):
+                 n_initial: int = None,
+                 random_state: int = None):
         """
         Initialize Bayesian optimizer.
         
@@ -102,6 +104,12 @@ class BayesianOptimizer:
             n_initial: Number of initial random samples
             random_state: Random seed
         """
+        ocfg = get_config().optimization
+        if n_initial is None:
+            n_initial = ocfg.n_initial
+        if random_state is None:
+            random_state = ocfg.random_state
+
         self.bounds_lower = np.asarray(bounds_lower)
         self.bounds_upper = np.asarray(bounds_upper)
         self.n_dims = len(bounds_lower)
@@ -113,24 +121,26 @@ class BayesianOptimizer:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             
+            ls_bounds = tuple(ocfg.gp_length_scale_bounds)
             if kernel == 'matern':
                 base_kernel = Matern(nu=2.5, length_scale=np.ones(self.n_dims),
-                                    length_scale_bounds=(1e-2, 1e2))
+                                    length_scale_bounds=ls_bounds)
             else:
                 base_kernel = RBF(length_scale=np.ones(self.n_dims),
-                                length_scale_bounds=(1e-2, 1e2))
+                                length_scale_bounds=ls_bounds)
             
             self.kernel = ConstantKernel(1.0) * base_kernel + WhiteKernel(
-                noise_level=1e-3, noise_level_bounds=(1e-4, 1e1)
+                noise_level=ocfg.gp_noise_level,
+                noise_level_bounds=tuple(ocfg.gp_noise_bounds)
             )
         
         # Acquisition function
         if acquisition == 'EI':
-            self.acquisition = ExpectedImprovement(xi=0.01)
+            self.acquisition = ExpectedImprovement(xi=ocfg.ei_xi)
         elif acquisition == 'PI':
-            self.acquisition = ProbabilityOfImprovement(xi=0.01)
+            self.acquisition = ProbabilityOfImprovement(xi=ocfg.pi_xi)
         elif acquisition == 'UCB':
-            self.acquisition = UpperConfidenceBound(kappa=2.0)
+            self.acquisition = UpperConfidenceBound(kappa=ocfg.ucb_kappa)
         else:
             raise ValueError(f"Unknown acquisition: {acquisition}")
         
@@ -147,8 +157,13 @@ class BayesianOptimizer:
         samples = self.rng.uniform(0, 1, size=(n, self.n_dims))
         return samples * (self.bounds_upper - self.bounds_lower) + self.bounds_lower
     
-    def _optimize_acquisition(self, n_restarts: int = 10,
-                             n_samples: int = 1000) -> np.ndarray:
+    def _optimize_acquisition(self, n_restarts: int = None,
+                             n_samples: int = None) -> np.ndarray:
+        ocfg = get_config().optimization
+        if n_restarts is None:
+            n_restarts = ocfg.acq_n_restarts
+        if n_samples is None:
+            n_samples = ocfg.acq_n_samples
         """Find point that maximizes acquisition function."""
         X_candidates = self._sample_random(n_samples)
         acq_values = self.acquisition(X_candidates, self.gp, self.best_y)
@@ -194,11 +209,12 @@ class BayesianOptimizer:
         
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
+            ocfg = get_config().optimization
             self.gp = GaussianProcessRegressor(
                 kernel=self.kernel,
-                n_restarts_optimizer=5,
+                n_restarts_optimizer=ocfg.gp_n_restarts,
                 normalize_y=True,
-                random_state=42
+                random_state=ocfg.random_state
             )
             self.gp.fit(X, y)
         

@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 import warnings
 
+from .config import get_config
+
 
 @dataclass
 class LearningMetrics:
@@ -130,7 +132,7 @@ class MetricsCalculator:
         y_pred_test = y_pred[n_train:]
         t_test = t[n_train:]
         
-        eps = 1e-10
+        eps = get_config().metrics.eps
         
         # Basic error metrics
         metrics.train_rmse = np.sqrt(np.mean((y_true_train - y_pred_train)**2))

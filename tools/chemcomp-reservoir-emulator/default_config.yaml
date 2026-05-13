@@ -1,0 +1,93 @@
+# ===========================================================================
+# ChemComp Reservoir Configuration
+# ===========================================================================
+# All tuneable parameters for the reservoir computing pipeline.
+# Copy this file and modify values to customize experiments.
+#
+# Usage (Python):
+#   import chemical_reservoir as cr
+#   cr.load_config("my_config.yaml")
+#
+# Usage (CLI):
+#   python run_reservoir.py --config my_config.yaml --problem vanderpol
+# ===========================================================================
+
+# --- Training & Testing ---------------------------------------------------
+training:
+  n_train: 500                  # Training time points (ODE)
+  n_test: 200                   # Test time points (ODE)
+  test_horizon_factor: 0.5      # Test span as fraction of training span (ODE)
+  n_train_time: 100             # Training time steps (PDE)
+  n_test_time: 50               # Test time steps (PDE)
+  pde_test_horizon_factor: 0.3  # Test span fraction (PDE)
+
+# --- Reservoir Readout ----------------------------------------------------
+reservoir:
+  ridge_alpha: 1.0e-4           # Ridge regularization parameter
+  feature_expansion: quadratic  # Feature expansion: quadratic | delayed | none
+  delays: [1, 2, 4, 8]         # Time-delay lags (used when feature_expansion=delayed)
+  ridge_cv_alphas_log_min: -6   # RidgeCV alpha grid: 10^min
+  ridge_cv_alphas_log_max: 2    # RidgeCV alpha grid: 10^max
+  ridge_cv_alphas_n: 50         # RidgeCV alpha grid: number of values
+
+# --- Input Encoding -------------------------------------------------------
+encoding:
+  method: mixed                 # Encoding method: linear | sinusoidal | mixed | multiharmonic
+  sinusoidal_amplitude: 0.3     # Amplitude for sinusoidal encoding
+  mixed_linear_coeff: 0.2       # Linear coefficient in mixed encoding
+  mixed_sine_coeff: 0.2         # Sine coefficient in mixed encoding
+  mixed_gaussian_coeff: 0.1     # Gaussian bump coefficient in mixed encoding
+  mixed_gaussian_width: 0.1     # Gaussian bump width (variance) in mixed encoding
+  multiharmonic_amplitude: 0.15 # Base amplitude for multiharmonic encoding
+  multiharmonic_n_harmonics: 8  # Number of harmonics in multiharmonic encoding
+
+# --- Closed-Loop (Feedback) -----------------------------------------------
+closed_loop:
+  feedback_scale: 0.5           # Output-to-input feedback strength (0 to 1)
+  normalization_eps: 1.0e-8     # Numerical stability epsilon for normalization
+
+# --- Bayesian Optimization ------------------------------------------------
+optimization:
+  n_iterations: 50              # Total BO iterations
+  n_initial: 10                 # Random samples before surrogate-guided search
+  random_state: 42              # Random seed for reproducibility
+
+  # Acquisition functions
+  ei_xi: 0.01                   # Exploration param for Expected Improvement
+  pi_xi: 0.01                   # Exploration param for Probability of Improvement
+  ucb_kappa: 2.0                # Exploration param for Upper Confidence Bound
+
+  # Gaussian Process surrogate
+  gp_length_scale_bounds: [0.01, 100.0]   # Kernel length-scale bounds
+  gp_noise_level: 1.0e-3                  # White kernel noise level
+  gp_noise_bounds: [1.0e-4, 10.0]         # White kernel noise bounds
+  gp_n_restarts: 5                        # GP hyperparameter optimization restarts
+
+  # Acquisition maximization
+  acq_n_restarts: 10            # Multi-start optimization restarts
+  acq_n_samples: 1000           # Random candidates for acquisition maximization
+
+  # Safety
+  sigma_floor: 1.0e-9           # Minimum GP predictive std (avoid div-by-zero)
+  failure_penalty: 1.0e+10      # Objective returned on simulation failure
+
+# --- Metrics --------------------------------------------------------------
+metrics:
+  eps: 1.0e-10                  # Epsilon for MAPE, NRMSE, stability (avoid div-by-zero)
+
+# --- Sensitivity Analysis -------------------------------------------------
+sensitivity:
+  perturbation_fractions: [0.01, 0.05, 0.1, 0.2, 0.5]
+  n_samples: 5                  # Monte Carlo samples per perturbation level
+  local_epsilon: 0.01           # Finite-difference step for local sensitivity
+  base_val_floor: 0.1           # Minimum concentration for local sensitivity denom
+  max_measurement_combos: 30    # Cap on measurement channel combinations tested
+  stability_eps: 1.0e-10        # Denominator guard in normalized sensitivity
+
+# --- Output ---------------------------------------------------------------
+output:
+  output_dir: test_results      # Default results directory
+  figure_format: pdf            # Figure format: pdf | png | svg
+  figure_dpi: 300               # Figure resolution (DPI)
+  save_figures: true            # Save figures to disk
+  show_figures: false           # Display figures interactively

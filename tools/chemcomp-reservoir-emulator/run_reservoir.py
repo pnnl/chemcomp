@@ -235,6 +235,8 @@ def main():
     parser.add_argument("--problem", type=str, help="Problem name (see --list-problems)")
     parser.add_argument("--problem-file", type=str, default=None,
                         help="Path to a YAML file defining a custom ODE/PDE problem")
+    parser.add_argument("--config", type=str, default=None,
+                        help="Path to a YAML config file (overrides default_config.yaml)")
     parser.add_argument("--network", type=str, help="Path to reaction network JSON")
     parser.add_argument("-o", "--output", type=str, default=None,
                         help="Output directory (default: results/<problem>_<network>_<timestamp>)")
@@ -261,6 +263,14 @@ def main():
     # any working directory.  network_configs/ lives at the project root.
     script_dir = Path(__file__).resolve().parent
     config_dir = script_dir / "network_configs"
+
+    # Load user config (if supplied) before doing anything else
+    if args.config:
+        cfg_path = Path(args.config)
+        if not cfg_path.is_absolute():
+            cfg_path = script_dir / cfg_path
+        cr.load_config(str(cfg_path))
+        print(f"Config:   {cfg_path}")
 
     if args.list_problems:
         list_problems()
