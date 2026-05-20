@@ -37,7 +37,7 @@ Here, `$LLVM_SRC_DIR` needs to point to the root of the monorepo.
 
 # License
 
-This project is made available under the Apache License v2.0 with LLVM Exceptions. See the LICENSE.txt file for more details.
+This project is made available under the Apache License v2.0 with LLVM Exceptions. See the [LICENSE.txt](LICENSE.txt) file for more details.
 
 ## Software from third parties included in this project
 
@@ -45,3 +45,7 @@ The ChemComp project contains third party software which is under different lice
 
 It will be in a separate directory tree with its own LICENSE.txt or LICENSE file at the top containing the specific license and restrictions which apply to that software, or
 It will contain specific license and restriction terms at the top of every file.
+
+# Citations
+
+If you wish to cite this work or learn more, refer to [CITATIONS.md](CITATIONS.md).
