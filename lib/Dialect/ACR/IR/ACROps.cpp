@@ -1,7 +1,7 @@
 //===- ACROps.cpp - ACR dialect ops ---------------*- C++ -*-===//
 //
 // This file is licensed under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
+// See https://github.com/pnnl/chemcomp/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
@@ -161,7 +161,8 @@ LogicalResult ReactOp::verify() {
 
 LogicalResult CRNGenericOp::verify() {
   // The stoich_matrix attribute is required.
-  auto stoichAttr = (*this)->getAttrOfType<DenseIntElementsAttr>("stoich_matrix");
+  auto stoichAttr =
+      (*this)->getAttrOfType<DenseIntElementsAttr>("stoich_matrix");
   if (!stoichAttr)
     return emitOpError("requires a 'stoich_matrix' dense integer attribute");
 
@@ -181,7 +182,8 @@ LogicalResult CRNGenericOp::verify() {
   // Detect tensor vs scalar form.
   if (auto speciesTensor = dyn_cast<RankedTensorType>(inputs[0])) {
     // --- Tensor form ---
-    // Expected: (tensor<Sx!acr.species>, tensor<Rxf32>) -> tensor<Sx!acr.species>
+    // Expected: (tensor<Sx!acr.species>, tensor<Rxf32>) ->
+    // tensor<Sx!acr.species>
     if (!isa<acr::SpeciesType>(speciesTensor.getElementType()) ||
         speciesTensor.getRank() != 1)
       return emitOpError("tensor form requires first input to be "
@@ -201,8 +203,8 @@ LogicalResult CRNGenericOp::verify() {
                          "tensor<Rxf32>");
     if (rateTensor.getDimSize(0) != R)
       return emitOpError("rate tensor dimension (")
-             << rateTensor.getDimSize(0)
-             << ") must match stoich_matrix rows (" << R << ")";
+             << rateTensor.getDimSize(0) << ") must match stoich_matrix rows ("
+             << R << ")";
 
     if (results.size() != 1)
       return emitOpError("tensor form expects exactly 1 result");
