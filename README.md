@@ -2,38 +2,53 @@
 
 ChemComp is set to implement a compilation flow that converts mathematical operations to chemical/biological operations of well-known reaction behavior, providing translation of relevant classes of ODEs.
 
-# Legacy build instructions from An out-of-tree MLIR dialect
+# Build instructions
 
-This is an example of an out-of-tree [MLIR](https://mlir.llvm.org/) dialect along with a standalone `opt`-like tool to operate on that dialect.
+ChemComp is built out-of-tree against a specific MLIR revision. Use this commit for llvm-project:
+26a1d6601d727a96f4301d0d8647b5a42760ae0c (tag: llvmorg-18.1.2)
 
-## Building - Component Build
+ChemComp is compiled and tested against that exact MLIR version. Other revisions may not build or may behave differently.
 
-This setup assumes that you have built LLVM and MLIR in `$BUILD_DIR` and installed them to `$PREFIX`. To build and launch the tests, run
+This repository is published in isolation. The steps below are self-contained.
+
+## Build LLVM/MLIR
+
 ```sh
-mkdir build && cd build
-cmake -G Ninja .. -DMLIR_DIR=$PREFIX/lib/cmake/mlir -DLLVM_EXTERNAL_LIT=$BUILD_DIR/bin/llvm-lit
-cmake --build . --target check-standalone
-```
-To build the documentation from the TableGen description of the dialect operations, run
-```sh
-cmake --build . --target mlir-doc
-```
-**Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM with CMake in order to install `FileCheck` to the chosen installation prefix.
+LLVM_SRC_DIR=/path/to/llvm-project
+LLVM_BUILD_DIR=/path/to/llvm-build
+LLVM_INSTALL_DIR=/path/to/llvm-install
 
-## Building - Monolithic Build
-
-This setup assumes that you build the project as part of a monolithic LLVM build via the `LLVM_EXTERNAL_PROJECTS` mechanism.
-To build LLVM, MLIR, the example and launch the tests run
-```sh
-mkdir build && cd build
-cmake -G Ninja `$LLVM_SRC_DIR/llvm` \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DLLVM_TARGETS_TO_BUILD=host
+cmake -G Ninja -S "$LLVM_SRC_DIR/llvm" -B "$LLVM_BUILD_DIR" \
+    -DCMAKE_INSTALL_PREFIX="$LLVM_INSTALL_DIR" \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DLLVM_INSTALL_UTILS=ON \
     -DLLVM_ENABLE_PROJECTS=mlir \
-    -DLLVM_EXTERNAL_PROJECTS=standalone-dialect -DLLVM_EXTERNAL_STANDALONE_DIALECT_SOURCE_DIR=../
-cmake --build . --target check-standalone
+    -DLLVM_TARGETS_TO_BUILD=host \
+    -DLLVM_ENABLE_ASSERTIONS=ON \
+    -DMLIR_ENABLE_BINDINGS_PYTHON=ON
+
+cmake --build "$LLVM_BUILD_DIR" --target mlir-opt mlir-translate mlir-cpu-runner install
 ```
-Here, `$LLVM_SRC_DIR` needs to point to the root of the monorepo.
+
+## Build ChemComp (out-of-tree)
+
+```sh
+CHEMCOMP_SRC_DIR=/path/to/chemcomp
+CHEMCOMP_BUILD_DIR=/path/to/chemcomp-build
+
+cmake -G Ninja -S "$CHEMCOMP_SRC_DIR" -B "$CHEMCOMP_BUILD_DIR" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DMLIR_DIR="$LLVM_INSTALL_DIR/lib/cmake/mlir" \
+    -DLLVM_DIR="$LLVM_INSTALL_DIR/lib/cmake/llvm" \
+    -DLLVM_EXTERNAL_LIT="$LLVM_BUILD_DIR/bin/llvm-lit"
+
+cmake --build "$CHEMCOMP_BUILD_DIR" --target standalone-opt
+```
+
+To run the test suite:
+```sh
+cmake --build "$CHEMCOMP_BUILD_DIR" --target check-standalone
+```
 
 # License
 
