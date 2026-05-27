@@ -9,12 +9,14 @@ ChemComp is built out-of-tree against a specific MLIR revision. Use this commit 
 
 ChemComp is compiled and tested against that exact MLIR version. Other revisions may not build or may behave differently.
 
-This repository is published in isolation. The steps below are self-contained.
-
 ## Build LLVM/MLIR
+
+Clone the llvm-project repository and check out the above commit. Then, build and install LLVM/MLIR with the following configuration:
 
 ```sh
 LLVM_SRC_DIR=/path/to/llvm-project
+git clone --depth 1 --revision=26a1d6601d727a96f4301d0d8647b5a42760ae0c https://github.com/llvm/llvm-project.git "$LLVM_SRC_DIR"
+
 LLVM_BUILD_DIR=/path/to/llvm-build
 LLVM_INSTALL_DIR=/path/to/llvm-install
 
