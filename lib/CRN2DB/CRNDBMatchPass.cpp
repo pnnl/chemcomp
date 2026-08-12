@@ -18,6 +18,7 @@
 #include "Standalone/CRN2DB/CRN2DBPasses.h"
 
 #include "Standalone/CRN2DB/CRNMatcher.h"
+#include "Standalone/CRN2DB/FrontierDP.h"
 #include "Standalone/CRN2DB/MotifDatabase.h"
 #include "Standalone/CRN2DB/MotifDatabaseLoader.h"
 
@@ -117,9 +118,7 @@ private:
     return loadFixtureDatabase(dbSlice, spec, database);
   }
 
-  /// Annotate `op` with the match result.
-  ///
-  /// TODO: replace the greedy stand-in with the frontier dynamic program.
+  /// Match `op` against the database and annotate it with the result.
   void matchOp(acr::CRNGenericOp op, const MotifDatabase &database) {
     QueryCRN query;
     if (!extractQuery(op, query)) {
@@ -150,48 +149,56 @@ private:
                          "candidate domains are larger than a full run would "
                          "leave them";
 
+    DPOptions dpOptions;
+    dpOptions.weights.coverage = weightCoverage;
+    dpOptions.weights.stoich = weightStoich;
+    dpOptions.weights.rate = weightRate;
+    dpOptions.weights.sigma = rateSigma;
+    dpOptions.beamWidth = beamWidth;
+    dpOptions.globalInjectivity = globalInjectivity;
+
+    MatchResult match = runFrontierDP(query, database, prep, dpOptions);
+
     MLIRContext *context = op.getContext();
-    llvm::SmallVector<Attribute, 8> speciesNames(
-        query.numSpecies, StringAttr::get(context, ""));
-    llvm::SmallVector<Attribute, 8> motifIds(query.numReactions,
-                                             StringAttr::get(context, ""));
-    llvm::SmallVector<unsigned, 4> unmatched;
+    llvm::SmallVector<Attribute, 8> speciesNames;
+    speciesNames.reserve(query.numSpecies);
+    for (const std::optional<SpeciesId> &bound : match.assignment)
+      speciesNames.push_back(StringAttr::get(
+          context, bound ? database.getSpeciesName(*bound) : llvm::StringRef()));
 
-    for (unsigned r = 0; r < query.numReactions; ++r) {
-      if (prep.candidates[r].empty()) {
-        unmatched.push_back(r);
-        continue;
-      }
-
-      // Candidates are in ascending motif-id order, so taking the first is
-      // deterministic. The dynamic program will choose by score instead.
-      const Motif &motif = database.getMotif(prep.candidates[r].front());
-      motifIds[r] = StringAttr::get(context, motif.id);
-
-      // Bind this reaction's species positionally against the motif. The real
-      // algorithm searches over injective extensions; the stand-in takes the
-      // motif's own order, which is enough to exercise the annotation path.
-      llvm::SmallVector<AbstractSpecies, 8> supp = query.support(r);
-      for (auto [i, column] : llvm::enumerate(supp)) {
-        if (i >= motif.species.size())
-          break;
-        auto existing = llvm::cast<StringAttr>(speciesNames[column]);
-        if (!existing.getValue().empty())
-          continue;
-        speciesNames[column] = StringAttr::get(
-            context, database.getSpeciesName(motif.species[i]));
-      }
-    }
+    llvm::SmallVector<Attribute, 8> motifIds;
+    motifIds.reserve(query.numReactions);
+    for (const std::optional<MotifIdx> &matched : match.matches)
+      motifIds.push_back(StringAttr::get(
+          context, matched ? database.getMotif(*matched).id : llvm::StringRef()));
 
     op->setAttr("species_names", ArrayAttr::get(context, speciesNames));
     op->setAttr("motif_ids", ArrayAttr::get(context, motifIds));
 
-    if (!unmatched.empty()) {
+    if (match.beamTruncated)
+      op.emitRemark() << "beam search discarded states; the result may be "
+                         "suboptimal";
+
+    if (!match.injectivityViolations.empty()) {
+      // Frontier-local injectivity is the paper's own state design: a binding
+      // is forgotten once its species leaves the frontier, so a retired
+      // chemical can be reused. Report rather than hide it, and point at the
+      // option that enforces the paper's stated requirement.
+      std::string list;
+      llvm::raw_string_ostream os(list);
+      llvm::interleaveComma(match.injectivityViolations, os,
+                            [&](SpeciesId s) { os << database.getSpeciesName(s); });
+      op.emitWarning() << "assignment is not globally injective; reused: "
+                       << os.str()
+                       << " (pass global-injectivity=1 to enforce injectivity)";
+    }
+
+    if (!match.unmatched.empty()) {
       // Partial coverage is a warning, not an error: the paper's flow expects
       // downstream passes to handle partially instantiated CRNs.
       std::string list;
       llvm::raw_string_ostream os(list);
-      llvm::interleaveComma(unmatched, os);
+      llvm::interleaveComma(match.unmatched, os);
       op.emitWarning() << "unmatched reactions: " << os.str();
     }
   }

@@ -4,7 +4,9 @@
 add_mlir_conversion_library(MLIRCRN2DB
     CRNDBMatchPass.cpp
     MotifDatabase.cpp
+    FrontierDP.cpp
     Preprocessing.cpp
+    Scoring.cpp
     MotifDatabaseFixture.cpp
     MotifDatabaseJSON.cpp
 

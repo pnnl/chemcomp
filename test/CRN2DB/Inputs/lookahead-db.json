@@ -1,0 +1,5 @@
+[
+ {"motif_id":"m01","species":["X","P"],"stoich":[-1,1],"source":"ModelSEED:m01"},
+ {"motif_id":"m02","species":["Y","Q"],"stoich":[-1,1],"source":"ModelSEED:m02"},
+ {"motif_id":"m03","species":["Y","R"],"stoich":[-1,1],"source":"ModelSEED:m03"}
+]
