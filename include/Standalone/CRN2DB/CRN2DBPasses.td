@@ -54,9 +54,14 @@ def CRNDBMatch : Pass<"crn-db-match", "::mlir::ModuleOp"> {
     Option<"filterSource", "filter-source", "std::string", /*default=*/"\"\"",
            "Keep only motifs whose source starts with this prefix">,
     Option<"maxCandidates", "max-candidates", "unsigned", /*default=*/"256",
-           "Cap on motifs kept per stoichiometric signature (0 = unlimited). "
+           "Cap on candidate motifs considered per reaction (0 = unlimited). "
            "Truncation keeps the lowest motif ids and emits a remark, because "
            "it makes the result heuristic rather than exact">,
+    Option<"maxPerSignature", "max-per-signature", "unsigned",
+           /*default=*/"0",
+           "Cap on motifs loaded per stoichiometric signature (0 = unlimited). "
+           "Unlike 'max-candidates' this shrinks the database itself, so the "
+           "discarded motifs are never considered and no remark is emitted">,
     Option<"weightCoverage", "wc", "double", /*default=*/"2.0",
            "Weight of the per-match coverage reward">,
     Option<"weightStoich", "ws", "double", /*default=*/"1.0",
@@ -78,6 +83,10 @@ def CRNDBMatch : Pass<"crn-db-match", "::mlir::ModuleOp"> {
     Option<"dumpDatabase", "dump-db", "bool", /*default=*/"false",
            "Print the loaded database and stop; for debugging and loader "
            "tests">,
+    Option<"dumpPreprocessing", "dump-preprocessing", "bool",
+           /*default=*/"false",
+           "Print the elimination ordering, frontiers, candidate sets and "
+           "pruned domains instead of matching">,
   ];
 }
 

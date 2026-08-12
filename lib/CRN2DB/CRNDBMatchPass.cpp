@@ -17,6 +17,7 @@
 
 #include "Standalone/CRN2DB/CRN2DBPasses.h"
 
+#include "Standalone/CRN2DB/CRNMatcher.h"
 #include "Standalone/CRN2DB/MotifDatabase.h"
 #include "Standalone/CRN2DB/MotifDatabaseLoader.h"
 
@@ -36,24 +37,6 @@ namespace mlir::crn2db {
 
 namespace {
 
-/// The abstract CRN extracted from an `acr.crn_generic` operation: the paper's
-/// query Q = (S_Q, R_Q, N_Q, k_Q), minus the rate constants for now.
-struct QueryCRN {
-  /// Row-major stoichiometry, reactions x species (ChemComp's convention).
-  llvm::SmallVector<llvm::SmallVector<int32_t, 8>, 8> rows;
-  int64_t numReactions = 0;
-  int64_t numSpecies = 0;
-
-  /// Column indices with a non-zero coefficient in row `r`: supp(r).
-  llvm::SmallVector<unsigned, 8> support(unsigned r) const {
-    llvm::SmallVector<unsigned, 8> out;
-    for (auto [c, v] : llvm::enumerate(rows[r]))
-      if (v != 0)
-        out.push_back(static_cast<unsigned>(c));
-    return out;
-  }
-};
-
 /// Read the `stoich_matrix` attribute into a QueryCRN.
 ///
 /// The operation verifier has already checked that the attribute exists, is
@@ -67,16 +50,16 @@ bool extractQuery(acr::CRNGenericOp op, QueryCRN &query) {
   if (!type || type.getRank() != 2)
     return false;
 
-  query.numReactions = type.getDimSize(0);
-  query.numSpecies = type.getDimSize(1);
+  query.numReactions = static_cast<unsigned>(type.getDimSize(0));
+  query.numSpecies = static_cast<unsigned>(type.getDimSize(1));
 
   auto values = stoichAttr.getValues<llvm::APInt>();
   auto it = values.begin();
   query.rows.reserve(query.numReactions);
-  for (int64_t r = 0; r < query.numReactions; ++r) {
+  for (unsigned r = 0; r < query.numReactions; ++r) {
     llvm::SmallVector<int32_t, 8> row;
     row.reserve(query.numSpecies);
-    for (int64_t c = 0; c < query.numSpecies; ++c, ++it)
+    for (unsigned c = 0; c < query.numSpecies; ++c, ++it)
       row.push_back(static_cast<int32_t>((*it).getSExtValue()));
     query.rows.push_back(std::move(row));
   }
@@ -92,11 +75,16 @@ public:
 
     // Build the slice from the pass options once; it applies to whichever
     // loader runs.
+    // Note that `max-candidates` is deliberately NOT applied here as a
+    // per-signature slice cap. Cutting the database at load time would hide
+    // the truncation from preprocessing, which is what emits the remark
+    // warning that the result has become heuristic. The cap belongs to
+    // candidate selection, where it is observable.
     SliceSpec spec;
     for (const std::string &s : filterSpecies)
       spec.requireAnySpecies.push_back(s);
     spec.sourcePrefix = filterSource;
-    spec.maxPerSignature = maxCandidates;
+    spec.maxPerSignature = maxPerSignature;
 
     MotifDatabase database;
     if (llvm::Error error = loadDatabase(spec, database)) {
@@ -139,6 +127,29 @@ private:
       return signalPassFailure();
     }
 
+    PreprocessOptions preprocessOptions;
+    preprocessOptions.maxCandidates = maxCandidates;
+    preprocessOptions.strictSignature = strictSignature;
+    Preprocessing prep = preprocess(query, database, preprocessOptions);
+
+    if (dumpPreprocessing) {
+      prep.print(llvm::outs(), query, database);
+      return;
+    }
+
+    // Truncation turns an exact algorithm into a heuristic, so it must never
+    // be silent.
+    for (auto [reaction, before] : prep.truncated)
+      op.emitRemark() << "candidate set for reaction " << reaction
+                      << " truncated from " << before << " to "
+                      << prep.candidates[reaction].size()
+                      << "; the result is heuristic rather than optimal";
+
+    if (prep.arcConsistencyIncomplete)
+      op.emitRemark() << "arc-consistency stopped at its iteration budget; "
+                         "candidate domains are larger than a full run would "
+                         "leave them";
+
     MLIRContext *context = op.getContext();
     llvm::SmallVector<Attribute, 8> speciesNames(
         query.numSpecies, StringAttr::get(context, ""));
@@ -146,21 +157,21 @@ private:
                                              StringAttr::get(context, ""));
     llvm::SmallVector<unsigned, 4> unmatched;
 
-    for (int64_t r = 0; r < query.numReactions; ++r) {
-      unsigned reaction = static_cast<unsigned>(r);
-      std::optional<MotifIdx> matched = matchReaction(query, reaction, database);
-      if (!matched) {
-        unmatched.push_back(reaction);
+    for (unsigned r = 0; r < query.numReactions; ++r) {
+      if (prep.candidates[r].empty()) {
+        unmatched.push_back(r);
         continue;
       }
 
-      const Motif &motif = database.getMotif(*matched);
+      // Candidates are in ascending motif-id order, so taking the first is
+      // deterministic. The dynamic program will choose by score instead.
+      const Motif &motif = database.getMotif(prep.candidates[r].front());
       motifIds[r] = StringAttr::get(context, motif.id);
 
       // Bind this reaction's species positionally against the motif. The real
       // algorithm searches over injective extensions; the stand-in takes the
       // motif's own order, which is enough to exercise the annotation path.
-      llvm::SmallVector<unsigned, 8> supp = query.support(reaction);
+      llvm::SmallVector<AbstractSpecies, 8> supp = query.support(r);
       for (auto [i, column] : llvm::enumerate(supp)) {
         if (i >= motif.species.size())
           break;
@@ -183,32 +194,6 @@ private:
       llvm::interleaveComma(unmatched, os);
       op.emitWarning() << "unmatched reactions: " << os.str();
     }
-  }
-
-  /// Pick a motif for one reaction, ignoring cross-reaction consistency.
-  std::optional<MotifIdx> matchReaction(const QueryCRN &query, unsigned reaction,
-                                        const MotifDatabase &database) {
-    llvm::SmallVector<int32_t, 8> coefficients;
-    for (int32_t v : query.rows[reaction])
-      if (v != 0)
-        coefficients.push_back(v);
-    if (coefficients.empty())
-      return std::nullopt;
-
-    // makeSignature() interns into the database's arena, so build the key
-    // through a local database-independent sort instead.
-    llvm::sort(coefficients);
-    SignatureKey key(coefficients);
-
-    llvm::ArrayRef<MotifIdx> candidates =
-        strictSignature ? database.lookupExact(key)
-                        : database.lookupSupersets(key);
-    if (candidates.empty())
-      return std::nullopt;
-
-    // Candidates are in ascending motif-id order, so taking the first is
-    // deterministic.
-    return candidates.front();
   }
 };
 

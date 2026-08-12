@@ -7,7 +7,7 @@
 // RUN: standalone-opt %s -crn-db-match='dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=ALL
 // RUN: standalone-opt %s \
-// RUN:   -crn-db-match='db-slice=AmbiguousSlice max-candidates=2 dump-db=1' \
+// RUN:   -crn-db-match='db-slice=AmbiguousSlice max-per-signature=2 dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=CAPPED
 // RUN: standalone-opt %s \
 // RUN:   -crn-db-match='filter-species=ATP dump-db=1' \
