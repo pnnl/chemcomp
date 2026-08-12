@@ -18,10 +18,13 @@
 #include "Standalone/Dialect/ACR/ACRDialect.h"
 #include "Standalone/Dialect/ACR/ACRPasses.h"
 
+#include "Standalone/CRN2DB/CRN2DBPasses.h"
+
 int main(int argc, char **argv) {
   mlir::registerAllPasses();
   mlir::standalone::registerPasses();
   mlir::acr::registerPasses();
+  mlir::crn2db::registerPasses();
 
   mlir::DialectRegistry registry;
   registry

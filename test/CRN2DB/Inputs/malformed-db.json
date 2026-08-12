@@ -1,0 +1,4 @@
+{
+  "comment": "A JSON object, not the expected top-level array of motif records.",
+  "motifs": []
+}

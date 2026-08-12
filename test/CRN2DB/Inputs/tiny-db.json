@@ -1,0 +1,5 @@
+[
+ {"motif_id":"rxn00001","species":["H2O","PPi","Phosphate","H+"],"stoich":[-1,-1,2,1],"deltaG":-3.46,"deltaGerr":0.05,"rate_range":[0.01,1.0],"source":"KEGG:R00004|ModelSEED:rxn00001"},
+ {"motif_id":"rxn00004","species":["Parapyruvate","Pyruvate"],"stoich":[-1,2],"deltaG":4.49,"deltaGerr":0.57,"source":"KEGG:R00008|ModelSEED:rxn00004"},
+ {"motif_id":"rxn00006","species":["H2O2","H2O","O2"],"stoich":[-2,2,1],"deltaG":-46.06,"deltaGerr":1.64,"rate_range":[0.1,10.0],"source":"KEGG:R00009|ModelSEED:rxn00006"}
+]

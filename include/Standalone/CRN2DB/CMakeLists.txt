@@ -23,3 +23,8 @@ add_custom_command(
 
 add_custom_target(ChemCompMotifsIncGen DEPENDS ${_motif_inc})
 set_target_properties(ChemCompMotifsIncGen PROPERTIES FOLDER "Tablegenning")
+
+# Pass declarations use the stock MLIR pass generator.
+set(LLVM_TARGET_DEFINITIONS CRN2DBPasses.td)
+mlir_tablegen(CRN2DBPasses.h.inc --gen-pass-decls)
+add_public_tablegen_target(ChemCompCRN2DBPassIncGen)

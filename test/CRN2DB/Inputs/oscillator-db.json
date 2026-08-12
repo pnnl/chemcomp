@@ -1,0 +1,6 @@
+[
+ {"motif_id":"rxnosc01","species":["ATP","ADP","AMP"],"stoich":[-1,-1,1],"deltaG":-1.20,"deltaGerr":0.10,"rate_range":[0.05,0.5],"source":"ModelSEED:rxnosc01"},
+ {"motif_id":"rxnosc02","species":["AMP","Phosphate"],"stoich":[-1,1],"deltaG":-0.80,"deltaGerr":0.10,"rate_range":[0.05,0.5],"source":"ModelSEED:rxnosc02"},
+ {"motif_id":"rxnosc03","species":["Phosphate","H2O","ATP","H+"],"stoich":[-1,-1,1,1],"deltaG":-2.10,"deltaGerr":0.20,"rate_range":[0.05,0.5],"source":"ModelSEED:rxnosc03"},
+ {"motif_id":"rxnosc04","species":["H+","ADP","H2O"],"stoich":[-1,1,1],"deltaG":-0.50,"deltaGerr":0.10,"rate_range":[0.05,0.5],"source":"ModelSEED:rxnosc04"}
+]
