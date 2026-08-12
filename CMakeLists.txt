@@ -44,6 +44,8 @@ include_directories(${STANDALONE_BINARY_DIR}/include)
 link_directories(${LLVM_BUILD_LIBRARY_DIR})
 add_definitions(${LLVM_DEFINITIONS})
 
+# Must precede include/, whose custom commands invoke chemcomp-tblgen.
+add_subdirectory(chemcomp-tblgen)
 add_subdirectory(include)
 add_subdirectory(lib)
 if(MLIR_ENABLE_BINDINGS_PYTHON)

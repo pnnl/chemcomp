@@ -11,6 +11,7 @@ configure_lit_site_cfg(
 
 set(STANDALONE_TEST_DEPENDS
         FileCheck count not
+        chemcomp-tblgen
         standalone-capi-test
         standalone-opt
         standalone-translate
