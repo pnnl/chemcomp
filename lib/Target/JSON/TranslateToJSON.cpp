@@ -60,10 +60,23 @@ static LogicalResult emitCRNGenericOp(acr::CRNGenericOp op,
   for (auto val : stoichAttr.getValues<int32_t>())
     matrix.push_back(val);
 
-  // Generate species names: S0, S1, ...
+  // Prefer the concrete names attached by the crn-db-match pass; fall back to
+  // generic S0, S1, ... where the CRN was never matched or a species was left
+  // unbound. Without this the matched names would stop at the IR and never
+  // reach the emulator.
+  auto namesAttr = op->getAttrOfType<ArrayAttr>("species_names");
   SmallVector<std::string> speciesNames;
-  for (int64_t s = 0; s < S; ++s)
+  for (int64_t s = 0; s < S; ++s) {
+    if (namesAttr && s < (int64_t)namesAttr.size()) {
+      if (auto name = dyn_cast<StringAttr>(namesAttr[s])) {
+        if (!name.getValue().empty()) {
+          speciesNames.push_back(name.getValue().str());
+          continue;
+        }
+      }
+    }
     speciesNames.push_back(("S" + Twine(s)).str());
+  }
 
   // Extract rate constants.
   // Detect tensor vs scalar form.
