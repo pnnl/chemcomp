@@ -164,6 +164,32 @@ acr.crn @generic_network_tensor(%sv: tensor<3x!acr.species>, %rv: tensor<2xf32>)
 // -----
 
 //===----------------------------------------------------------------------===//
+// acr.crn_generic — discardable attributes round-trip
+//
+// The crn-db-match pass annotates crn_generic in place with `species_names`
+// and `motif_ids`. The verifier inspects only `stoich_matrix`, so extra
+// discardable attributes must survive parse/print untouched.
+//===----------------------------------------------------------------------===//
+
+// CHECK-LABEL: acr.crn @generic_network_annotated
+acr.crn @generic_network_annotated(%sv: tensor<3x!acr.species>,
+                                    %rv: tensor<2xf32>)
+    -> tensor<3x!acr.species> {
+  // CHECK: acr.crn_generic
+  // CHECK-SAME: motif_ids = ["rxn00006", "rxn00001"]
+  // CHECK-SAME: species_names = ["H2O2", "H2O", "O2"]
+  // CHECK-SAME: stoich_matrix
+  %out = acr.crn_generic
+      {stoich_matrix = dense<[[-2, -1, 2], [0, -1, 1]]> : tensor<2x3xi32>,
+       species_names = ["H2O2", "H2O", "O2"],
+       motif_ids = ["rxn00006", "rxn00001"]}
+      (%sv, %rv) : (tensor<3x!acr.species>, tensor<2xf32>) -> tensor<3x!acr.species>
+  acr.return %out : tensor<3x!acr.species>
+}
+
+// -----
+
+//===----------------------------------------------------------------------===//
 // acr.reaction — tensor form definition
 //===----------------------------------------------------------------------===//
 

@@ -45,6 +45,35 @@ func.func @react_scalar_result_mismatch(%h2: !acr.species, %o2: !acr.species,
 // -----
 
 //===----------------------------------------------------------------------===//
+// acr.crn_generic — missing stoich_matrix attribute
+//===----------------------------------------------------------------------===//
+
+func.func @crn_generic_missing_stoich(%sv: tensor<3x!acr.species>,
+                                       %rv: tensor<2xf32>) {
+  // expected-error @+1 {{requires a 'stoich_matrix' dense integer attribute}}
+  %out = acr.crn_generic
+      (%sv, %rv) : (tensor<3x!acr.species>, tensor<2xf32>) -> tensor<3x!acr.species>
+  return
+}
+
+// -----
+
+//===----------------------------------------------------------------------===//
+// acr.crn_generic — stoich_matrix must be 2-D
+//===----------------------------------------------------------------------===//
+
+func.func @crn_generic_stoich_rank1(%sv: tensor<3x!acr.species>,
+                                     %rv: tensor<2xf32>) {
+  // expected-error @+1 {{'stoich_matrix' must be a 2-D tensor}}
+  %out = acr.crn_generic
+      {stoich_matrix = dense<[-2, -1, 2]> : tensor<3xi32>}
+      (%sv, %rv) : (tensor<3x!acr.species>, tensor<2xf32>) -> tensor<3x!acr.species>
+  return
+}
+
+// -----
+
+//===----------------------------------------------------------------------===//
 // acr.crn_generic — tensor form: species dimension mismatch with stoich_matrix
 //===----------------------------------------------------------------------===//
 
