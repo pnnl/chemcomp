@@ -9,10 +9,6 @@
 #include "Standalone-c/Dialects.h"
 
 #include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/Standalone/StandaloneDialect.h"
 #include "mlir/CAPI/Registration.h"
-
-MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(Standalone, standalone,
-                                      mlir::standalone::StandaloneDialect)
 
 MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(ACR, acr, mlir::acr::ACRDialect)

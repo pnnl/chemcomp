@@ -12,9 +12,6 @@
 #include "mlir/Support/FileUtilities.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
 
-#include "Standalone/Dialect/Standalone/StandaloneDialect.h"
-#include "Standalone/Dialect/Standalone/StandalonePasses.h"
-
 #include "Standalone/Dialect/ACR/ACRDialect.h"
 #include "Standalone/Dialect/ACR/ACRPasses.h"
 
@@ -22,14 +19,12 @@
 
 int main(int argc, char **argv) {
   mlir::registerAllPasses();
-  mlir::standalone::registerPasses();
   mlir::acr::registerPasses();
   mlir::crn2db::registerPasses();
 
   mlir::DialectRegistry registry;
-  registry
-      .insert<mlir::standalone::StandaloneDialect, mlir::arith::ArithDialect,
-              mlir::func::FuncDialect, mlir::acr::ACRDialect>();
+  registry.insert<mlir::arith::ArithDialect, mlir::func::FuncDialect,
+                  mlir::acr::ACRDialect>();
   // Add the following to include *all* MLIR Core dialects, or selectively
   // include what you need like above. You only need to register dialects that
   // will be *parsed* by the tool, not the one generated

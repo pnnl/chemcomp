@@ -4,12 +4,12 @@ add_llvm_library(StandalonePlugin
         standalone-plugin.cpp
 
         DEPENDS
-        MLIRStandalone
+        MLIRACR
         PLUGIN_TOOL
         mlir-opt
 
         LINK_LIBS
-        MLIRStandalone
+        MLIRACR
         )
 target_include_directories(
         StandalonePlugin

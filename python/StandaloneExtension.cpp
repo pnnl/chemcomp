@@ -13,21 +13,8 @@ using namespace mlir::python::adaptors;
 
 PYBIND11_MODULE(_standaloneDialects, m) {
   //===--------------------------------------------------------------------===//
-  // standalone dialect
+  // acr dialect
   //===--------------------------------------------------------------------===//
-  auto standaloneM = m.def_submodule("standalone");
-
-  standaloneM.def(
-      "register_dialect",
-      [](MlirContext context, bool load) {
-        MlirDialectHandle handle = mlirGetDialectHandle__standalone__();
-        mlirDialectHandleRegisterDialect(handle, context);
-        if (load) {
-          mlirDialectHandleLoadDialect(handle, context);
-        }
-      },
-      py::arg("context") = py::none(), py::arg("load") = true);
-
   auto acrM = m.def_submodule("acr");
 
   acrM.def(

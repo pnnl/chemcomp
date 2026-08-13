@@ -5,7 +5,6 @@ set(LIBS
         ${conversion_libs}
         MLIRArithDialect
         MLIROptLib
-        MLIRStandalone
         MLIRACR
         )
 add_llvm_executable(standalone-opt standalone-opt.cpp)
