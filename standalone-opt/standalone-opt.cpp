@@ -15,12 +15,12 @@
 #include "Standalone/Dialect/ACR/ACRDialect.h"
 #include "Standalone/Dialect/ACR/ACRPasses.h"
 
-#include "Standalone/CRN2DB/CRN2DBPasses.h"
+#include "Standalone/Conversion/Passes.h"
 
 int main(int argc, char **argv) {
   mlir::registerAllPasses();
   mlir::acr::registerPasses();
-  mlir::crn2db::registerPasses();
+  mlir::registerChemCompConversionPasses();
 
   mlir::DialectRegistry registry;
   registry.insert<mlir::arith::ArithDialect, mlir::func::FuncDialect,

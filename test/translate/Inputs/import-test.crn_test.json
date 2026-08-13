@@ -1,0 +1,22 @@
+{
+    "reactions": [
+        {
+            "species": ["A"],
+            "reactants": [1],
+            "products": [0],
+            "rate": 0.1,
+            "name": "R1"
+        },
+
+        {
+            // 2A+B > A+B+C
+            "species": ["A", "B", "C"],
+            "reactants": [2, 1, 0],
+            "products": [1, 1, 1],
+            "rate": 0.1,
+            "name": "R1"
+        }
+    ],
+    "populations": { "S0": 1, "S1": 1, "S2": 1 },
+    "tracked_species": []
+}

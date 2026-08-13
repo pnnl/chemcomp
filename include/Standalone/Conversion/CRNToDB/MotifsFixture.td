@@ -25,7 +25,7 @@
 #ifndef CHEMCOMP_MOTIFS_FIXTURE
 #define CHEMCOMP_MOTIFS_FIXTURE
 
-include "Standalone/CRN2DB/MotifBase.td"
+include "Standalone/Conversion/CRNToDB/MotifBase.td"
 
 //===----------------------------------------------------------------------===//
 // Table 1 -- the first ten ModelSEED motifs.

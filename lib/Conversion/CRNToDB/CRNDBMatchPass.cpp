@@ -15,12 +15,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/CRN2DB/CRN2DBPasses.h"
+#include "Standalone/Conversion/CRNToDB/CRNToDB.h"
 
-#include "Standalone/CRN2DB/CRNMatcher.h"
-#include "Standalone/CRN2DB/FrontierDP.h"
-#include "Standalone/CRN2DB/MotifDatabase.h"
-#include "Standalone/CRN2DB/MotifDatabaseLoader.h"
+#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
+#include "Standalone/Conversion/CRNToDB/FrontierDP.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabaseLoader.h"
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinAttributes.h"
@@ -32,9 +32,9 @@
 using namespace mlir;
 using namespace chemcomp;
 
-namespace mlir::crn2db {
+namespace mlir {
 #define GEN_PASS_DEF_CRNDBMATCH
-#include "Standalone/CRN2DB/CRN2DBPasses.h.inc"
+#include "Standalone/Conversion/Passes.h.inc"
 
 namespace {
 
@@ -205,4 +205,4 @@ private:
 };
 
 } // namespace
-} // namespace mlir::crn2db
+} // namespace mlir

@@ -6,12 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_CRN2DB_FRONTIERDP_H
-#define STANDALONE_CRN2DB_FRONTIERDP_H
+#ifndef CHEMCOMP_CONVERSION_CRNTODB_FRONTIERDP_H
+#define CHEMCOMP_CONVERSION_CRNTODB_FRONTIERDP_H
 
-#include "Standalone/CRN2DB/CRNMatcher.h"
-#include "Standalone/CRN2DB/MotifDatabase.h"
-#include "Standalone/CRN2DB/Scoring.h"
+#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
+#include "Standalone/Conversion/CRNToDB/Scoring.h"
 
 #include <optional>
 
@@ -80,4 +80,4 @@ MatchResult runFrontierDP(const QueryCRN &query, const MotifDatabase &db,
 
 } // namespace chemcomp
 
-#endif // STANDALONE_CRN2DB_FRONTIERDP_H
+#endif // CHEMCOMP_CONVERSION_CRNTODB_FRONTIERDP_H

@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/CRN2DB/MotifDatabase.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Format.h"

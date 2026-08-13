@@ -6,11 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_CRN2DB_SCORING_H
-#define STANDALONE_CRN2DB_SCORING_H
+#ifndef CHEMCOMP_CONVERSION_CRNTODB_SCORING_H
+#define CHEMCOMP_CONVERSION_CRNTODB_SCORING_H
 
-#include "Standalone/CRN2DB/CRNMatcher.h"
-#include "Standalone/CRN2DB/MotifDatabase.h"
+#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/ArrayRef.h"
 
@@ -51,4 +51,4 @@ double localScore(const QueryCRN &query, AbstractReaction r, const Motif &motif,
 
 } // namespace chemcomp
 
-#endif // STANDALONE_CRN2DB_SCORING_H
+#endif // CHEMCOMP_CONVERSION_CRNTODB_SCORING_H

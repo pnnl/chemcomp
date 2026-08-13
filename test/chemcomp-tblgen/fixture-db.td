@@ -1,5 +1,5 @@
 // RUN: chemcomp-tblgen -gen-motif-db -I %S/../../include \
-// RUN:   %S/../../include/Standalone/CRN2DB/MotifsFixture.td | FileCheck %s
+// RUN:   %S/../../include/Standalone/Conversion/CRNToDB/MotifsFixture.td | FileCheck %s
 
 // Guards the committed fixture itself. Deliberately checks structure and a few
 // anchor records rather than every row, so adding motifs does not churn the

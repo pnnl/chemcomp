@@ -11,10 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_CRN2DB_CRNMATCHER_H
-#define STANDALONE_CRN2DB_CRNMATCHER_H
+#ifndef CHEMCOMP_CONVERSION_CRNTODB_CRNMATCHER_H
+#define CHEMCOMP_CONVERSION_CRNTODB_CRNMATCHER_H
 
-#include "Standalone/CRN2DB/MotifDatabase.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/SmallBitVector.h"
 #include "llvm/ADT/SmallVector.h"
@@ -153,4 +153,4 @@ computeFrontiers(const QueryCRN &query,
 
 } // namespace chemcomp
 
-#endif // STANDALONE_CRN2DB_CRNMATCHER_H
+#endif // CHEMCOMP_CONVERSION_CRNTODB_CRNMATCHER_H

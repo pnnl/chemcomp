@@ -3,7 +3,7 @@
 // Two records claiming one motif id would make slice membership ambiguous and
 // silently shadow one another in the generated table.
 
-include "Standalone/CRN2DB/MotifBase.td"
+include "Standalone/Conversion/CRNToDB/MotifBase.td"
 
 def RxnFirst : Motif<"rxn00001", ["A", "B"], [-1, 1]>;
 def RxnSecond : Motif<"rxn00001", ["C", "D"], [-1, 1]>;

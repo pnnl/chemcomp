@@ -11,7 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/CRN2DB/MotifDatabaseLoader.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabaseLoader.h"
 
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
@@ -24,7 +24,7 @@
 #include <limits>
 
 #define GET_MOTIF_DB
-#include "Standalone/CRN2DB/MotifsFixture.inc"
+#include "Standalone/Conversion/CRNToDB/MotifsFixture.inc"
 
 using namespace chemcomp;
 

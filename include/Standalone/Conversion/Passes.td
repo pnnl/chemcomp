@@ -1,4 +1,4 @@
-//===- CRN2DBPasses.td - CRN2DB passes ---------------------*- tablegen -*-===//
+//===-- Passes.td - Conversion pass definition file --------*- tablegen -*-===//
 //
 // This file is licensed under the Apache License v2.0 with LLVM Exceptions.
 // See https://github.com/pnnl/chemcomp/LICENSE.txt for license information.
@@ -6,10 +6,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef CHEMCOMP_CRN2DB_PASSES
-#define CHEMCOMP_CRN2DB_PASSES
+#ifndef CHEMCOMP_CONVERSION_PASSES
+#define CHEMCOMP_CONVERSION_PASSES
 
 include "mlir/Pass/PassBase.td"
+
+//===----------------------------------------------------------------------===//
+// CRNToDB
+//===----------------------------------------------------------------------===//
 
 def CRNDBMatch : Pass<"crn-db-match", "::mlir::ModuleOp"> {
   let summary = "Match abstract CRNs against a concrete reaction database";
@@ -36,7 +40,7 @@ def CRNDBMatch : Pass<"crn-db-match", "::mlir::ModuleOp"> {
     Example:
 
     ```mlir
-    // RUN: standalone-opt -crn-db-match='db-slice=OscillatorSlice'
+    // RUN: chemcomp-opt -crn-db-match='db-slice=OscillatorSlice'
     %out = acr.crn_generic {stoich_matrix = dense<...> : tensor<4x6xi32>}
         (%species, %rates) : (...) -> ...
     ```
@@ -90,4 +94,4 @@ def CRNDBMatch : Pass<"crn-db-match", "::mlir::ModuleOp"> {
   ];
 }
 
-#endif // CHEMCOMP_CRN2DB_PASSES
+#endif // CHEMCOMP_CONVERSION_PASSES

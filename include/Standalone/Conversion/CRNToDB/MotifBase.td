@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// Schema for the compiled-in reaction motif fixture consumed by the CRN2DB
+// Schema for the compiled-in reaction motif fixture consumed by the CRNToDB
 // matching pass (papers/cf26-crn2db). `chemcomp-tblgen -gen-motif-db` turns
 // records defined against these classes into a static C++ table.
 //

@@ -1,2 +1,2 @@
-add_subdirectory(CRN2DB)
+add_subdirectory(Conversion)
 add_subdirectory(Dialect)

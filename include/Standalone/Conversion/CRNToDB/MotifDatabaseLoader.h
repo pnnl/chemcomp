@@ -10,14 +10,14 @@
 //
 // Both apply the same SliceSpec and call buildIndex(), so the resulting
 // database is indistinguishable to the matcher regardless of origin -- a
-// property asserted directly by test/CRN2DB/db-loader-equivalence.mlir.
+// property asserted directly by test/Conversion/CRNToDB/db-loader-equivalence.mlir.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_CRN2DB_MOTIFDATABASELOADER_H
-#define STANDALONE_CRN2DB_MOTIFDATABASELOADER_H
+#ifndef CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASELOADER_H
+#define CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASELOADER_H
 
-#include "Standalone/CRN2DB/MotifDatabase.h"
+#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
@@ -62,4 +62,4 @@ llvm::Error loadJSONDatabaseFromBuffer(llvm::StringRef json,
 
 } // namespace chemcomp
 
-#endif // STANDALONE_CRN2DB_MOTIFDATABASELOADER_H
+#endif // CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASELOADER_H

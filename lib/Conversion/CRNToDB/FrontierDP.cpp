@@ -23,7 +23,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/CRN2DB/FrontierDP.h"
+#include "Standalone/Conversion/CRNToDB/FrontierDP.h"
 
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/MapVector.h"

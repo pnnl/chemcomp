@@ -21,8 +21,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_CRN2DB_MOTIFDATABASE_H
-#define STANDALONE_CRN2DB_MOTIFDATABASE_H
+#ifndef CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASE_H
+#define CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASE_H
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
@@ -317,4 +317,4 @@ template <> struct DenseMapInfo<chemcomp::SignatureKey> {
 };
 } // namespace llvm
 
-#endif // STANDALONE_CRN2DB_MOTIFDATABASE_H
+#endif // CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASE_H

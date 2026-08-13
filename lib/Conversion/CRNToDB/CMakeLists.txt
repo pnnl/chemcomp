@@ -1,7 +1,7 @@
-# A conversion library rather than a plain one: standalone-opt already links
+# A conversion library rather than a plain one: chemcomp-opt already links
 # everything in the global MLIR_CONVERSION_LIBS property, so registering here
 # means the pass reaches the tool without editing its CMakeLists.
-add_mlir_conversion_library(MLIRCRN2DB
+add_mlir_conversion_library(MLIRCRNToDB
     CRNDBMatchPass.cpp
     MotifDatabase.cpp
     FrontierDP.cpp
@@ -11,11 +11,11 @@ add_mlir_conversion_library(MLIRCRN2DB
     MotifDatabaseJSON.cpp
 
     ADDITIONAL_HEADER_DIRS
-    ${PROJECT_SOURCE_DIR}/include/Standalone/CRN2DB
+    ${PROJECT_SOURCE_DIR}/include/Standalone/Conversion/CRNToDB
 
     DEPENDS
     ChemCompMotifsIncGen
-    ChemCompCRN2DBPassIncGen
+    ChemCompConversionPassIncGen
 
     LINK_LIBS PUBLIC
     MLIRACR

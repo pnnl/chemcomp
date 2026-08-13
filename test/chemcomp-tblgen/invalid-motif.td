@@ -5,7 +5,7 @@
 // backend enforces it -- with a source location, which is why this is caught
 // here rather than by MotifDatabase::addMotif returning false at load time.
 
-include "Standalone/CRN2DB/MotifBase.td"
+include "Standalone/Conversion/CRNToDB/MotifBase.td"
 
 def RxnMismatched : Motif<"rxn00001", ["H2O", "PPi", "Phosphate"], [-1, 1]>;
 
