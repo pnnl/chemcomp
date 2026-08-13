@@ -15,12 +15,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Conversion/CRNToDB/CRNToDB.h"
+#include "ChemComp/Conversion/CRNToDB/CRNToDB.h"
 
-#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
-#include "Standalone/Conversion/CRNToDB/FrontierDP.h"
-#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
-#include "Standalone/Conversion/CRNToDB/MotifDatabaseLoader.h"
+#include "ChemComp/Conversion/CRNToDB/CRNMatcher.h"
+#include "ChemComp/Conversion/CRNToDB/FrontierDP.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabase.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabaseLoader.h"
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinAttributes.h"
@@ -34,7 +34,7 @@ using namespace chemcomp;
 
 namespace mlir {
 #define GEN_PASS_DEF_CRNDBMATCH
-#include "Standalone/Conversion/Passes.h.inc"
+#include "ChemComp/Conversion/Passes.h.inc"
 
 namespace {
 

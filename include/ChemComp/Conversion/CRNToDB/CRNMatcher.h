@@ -14,7 +14,7 @@
 #ifndef CHEMCOMP_CONVERSION_CRNTODB_CRNMATCHER_H
 #define CHEMCOMP_CONVERSION_CRNTODB_CRNMATCHER_H
 
-#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/SmallBitVector.h"
 #include "llvm/ADT/SmallVector.h"

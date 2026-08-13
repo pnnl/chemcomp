@@ -9,9 +9,9 @@
 #ifndef CHEMCOMP_CONVERSION_CRNTODB_FRONTIERDP_H
 #define CHEMCOMP_CONVERSION_CRNTODB_FRONTIERDP_H
 
-#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
-#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
-#include "Standalone/Conversion/CRNToDB/Scoring.h"
+#include "ChemComp/Conversion/CRNToDB/CRNMatcher.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabase.h"
+#include "ChemComp/Conversion/CRNToDB/Scoring.h"
 
 #include <optional>
 

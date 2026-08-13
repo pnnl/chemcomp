@@ -3,4 +3,4 @@
 #  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 from ._acr_ops_gen import *
-from .._mlir_libs._standaloneDialects.acr import *
+from .._mlir_libs._chemcompDialects.acr import *

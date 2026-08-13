@@ -12,10 +12,10 @@
 #include "mlir/Support/FileUtilities.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/ACR/ACRPasses.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACRPasses.h"
 
-#include "Standalone/Conversion/Passes.h"
+#include "ChemComp/Conversion/Passes.h"
 
 int main(int argc, char **argv) {
   mlir::registerAllPasses();
@@ -31,5 +31,5 @@ int main(int argc, char **argv) {
   // registerAllDialects(registry);
 
   return mlir::asMainReturnCode(
-      mlir::MlirOptMain(argc, argv, "Standalone optimizer driver\n", registry));
+      mlir::MlirOptMain(argc, argv, "ChemComp optimizer driver\n", registry));
 }

@@ -6,14 +6,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/ACR/ACROps.h"
-#include "Standalone/Dialect/ACR/ACRTypes.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACROps.h"
+#include "ChemComp/Dialect/ACR/ACRTypes.h"
 
 using namespace mlir;
 using namespace mlir::acr;
 
-#include "Standalone/Dialect/ACR/ACROpsDialect.cpp.inc"
+#include "ChemComp/Dialect/ACR/ACROpsDialect.cpp.inc"
 
 //===----------------------------------------------------------------------===//
 // ACR dialect.
@@ -22,7 +22,7 @@ using namespace mlir::acr;
 void ACRDialect::initialize() {
   addOperations<
 #define GET_OP_LIST
-#include "Standalone/Dialect/ACR/ACROps.cpp.inc"
+#include "ChemComp/Dialect/ACR/ACROps.cpp.inc"
       >();
   registerTypes();
 }

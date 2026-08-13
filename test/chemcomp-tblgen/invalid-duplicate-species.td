@@ -2,7 +2,7 @@
 
 // A species repeated inside one motif leaves nu_j(s) with two values.
 
-include "Standalone/Conversion/CRNToDB/MotifBase.td"
+include "ChemComp/Conversion/CRNToDB/MotifBase.td"
 
 def RxnRepeated : Motif<"rxn00001", ["H2O", "PPi", "H2O"], [-1, -1, 2]>;
 

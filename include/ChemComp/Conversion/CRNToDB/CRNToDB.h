@@ -9,8 +9,8 @@
 #ifndef CHEMCOMP_CONVERSION_CRNTODB_CRNTODB_H
 #define CHEMCOMP_CONVERSION_CRNTODB_CRNTODB_H
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/ACR/ACROps.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACROps.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Pass/Pass.h"
 #include <memory>
@@ -18,7 +18,7 @@
 namespace mlir {
 
 #define GEN_PASS_DECL_CRNDBMATCH
-#include "Standalone/Conversion/Passes.h.inc"
+#include "ChemComp/Conversion/Passes.h.inc"
 
 } // namespace mlir
 

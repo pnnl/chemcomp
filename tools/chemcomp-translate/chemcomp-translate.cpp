@@ -11,8 +11,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Target/JSON/JSONEmitter.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Target/JSON/JSONEmitter.h"
 #include "mlir/IR/DialectRegistry.h"
 #include "mlir/IR/Operation.h"
 #include "mlir/InitAllTranslations.h"

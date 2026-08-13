@@ -6,9 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Dialect/ACR/ACRTypes.h"
+#include "ChemComp/Dialect/ACR/ACRTypes.h"
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
 #include "llvm/ADT/TypeSwitch.h"
@@ -16,11 +16,11 @@
 using namespace mlir::acr;
 
 #define GET_TYPEDEF_CLASSES
-#include "Standalone/Dialect/ACR/ACROpsTypes.cpp.inc"
+#include "ChemComp/Dialect/ACR/ACROpsTypes.cpp.inc"
 
 void ACRDialect::registerTypes() {
   addTypes<
 #define GET_TYPEDEF_LIST
-#include "Standalone/Dialect/ACR/ACROpsTypes.cpp.inc"
+#include "ChemComp/Dialect/ACR/ACROpsTypes.cpp.inc"
       >();
 }

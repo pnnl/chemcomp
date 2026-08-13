@@ -1,4 +1,4 @@
-// RUN: mlir-opt %s --load-dialect-plugin=%standalone_libs/ChemCompPlugin%shlibext --pass-pipeline="builtin.module(acr-switch-bar-foo)" | FileCheck %s
+// RUN: mlir-opt %s --load-dialect-plugin=%chemcomp_libs/ChemCompPlugin%shlibext --pass-pipeline="builtin.module(acr-switch-bar-foo)" | FileCheck %s
 
 //===----------------------------------------------------------------------===//
 // Dialect plugin load path.

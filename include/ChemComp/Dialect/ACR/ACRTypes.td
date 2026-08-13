@@ -11,7 +11,7 @@
 
 include "mlir/IR/AttrTypeBase.td"
 include "mlir/IR/BuiltinTypeInterfaces.td"
-include "Standalone/Dialect/ACR/ACRDialect.td"
+include "ChemComp/Dialect/ACR/ACRDialect.td"
 
 //===----------------------------------------------------------------------===//
 // ACR type definitions

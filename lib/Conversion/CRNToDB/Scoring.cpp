@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Conversion/CRNToDB/Scoring.h"
+#include "ChemComp/Conversion/CRNToDB/Scoring.h"
 
 #include <cmath>
 

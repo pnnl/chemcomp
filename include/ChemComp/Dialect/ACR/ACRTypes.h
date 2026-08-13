@@ -12,6 +12,6 @@
 #include "mlir/IR/BuiltinTypes.h"
 
 #define GET_TYPEDEF_CLASSES
-#include "Standalone/Dialect/ACR/ACROpsTypes.h.inc"
+#include "ChemComp/Dialect/ACR/ACROpsTypes.h.inc"
 
 #endif // ACR_ACRTYPES_H

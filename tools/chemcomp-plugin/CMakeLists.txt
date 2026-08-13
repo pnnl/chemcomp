@@ -14,5 +14,5 @@ add_llvm_library(ChemCompPlugin
 target_include_directories(
         ChemCompPlugin
         PRIVATE
-        "${STANDALONE_BINARY_DIR}/include"
+        "${CHEMCOMP_BINARY_DIR}/include"
 )

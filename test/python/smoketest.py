@@ -1,7 +1,7 @@
 # RUN: %python %s | FileCheck %s
 
-from mlir_standalone.ir import *
-from mlir_standalone.dialects import builtin as builtin_d, acr as acr_d
+from mlir_chemcomp.ir import *
+from mlir_chemcomp.dialects import builtin as builtin_d, acr as acr_d
 
 with Context():
     acr_d.register_dialect()

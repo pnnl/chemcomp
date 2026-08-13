@@ -19,6 +19,6 @@
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
 #define GET_OP_CLASSES
-#include "Standalone/Dialect/ACR/ACROps.h.inc"
+#include "ChemComp/Dialect/ACR/ACROps.h.inc"
 
 #endif // ACR_ACROPS_H

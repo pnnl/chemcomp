@@ -6,9 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Dialect/ACR/ACROps.h"
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/ACR/ACRTypes.h"
+#include "ChemComp/Dialect/ACR/ACROps.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACRTypes.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/Interfaces/FunctionImplementation.h"
@@ -248,4 +248,4 @@ LogicalResult CRNGenericOp::verify() {
 //===----------------------------------------------------------------------===//
 
 #define GET_OP_CLASSES
-#include "Standalone/Dialect/ACR/ACROps.cpp.inc"
+#include "ChemComp/Dialect/ACR/ACROps.cpp.inc"

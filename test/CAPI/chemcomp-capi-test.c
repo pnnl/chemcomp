@@ -1,4 +1,4 @@
-//===- standalone-cap-demo.c - Simple demo of C-API -----------------------===//
+//===- chemcomp-cap-demo.c - Simple demo of C-API -----------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM
 // Exceptions.
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-#include "Standalone-c/Dialects.h"
+#include "ChemComp-c/Dialects.h"
 #include "mlir-c/IR.h"
 #include "mlir-c/RegisterEverything.h"
 

@@ -10,8 +10,8 @@
 #include "mlir/InitAllDialects.h"
 #include "mlir/Tools/Plugins/DialectPlugin.h"
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/ACR/ACRPasses.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACRPasses.h"
 #include "mlir/Tools/Plugins/PassPlugin.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvm/Support/Compiler.h"

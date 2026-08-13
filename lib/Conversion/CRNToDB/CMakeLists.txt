@@ -11,7 +11,7 @@ add_mlir_conversion_library(MLIRCRNToDB
     MotifDatabaseJSON.cpp
 
     ADDITIONAL_HEADER_DIRS
-    ${PROJECT_SOURCE_DIR}/include/Standalone/Conversion/CRNToDB
+    ${PROJECT_SOURCE_DIR}/include/ChemComp/Conversion/CRNToDB
 
     DEPENDS
     ChemCompMotifsIncGen

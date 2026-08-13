@@ -9,6 +9,6 @@
 #ifndef PYTHON_BINDINGS_ACR_OPS
 #define PYTHON_BINDINGS_ACR_OPS
 
-include "Standalone/Dialect/ACR/ACRTypes.td"
+include "ChemComp/Dialect/ACR/ACRTypes.td"
 
 #endif

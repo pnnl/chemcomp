@@ -6,10 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Dialect/ACR/ACROps.h"
-#include "Standalone/Dialect/ACR/ACRTypes.h"
-#include "Standalone/Target/JSON/JSONEmitter.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACROps.h"
+#include "ChemComp/Dialect/ACR/ACRTypes.h"
+#include "ChemComp/Target/JSON/JSONEmitter.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"

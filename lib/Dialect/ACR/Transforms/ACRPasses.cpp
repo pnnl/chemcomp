@@ -11,11 +11,11 @@
 #include "mlir/Support/LogicalResult.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
-#include "Standalone/Dialect/ACR/ACRPasses.h"
+#include "ChemComp/Dialect/ACR/ACRPasses.h"
 
 namespace mlir::acr {
 #define GEN_PASS_DEF_ACRSWITCHBARFOO
-#include "Standalone/Dialect/ACR/ACRPasses.h.inc"
+#include "ChemComp/Dialect/ACR/ACRPasses.h.inc"
 
 namespace {
 class ACRSwitchBarFooRewriter : public OpRewritePattern<func::FuncOp> {

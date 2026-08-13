@@ -1,4 +1,4 @@
-//===- StandaloneExtension.cpp - Extension module -------------------------===//
+//===- ChemCompExtension.cpp - Extension module -------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://github.com/pnnl/chemcomp/LICENSE.txt for license information.
@@ -6,12 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone-c/Dialects.h"
+#include "ChemComp-c/Dialects.h"
 #include "mlir/Bindings/Python/PybindAdaptors.h"
 
 using namespace mlir::python::adaptors;
 
-PYBIND11_MODULE(_standaloneDialects, m) {
+PYBIND11_MODULE(_chemcompDialects, m) {
   //===--------------------------------------------------------------------===//
   // acr dialect
   //===--------------------------------------------------------------------===//

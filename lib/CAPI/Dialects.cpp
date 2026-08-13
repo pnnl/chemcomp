@@ -6,9 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone-c/Dialects.h"
+#include "ChemComp-c/Dialects.h"
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
 #include "mlir/CAPI/Registration.h"
 
 MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(ACR, acr, mlir::acr::ACRDialect)

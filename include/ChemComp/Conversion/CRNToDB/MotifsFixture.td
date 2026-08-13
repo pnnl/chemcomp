@@ -8,7 +8,7 @@
 //
 // The curated motif database compiled into the binary for lit tests.
 //
-// Everything here is committed, so `check-standalone` runs with no external
+// Everything here is committed, so `check-chemcomp` runs with no external
 // data file. The full ~43k-motif database lives outside the build and is
 // loaded from JSON at runtime (`db=<path>`); see MotifBase.td for why.
 //
@@ -25,7 +25,7 @@
 #ifndef CHEMCOMP_MOTIFS_FIXTURE
 #define CHEMCOMP_MOTIFS_FIXTURE
 
-include "Standalone/Conversion/CRNToDB/MotifBase.td"
+include "ChemComp/Conversion/CRNToDB/MotifBase.td"
 
 //===----------------------------------------------------------------------===//
 // Table 1 -- the first ten ModelSEED motifs.

@@ -5,7 +5,7 @@ add_mlir_dialect_library(MLIRACR
         Transforms/ACRPasses.cpp
 
         ADDITIONAL_HEADER_DIRS
-        ${PROJECT_SOURCE_DIR}/Standalone/Dialect/ACR
+        ${PROJECT_SOURCE_DIR}/include/ChemComp/Dialect/ACR
 
         DEPENDS
         MLIRACROpsIncGen

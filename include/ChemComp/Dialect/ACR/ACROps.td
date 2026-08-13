@@ -9,7 +9,7 @@
 #ifndef ACR_OPS
 #define ACR_OPS
 
-include "Standalone/Dialect/ACR/ACRTypes.td"
+include "ChemComp/Dialect/ACR/ACRTypes.td"
 include "mlir/Interfaces/FunctionInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
 include "mlir/Interfaces/ControlFlowInterfaces.td"

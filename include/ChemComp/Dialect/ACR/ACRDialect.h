@@ -12,6 +12,6 @@
 #include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/Dialect.h"
 
-#include "Standalone/Dialect/ACR/ACROpsDialect.h.inc"
+#include "ChemComp/Dialect/ACR/ACROpsDialect.h.inc"
 
 #endif // ACR_ACRDIALECT_H

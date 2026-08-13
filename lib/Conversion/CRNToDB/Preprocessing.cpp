@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
+#include "ChemComp/Conversion/CRNToDB/CRNMatcher.h"
 
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallSet.h"

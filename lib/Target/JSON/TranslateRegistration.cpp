@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Dialect/ACR/ACRDialect.h"
-#include "Standalone/Target/JSON/JSONEmitter.h"
+#include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Target/JSON/JSONEmitter.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/Dialect.h"

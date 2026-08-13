@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Standalone/Conversion/CRNToDB/MotifDatabaseLoader.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabaseLoader.h"
 
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Error.h"

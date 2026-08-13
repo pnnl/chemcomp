@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_C_DIALECTS_H
-#define STANDALONE_C_DIALECTS_H
+#ifndef CHEMCOMP_C_DIALECTS_H
+#define CHEMCOMP_C_DIALECTS_H
 
 #include "mlir-c/IR.h"
 
@@ -21,4 +21,4 @@ MLIR_DECLARE_CAPI_DIALECT_REGISTRATION(ACR, acr);
 }
 #endif
 
-#endif // STANDALONE_C_DIALECTS_H
+#endif // CHEMCOMP_C_DIALECTS_H

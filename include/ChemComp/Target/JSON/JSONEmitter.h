@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef STANDALONE_TARGET_JSON_JSONEMITTER_H
-#define STANDALONE_TARGET_JSON_JSONEMITTER_H
+#ifndef CHEMCOMP_TARGET_JSON_JSONEMITTER_H
+#define CHEMCOMP_TARGET_JSON_JSONEMITTER_H
 
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/OwningOpRef.h"
@@ -34,4 +34,4 @@ void registerFromJSONTranslation();
 } // namespace acr
 } // namespace mlir
 
-#endif // STANDALONE_TARGET_JSON_JSONEMITTER_H
+#endif // CHEMCOMP_TARGET_JSON_JSONEMITTER_H

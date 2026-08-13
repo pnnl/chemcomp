@@ -2,7 +2,7 @@
 """Convert MotifsDB CSV rows into TableGen motif records.
 
 Used to (re)generate curated fixture records for
-include/Standalone/Conversion/CRNToDB/MotifsFixture.td. Run offline; its output is meant to
+include/ChemComp/Conversion/CRNToDB/MotifsFixture.td. Run offline; its output is meant to
 be reviewed and pasted, not wired into the build.
 
 Emitting all 43k motifs as TableGen is deliberately not supported: parsing that

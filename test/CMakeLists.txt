@@ -9,7 +9,7 @@ configure_lit_site_cfg(
         ${CMAKE_CURRENT_SOURCE_DIR}/lit.cfg.py
 )
 
-set(STANDALONE_TEST_DEPENDS
+set(CHEMCOMP_TEST_DEPENDS
         FileCheck count not
         chemcomp-tblgen
         chemcomp-capi-test
@@ -18,15 +18,15 @@ set(STANDALONE_TEST_DEPENDS
         ChemCompPlugin
         )
 if(MLIR_ENABLE_BINDINGS_PYTHON)
-  list(APPEND STANDALONE_TEST_DEPENDS StandalonePythonModules)
+  list(APPEND CHEMCOMP_TEST_DEPENDS ChemCompPythonModules)
 endif()
 
-add_lit_testsuite(check-standalone "Running the standalone regression tests"
+add_lit_testsuite(check-chemcomp "Running the chemcomp regression tests"
         ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS ${STANDALONE_TEST_DEPENDS}
+        DEPENDS ${CHEMCOMP_TEST_DEPENDS}
         )
-set_target_properties(check-standalone PROPERTIES FOLDER "Tests")
+set_target_properties(check-chemcomp PROPERTIES FOLDER "Tests")
 
-add_lit_testsuites(STANDALONE ${CMAKE_CURRENT_SOURCE_DIR} DEPENDS ${STANDALONE_TEST_DEPENDS})
+add_lit_testsuites(CHEMCOMP ${CMAKE_CURRENT_SOURCE_DIR} DEPENDS ${CHEMCOMP_TEST_DEPENDS})
 
 add_subdirectory(CAPI)

@@ -4,7 +4,7 @@
 // than on the real fixture, so the expectations stay readable and stable when
 // motifs are added to MotifsFixture.td.
 
-include "Standalone/Conversion/CRNToDB/MotifBase.td"
+include "ChemComp/Conversion/CRNToDB/MotifBase.td"
 
 //===----------------------------------------------------------------------===//
 // Counts, emitted ahead of the tables.

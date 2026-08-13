@@ -9,8 +9,8 @@
 #ifndef CHEMCOMP_CONVERSION_CRNTODB_SCORING_H
 #define CHEMCOMP_CONVERSION_CRNTODB_SCORING_H
 
-#include "Standalone/Conversion/CRNToDB/CRNMatcher.h"
-#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
+#include "ChemComp/Conversion/CRNToDB/CRNMatcher.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/ArrayRef.h"
 

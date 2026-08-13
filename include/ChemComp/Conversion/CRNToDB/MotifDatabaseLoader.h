@@ -17,7 +17,7 @@
 #ifndef CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASELOADER_H
 #define CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASELOADER_H
 
-#include "Standalone/Conversion/CRNToDB/MotifDatabase.h"
+#include "ChemComp/Conversion/CRNToDB/MotifDatabase.h"
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
