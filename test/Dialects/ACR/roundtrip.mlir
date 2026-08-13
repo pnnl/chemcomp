@@ -1,4 +1,4 @@
-// RUN: standalone-opt %s -split-input-file | FileCheck %s
+// RUN: chemcomp-opt %s -split-input-file | FileCheck %s
 
 //===----------------------------------------------------------------------===//
 // acr.stoich_coeff

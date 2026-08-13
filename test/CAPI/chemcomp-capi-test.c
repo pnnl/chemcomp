@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// RUN: standalone-capi-test 2>&1 | FileCheck %s
+// RUN: chemcomp-capi-test 2>&1 | FileCheck %s
 
 #include <stdio.h>
 

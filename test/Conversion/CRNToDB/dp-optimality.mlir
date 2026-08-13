@@ -15,12 +15,12 @@
 // committing, gives up the locally preferred m01, and reaches full coverage
 // with m02 and m03 sharing s0 = Y.
 
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='db=%S/Inputs/lookahead-db.json global-injectivity=1' \
 // RUN:   | FileCheck %s
 
 // Full coverage, so no diagnostics.
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='db=%S/Inputs/lookahead-db.json global-injectivity=1' \
 // RUN:   -verify-diagnostics
 

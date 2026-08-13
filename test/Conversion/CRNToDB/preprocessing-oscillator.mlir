@@ -12,7 +12,7 @@
 // minimum achievable maximum frontier width of 3. The min-fill ordering below
 // achieves that measured optimum.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice dump-preprocessing=1' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=OscillatorSlice dump-preprocessing=1' \
 // RUN:   | FileCheck %s
 
 acr.crn @oscillator(%sv: tensor<6x!acr.species>, %rv: tensor<4xf32>)

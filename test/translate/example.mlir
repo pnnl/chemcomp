@@ -1,4 +1,4 @@
-// RUN: standalone-translate --split-input-file -mlir-to-json %s | FileCheck %s
+// RUN: chemcomp-translate --split-input-file -mlir-to-json %s | FileCheck %s
 
 // Chemical Reactions (2 species, 2 reactions):
 //   2 S0 + S1 -> 2 S2    (stoich row: [-2, -1, 2, 0, 0])

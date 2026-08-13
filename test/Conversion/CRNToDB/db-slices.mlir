@@ -1,18 +1,18 @@
 // Slice selection and the SliceSpec filters.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice dump-db=1' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=OscillatorSlice dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=OSC
-// RUN: standalone-opt %s -crn-db-match='db-slice=AmbiguousSlice dump-db=1' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=AmbiguousSlice dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=AMB
-// RUN: standalone-opt %s -crn-db-match='dump-db=1' \
+// RUN: chemcomp-opt %s -crn-db-match='dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=ALL
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='db-slice=AmbiguousSlice max-per-signature=2 dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=CAPPED
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='filter-species=ATP dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=SPECIES
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='filter-source=KEGG: dump-db=1' \
 // RUN:   | FileCheck %s --check-prefix=SOURCE
 

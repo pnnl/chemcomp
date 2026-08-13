@@ -9,10 +9,10 @@
 // achieving full coverage, though not enforcing stoichiometric or
 // thermodynamic feasibility"; the OscillatorSlice motifs inherit that caveat.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice' | FileCheck %s
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=OscillatorSlice' | FileCheck %s
 
 // Full coverage, so no diagnostics at all.
-// RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=OscillatorSlice' \
 // RUN:   -verify-diagnostics
 
 acr.crn @oscillator(%sv: tensor<6x!acr.species>, %rv: tensor<4xf32>)

@@ -1,4 +1,4 @@
-// RUN: standalone-translate -mlir-to-json %s | FileCheck %s
+// RUN: chemcomp-translate -mlir-to-json %s | FileCheck %s
 
 // Tensor form with constant rates: 3 species, 2 reactions
 

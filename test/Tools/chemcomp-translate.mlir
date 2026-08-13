@@ -1,4 +1,4 @@
-// RUN: standalone-translate --help | FileCheck %s
+// RUN: chemcomp-translate --help | FileCheck %s
 // CHECK: --deserialize-spirv
 // CHECK: --import-llvm
 // CHECK: --json-to-mlir

@@ -1,4 +1,4 @@
-//===- standalone-plugin.cpp ------------------------------------*- C++ -*-===//
+//===- chemcomp-plugin.cpp --------------------------------------*- C++ -*-===//
 //
 // This file is licensed under the Apache License v2.0 with LLVM Exceptions.
 // See https://github.com/pnnl/chemcomp/LICENSE.txt for license information.

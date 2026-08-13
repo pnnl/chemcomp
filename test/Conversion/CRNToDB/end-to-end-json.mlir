@@ -4,11 +4,11 @@
 // those names out of MLIR. Before this worked, the export emitted generic
 // S0, S1, ... and the concrete chemistry stopped at the IR boundary.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice' \
-// RUN:   | standalone-translate -mlir-to-json | FileCheck %s
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=OscillatorSlice' \
+// RUN:   | chemcomp-translate -mlir-to-json | FileCheck %s
 
 // A CRN that was never matched still exports, falling back to generic names.
-// RUN: standalone-translate -mlir-to-json %s | FileCheck %s --check-prefix=UNMATCHED
+// RUN: chemcomp-translate -mlir-to-json %s | FileCheck %s --check-prefix=UNMATCHED
 
 acr.crn @oscillator(%sv: tensor<6x!acr.species>, %rv: tensor<4xf32>)
     -> tensor<6x!acr.species> {

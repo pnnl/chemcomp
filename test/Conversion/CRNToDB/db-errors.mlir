@@ -2,15 +2,15 @@
 // empty database -- an empty database looks like "nothing matched", which
 // sends you debugging the wrong thing.
 
-// RUN: not standalone-opt %s -crn-db-match='db=%S/Inputs/does-not-exist.json' 2>&1 \
+// RUN: not chemcomp-opt %s -crn-db-match='db=%S/Inputs/does-not-exist.json' 2>&1 \
 // RUN:   | FileCheck %s --check-prefix=MISSING
-// RUN: not standalone-opt %s -crn-db-match='db=%S/Inputs/malformed-db.json' 2>&1 \
+// RUN: not chemcomp-opt %s -crn-db-match='db=%S/Inputs/malformed-db.json' 2>&1 \
 // RUN:   | FileCheck %s --check-prefix=MALFORMED
-// RUN: not standalone-opt %s -crn-db-match='db=%S/Inputs/mismatched-db.json' 2>&1 \
+// RUN: not chemcomp-opt %s -crn-db-match='db=%S/Inputs/mismatched-db.json' 2>&1 \
 // RUN:   | FileCheck %s --check-prefix=MISMATCH
-// RUN: not standalone-opt %s -crn-db-match='db-slice=NoSuchSlice' 2>&1 \
+// RUN: not chemcomp-opt %s -crn-db-match='db-slice=NoSuchSlice' 2>&1 \
 // RUN:   | FileCheck %s --check-prefix=BADSLICE
-// RUN: not standalone-opt %s \
+// RUN: not chemcomp-opt %s \
 // RUN:   -crn-db-match='db=%S/Inputs/tiny-db.json db-slice=TinySlice' 2>&1 \
 // RUN:   | FileCheck %s --check-prefix=BOTH
 

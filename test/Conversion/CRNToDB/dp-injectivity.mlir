@@ -16,11 +16,11 @@
 // assignment, at the cost of a state space exponential in the species count
 // rather than the treewidth -- which is why it is not the default.
 
-// RUN: standalone-opt %s -crn-db-match='db=%S/Inputs/lookahead-db.json' \
+// RUN: chemcomp-opt %s -crn-db-match='db=%S/Inputs/lookahead-db.json' \
 // RUN:   | FileCheck %s --check-prefix=LOCAL
-// RUN: standalone-opt %s -crn-db-match='db=%S/Inputs/lookahead-db.json' \
+// RUN: chemcomp-opt %s -crn-db-match='db=%S/Inputs/lookahead-db.json' \
 // RUN:   -verify-diagnostics
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='db=%S/Inputs/lookahead-db.json global-injectivity=1' \
 // RUN:   | FileCheck %s --check-prefix=GLOBAL
 

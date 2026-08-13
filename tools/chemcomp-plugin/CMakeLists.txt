@@ -1,7 +1,7 @@
-add_llvm_library(StandalonePlugin
+add_llvm_library(ChemCompPlugin
         # BUILDTREE_ONLY is only for testing purposes
         MODULE BUILDTREE_ONLY
-        standalone-plugin.cpp
+        chemcomp-plugin.cpp
 
         DEPENDS
         MLIRACR
@@ -12,7 +12,7 @@ add_llvm_library(StandalonePlugin
         MLIRACR
         )
 target_include_directories(
-        StandalonePlugin
+        ChemCompPlugin
         PRIVATE
         "${STANDALONE_BINARY_DIR}/include"
 )

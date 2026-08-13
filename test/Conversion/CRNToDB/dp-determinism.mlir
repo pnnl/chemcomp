@@ -11,12 +11,12 @@
 
 // Running twice in one pipeline must produce identical output; the second
 // invocation re-matches an already-annotated operation.
-// RUN: standalone-opt %s -crn-db-match='db-slice=AmbiguousSlice' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=AmbiguousSlice' \
 // RUN:   -crn-db-match='db-slice=AmbiguousSlice' | FileCheck %s
 
 // Scoring weights are reported the same way regardless of their values: with
 // every weight zeroed all matches tie, and the tie-break still picks rxnamb01.
-// RUN: standalone-opt %s -crn-db-match='db-slice=AmbiguousSlice wc=0 ws=0 wr=0' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=AmbiguousSlice wc=0 ws=0 wr=0' \
 // RUN:   | FileCheck %s
 
 acr.crn @ambiguous(%sv: tensor<4x!acr.species>, %rv: tensor<1xf32>)

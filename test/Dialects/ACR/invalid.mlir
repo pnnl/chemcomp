@@ -1,4 +1,4 @@
-// RUN: standalone-opt -split-input-file -verify-diagnostics %s
+// RUN: chemcomp-opt -split-input-file -verify-diagnostics %s
 
 //===----------------------------------------------------------------------===//
 // acr.react — tensor form: mismatched stoich dimension

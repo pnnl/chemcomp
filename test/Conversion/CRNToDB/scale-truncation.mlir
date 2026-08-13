@@ -12,11 +12,11 @@
 // reaction shapes, so the cap is what keeps matching tractable, and capping
 // makes the result heuristic rather than exact.
 
-// RUN: standalone-opt %s -crn-db-match='db=%S/Inputs/large-db.json max-candidates=64' \
+// RUN: chemcomp-opt %s -crn-db-match='db=%S/Inputs/large-db.json max-candidates=64' \
 // RUN:   -verify-diagnostics | FileCheck %s
 
 // Uncapped, the same query still completes -- slower, and without the remark.
-// RUN: standalone-opt %s -crn-db-match='db=%S/Inputs/large-db.json max-candidates=0' \
+// RUN: chemcomp-opt %s -crn-db-match='db=%S/Inputs/large-db.json max-candidates=0' \
 // RUN:   | FileCheck %s --check-prefix=UNCAPPED
 
 acr.crn @common(%sv: tensor<4x!acr.species>, %rv: tensor<1xf32>)

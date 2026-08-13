@@ -1,4 +1,4 @@
-// RUN: standalone-translate -json-to-mlir %S/Inputs/import-test.crn.json | FileCheck %s
+// RUN: chemcomp-translate -json-to-mlir %S/Inputs/import-test.crn.json | FileCheck %s
 
 // CHECK-LABEL: acr.crn @crn
 // CHECK-SAME: (%{{.*}}: tensor<3x!acr.species>, %{{.*}}: tensor<2xf32>)

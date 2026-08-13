@@ -12,10 +12,10 @@ configure_lit_site_cfg(
 set(STANDALONE_TEST_DEPENDS
         FileCheck count not
         chemcomp-tblgen
-        standalone-capi-test
-        standalone-opt
-        standalone-translate
-        StandalonePlugin
+        chemcomp-capi-test
+        chemcomp-opt
+        chemcomp-translate
+        ChemCompPlugin
         )
 if(MLIR_ENABLE_BINDINGS_PYTHON)
   list(APPEND STANDALONE_TEST_DEPENDS StandalonePythonModules)

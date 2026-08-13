@@ -56,9 +56,9 @@ tool_dirs = [config.standalone_tools_dir, config.llvm_tools_dir]
 tools = [
     "chemcomp-tblgen",
     "mlir-opt",
-    "standalone-capi-test",
-    "standalone-opt",
-    "standalone-translate",
+    "chemcomp-capi-test",
+    "chemcomp-opt",
+    "chemcomp-translate",
 ]
 
 llvm_config.add_tool_substitutions(tools, tool_dirs)

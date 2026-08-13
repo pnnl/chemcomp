@@ -1,4 +1,4 @@
-// RUN: standalone-translate -mlir-to-json %s | FileCheck %s
+// RUN: chemcomp-translate -mlir-to-json %s | FileCheck %s
 
 // Scalar form: 3 species, 2 reactions with constant rates
 

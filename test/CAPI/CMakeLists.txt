@@ -12,9 +12,9 @@ add_mlir_aggregate(StandaloneCAPITestLib
   StandaloneCAPI
 )
 
-add_llvm_executable(standalone-capi-test
-  standalone-capi-test.c
+add_llvm_executable(chemcomp-capi-test
+  chemcomp-capi-test.c
 )
-llvm_update_compile_flags(standalone-capi-test)
-target_link_libraries(standalone-capi-test
+llvm_update_compile_flags(chemcomp-capi-test)
+target_link_libraries(chemcomp-capi-test
   PRIVATE StandaloneCAPITestLib)

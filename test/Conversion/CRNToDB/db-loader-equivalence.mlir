@@ -5,8 +5,8 @@
 // Inputs/tiny-db.json mirrors the fixture's TinySlice record for record, so
 // the two dumps below are compared against one identical set of expectations.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=TinySlice dump-db=1' | FileCheck %s
-// RUN: standalone-opt %s -crn-db-match='db=%S/Inputs/tiny-db.json dump-db=1' | FileCheck %s
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=TinySlice dump-db=1' | FileCheck %s
+// RUN: chemcomp-opt %s -crn-db-match='db=%S/Inputs/tiny-db.json dump-db=1' | FileCheck %s
 
 module {}
 

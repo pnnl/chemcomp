@@ -1,4 +1,4 @@
-// RUN: mlir-opt %s --load-pass-plugin=%standalone_libs/StandalonePlugin%shlibext --pass-pipeline="builtin.module(acr-switch-bar-foo)" | FileCheck %s
+// RUN: mlir-opt %s --load-pass-plugin=%standalone_libs/ChemCompPlugin%shlibext --pass-pipeline="builtin.module(acr-switch-bar-foo)" | FileCheck %s
 
 //===----------------------------------------------------------------------===//
 // Pass plugin load path.

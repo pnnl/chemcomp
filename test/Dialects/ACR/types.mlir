@@ -1,4 +1,4 @@
-// RUN: standalone-opt -split-input-file -verify-diagnostics %s | FileCheck %s
+// RUN: chemcomp-opt -split-input-file -verify-diagnostics %s | FileCheck %s
 
 // Verify that !acr.species parses and prints without angle brackets.
 

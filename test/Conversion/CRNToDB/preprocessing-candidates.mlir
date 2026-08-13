@@ -1,16 +1,16 @@
 // Candidate selection: signature lookup mode, the per-reaction cap, and the
 // remark that makes truncation visible.
 
-// RUN: standalone-opt %s -crn-db-match='dump-preprocessing=1' \
+// RUN: chemcomp-opt %s -crn-db-match='dump-preprocessing=1' \
 // RUN:   | FileCheck %s --check-prefix=SUPERSET
-// RUN: standalone-opt %s -crn-db-match='strict-signature=1 dump-preprocessing=1' \
+// RUN: chemcomp-opt %s -crn-db-match='strict-signature=1 dump-preprocessing=1' \
 // RUN:   | FileCheck %s --check-prefix=STRICT
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='db-slice=AmbiguousSlice max-candidates=2 dump-preprocessing=1' \
 // RUN:   | FileCheck %s --check-prefix=CAPPED
-// RUN: standalone-opt %s -crn-db-match='db-slice=AmbiguousSlice max-candidates=2' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=AmbiguousSlice max-candidates=2' \
 // RUN:   -verify-diagnostics
-// RUN: standalone-opt %s \
+// RUN: chemcomp-opt %s \
 // RUN:   -crn-db-match='db-slice=AmbiguousSlice max-per-signature=2 dump-preprocessing=1' \
 // RUN:   | FileCheck %s --check-prefix=SLICED
 

@@ -6,7 +6,7 @@
 // string rather than absent, keeping the arrays positionally aligned with the
 // stoichiometric matrix.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice' -verify-diagnostics \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=OscillatorSlice' -verify-diagnostics \
 // RUN:   | FileCheck %s
 
 // Row 0 has signature (-1,-1,1) and matches rxnosc01. Row 1 needs a species

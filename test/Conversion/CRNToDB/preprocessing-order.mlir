@@ -11,7 +11,7 @@
 // declared out of chain order (r2, r0, r3, r1) so a correct ordering has to be
 // derived rather than inherited from the input.
 
-// RUN: standalone-opt %s -crn-db-match='db-slice=SubsetSlice dump-preprocessing=1' \
+// RUN: chemcomp-opt %s -crn-db-match='db-slice=SubsetSlice dump-preprocessing=1' \
 // RUN:   | FileCheck %s
 
 acr.crn @chain(%sv: tensor<5x!acr.species>, %rv: tensor<4xf32>)
