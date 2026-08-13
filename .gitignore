@@ -1,3 +1,7 @@
 build/
 specs/
 .specs/
+
+# Python bytecode
+__pycache__/
+*.pyc

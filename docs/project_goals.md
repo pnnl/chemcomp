@@ -16,30 +16,35 @@ ChemComp is set to implement a compilation flow that converts mathematical opera
 │   ├── README.md
 │   ├── include
 │   │   ├── CMakeLists.txt
-│   │   ├── Standalone
-│   │   └── Standalone-c
+│   │   ├── ChemComp
+│   │   │   ├── Conversion    # CRNToDB, shared Passes.td/Passes.h
+│   │   │   ├── Dialect       # ACR
+│   │   │   └── Target        # JSON
+│   │   └── ChemComp-c
 │   ├── lib
 │   │   ├── CAPI
 │   │   ├── CMakeLists.txt
-│   │   └── Standalone
+│   │   ├── Conversion        # mirrors include/ChemComp/Conversion
+│   │   ├── Dialect
+│   │   └── Target
 │   ├── python
 │   │   ├── CMakeLists.txt
-│   │   ├── StandaloneExtension.cpp
-│   │   └── mlir_standalone
-│   ├── standalone-opt
+│   │   ├── ChemCompExtension.cpp
+│   │   └── mlir_chemcomp
+│   ├── tools
 │   │   ├── CMakeLists.txt
-│   │   └── standalone-opt.cpp
-│   ├── standalone-plugin
-│   │   ├── CMakeLists.txt
-│   │   └── standalone-plugin.cpp
-│   ├── standalone-translate
-│   │   ├── CMakeLists.txt
-│   │   └── standalone-translate.cpp
+│   │   ├── chemcomp-opt
+│   │   ├── chemcomp-plugin
+│   │   ├── chemcomp-tblgen
+│   │   └── chemcomp-translate
+│   ├── utils
 │   └── test
 │       ├── CAPI
 │       ├── CMakeLists.txt
+│       ├── Conversion
 │       ├── Dialects
-│       ├── Standalone
+│       ├── Tools
+│       ├── chemcomp-tblgen
 │       ├── lit.cfg.py
 │       ├── lit.site.cfg.py.in
 │       ├── python

@@ -21,7 +21,7 @@ An MLIR dialect consists of three interconnected parts that work together:
 
 ## Part 1: Include Directory (Header and TableGen Definitions)
 
-Location: `/workspaces/chemical-compiler/chemcomp/include/Standalone/Dialect/<Dialect>/`
+Location: `/workspaces/chemical-compiler/chemcomp/include/ChemComp/Dialect/<Dialect>/`
 
 This directory contains the dialect's public interface and declarative specifications:
 
@@ -116,7 +116,7 @@ This directory contains the dialect's implementation logic. Source files include
 
 ## Part 3: TableGen Generated Files (Read-Only Reference)
 
-Located in the build folders: `/workspaces/chemical-compiler/builds/chemcomp/build/include/Standalone/Dialect/<Dialect>/`
+Located in the build folders: `/workspaces/chemical-compiler/builds/chemcomp/build/include/ChemComp/Dialect/<Dialect>/`
 
 **⚠️ WARNING: These files are AUTO-GENERATED. Do NOT edit them directly!**
 
@@ -214,12 +214,12 @@ Generated `.inc` files provide multiple sections that can be selectively include
 **In Dialect Implementation:**
 ```c++
 // <Dialect>Dialect.cpp
-#include "Standalone/Dialect/<Dialect>/<Dialect>OpsDialect.cpp.inc" // Dialect constructor
+#include "ChemComp/Dialect/<Dialect>/<Dialect>OpsDialect.cpp.inc" // Dialect constructor
 
 void <Dialect>Dialect::initialize() {
   addOperations<
 #define GET_OP_LIST
-#include "Standalone/Dialect/<Dialect>/<Dialect>Ops.cpp.inc"  // Operation list
+#include "ChemComp/Dialect/<Dialect>/<Dialect>Ops.cpp.inc"  // Operation list
   >();
   registerTypes();
 }
@@ -229,19 +229,19 @@ void <Dialect>Dialect::initialize() {
 ```c++
 // <Dialect>Ops.cpp
 #define GET_OP_CLASSES
-#include "Standalone/Dialect/<Dialect>/<Dialect>Ops.cpp.inc"  // Operation implementations
+#include "ChemComp/Dialect/<Dialect>/<Dialect>Ops.cpp.inc"  // Operation implementations
 ```
 
 **In Type Implementation:**
 ```c++
 // <Dialect>Types.cpp
 #define GET_TYPEDEF_CLASSES
-#include "Standalone/Dialect/<Dialect>/<Dialect>OpsTypes.cpp.inc"  // Type implementations
+#include "ChemComp/Dialect/<Dialect>/<Dialect>OpsTypes.cpp.inc"  // Type implementations
 
 void <Dialect>Dialect::registerTypes() {
   addTypes<
 #define GET_TYPEDEF_LIST
-#include "Standalone/Dialect/<Dialect>/<Dialect>OpsTypes.cpp.inc"  // Type list
+#include "ChemComp/Dialect/<Dialect>/<Dialect>OpsTypes.cpp.inc"  // Type list
   >();
 }
 ```
@@ -250,7 +250,7 @@ void <Dialect>Dialect::registerTypes() {
 ```c++
 // <Dialect>Passes.cpp
 #define GEN_PASS_DEF_<PASSNAME>
-#include "Standalone/Dialect/<Dialect>/<Dialect>Passes.h.inc"  // Pass base class
+#include "ChemComp/Dialect/<Dialect>/<Dialect>Passes.h.inc"  // Pass base class
 
 class <PassName> : public impl::<PassName>Base<<PassName>> {
   void runOnOperation() final {
@@ -312,7 +312,7 @@ This directory contains test files that validate dialect functionality using Fil
 Tests use FileCheck directives embedded in MLIR comments to validate output:
 
 ```mlir
-// RUN: standalone-opt %s -pass-pipeline="..." | FileCheck %s
+// RUN: chemcomp-opt %s -pass-pipeline="..." | FileCheck %s
 
 // CHECK-LABEL: func @test_operation
 func.func @test_operation(%arg0: !dialect.custom_type) {

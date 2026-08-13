@@ -16,14 +16,14 @@ against the full database.
 
 ```bash
 # Compiled-in fixture, no external data needed.
-standalone-opt -crn-db-match='db-slice=OscillatorSlice' input.mlir
+chemcomp-opt -crn-db-match='db-slice=OscillatorSlice' input.mlir
 
 # Full database from JSON.
-standalone-opt -crn-db-match='db=motifs.json' input.mlir
+chemcomp-opt -crn-db-match='db=motifs.json' input.mlir
 
 # The whole flow, out to the emulator.
-standalone-opt -crn-db-match='db-slice=OscillatorSlice' input.mlir \
-  | standalone-translate -mlir-to-json
+chemcomp-opt -crn-db-match='db-slice=OscillatorSlice' input.mlir \
+  | chemcomp-translate -mlir-to-json
 ```
 
 The pass reads `stoich_matrix` and annotates the same operation in place with
@@ -72,8 +72,8 @@ apart. `test/CRN2DB/db-loader-equivalence.mlir` asserts that by running one set
 of expectations against both.
 
 **Compiled-in fixture** — ~50 curated motifs in
-`include/Standalone/CRN2DB/MotifsFixture.td`, turned into a static table by
-`chemcomp-tblgen -gen-motif-db`. Tests use this so `check-standalone` needs no
+`include/ChemComp/Conversion/CRNToDB/MotifsFixture.td`, turned into a static table by
+`chemcomp-tblgen -gen-motif-db`. Tests use this so `check-chemcomp` needs no
 external file.
 
 **Runtime JSON** — the full database, generated offline:
@@ -201,7 +201,7 @@ the database.
 ## Testing
 
 ```bash
-cmake --build /workspaces/chemical-compiler/builds/chemcomp/build --target check-standalone
+cmake --build /workspaces/chemical-compiler/builds/chemcomp/build --target check-chemcomp
 ```
 
 | Test | Covers |

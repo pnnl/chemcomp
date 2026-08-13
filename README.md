@@ -44,12 +44,12 @@ cmake -G Ninja -S "$CHEMCOMP_SRC_DIR" -B "$CHEMCOMP_BUILD_DIR" \
     -DLLVM_DIR="$LLVM_INSTALL_DIR/lib/cmake/llvm" \
     -DLLVM_EXTERNAL_LIT="$LLVM_BUILD_DIR/bin/llvm-lit"
 
-cmake --build "$CHEMCOMP_BUILD_DIR" --target standalone-opt
+cmake --build "$CHEMCOMP_BUILD_DIR" --target chemcomp-opt
 ```
 
 To run the test suite:
 ```sh
-cmake --build "$CHEMCOMP_BUILD_DIR" --target check-standalone
+cmake --build "$CHEMCOMP_BUILD_DIR" --target check-chemcomp
 ```
 
 # License
