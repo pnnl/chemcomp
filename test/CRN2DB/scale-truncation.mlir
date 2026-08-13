@@ -6,11 +6,11 @@
 // Inputs/gen-large-db.py rather than derived from MotifsDB, whose CSVs are
 // untracked in the submodule -- the test has to run on a fresh clone.
 //
-// This is the case the paper does not cover. Section 4.3 asserts
-// "|Cand| <= 100 for most abstract reactions", which does not hold: signature
-// indexing alone leaves thousands of candidates for the commonest reaction
-// shapes, so the cap is what keeps matching tractable, and capping makes the
-// result heuristic rather than exact.
+// This is the case the CF26-CRN2DB evaluation does not cover. Section 4.3
+// assumes "|Cand| <= 100 for most abstract reactions"; at full scale,
+// signature indexing alone leaves thousands of candidates for the commonest
+// reaction shapes, so the cap is what keeps matching tractable, and capping
+// makes the result heuristic rather than exact.
 
 // RUN: standalone-opt %s -crn-db-match='db=%S/Inputs/large-db.json max-candidates=64' \
 // RUN:   -verify-diagnostics | FileCheck %s

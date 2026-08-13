@@ -7,9 +7,10 @@ and each abstract reaction bound to a real reaction with compatible
 stoichiometry. The `crn-db-match` pass does that binding.
 
 Implements *"CRN2DB: Chemical Reaction Networks to Database Matching via Dynamic
-Programming in ChemComp"* (`papers/cf26-crn2db`). Where this implementation
-departs from the paper, the reasons are recorded at the end — several are
-corrections to errors in the paper itself.
+Programming in ChemComp"* (the CF26-CRN2DB paper). Where
+this implementation departs from it, the reasons are recorded at the end —
+several are places where an initial assumption was revised once measured
+against the full database.
 
 ## Using it
 
@@ -37,8 +38,8 @@ two discardable attributes:
 ```
 
 Unmatched reactions and unbound species get the empty string, so both arrays
-stay aligned with the matrix. Partial coverage is a warning, not an error: the
-paper's flow expects downstream passes to consume partially instantiated CRNs.
+stay aligned with the matrix. Partial coverage is a warning, not an error:
+downstream passes are expected to consume partially instantiated CRNs.
 
 ## Options
 
@@ -119,51 +120,54 @@ means unknown, which stays distinct from any numeric value.
 
 Inspect stages 1–4 with `dump-preprocessing`.
 
-## Deviations from the paper
+## Deviations from CF26-CRN2DB
 
-### Errors found in the paper
+### Assumptions revised during implementation
 
-**`|Cand| <= 100` is false.** Section 4.3 claims signature indexing bounds the
-candidate set. Measured over the real database: 43,455 integer-coefficient
-motifs across only 913 distinct signatures, with `(-1,-1,1,1)` alone holding
-11,421 — and 90.2% of motifs in buckets larger than 100. The coverage-correct
-superset lookup returns **30,649 candidates**, 70% of the database, for that one
-shape. The stated complexity bound does not hold at full scale; `max-candidates`
-is what makes matching tractable, and it makes the result heuristic, hence the
-remark.
+**The candidate-count assumption needed revision.** Section 4.3 assumes
+signature indexing bounds the candidate set to `|Cand| <= 100`. Measured over
+the real database: 43,455 integer-coefficient motifs across only 913 distinct
+signatures, with `(-1,-1,1,1)` alone holding 11,421 — and 90.2% of motifs in
+buckets larger than 100. The coverage-correct superset lookup returns
+**30,649 candidates**, 70% of the database, for that one shape. The assumed
+bound holds at small scale but not at the full database scale;
+`max-candidates` is what makes matching tractable, and it makes the result
+heuristic, hence the remark.
 
-**The oscillator's treewidth is 3, not 2.** Section 5.4 claims `W = 2` for its
-example, reasoning that "species A, B, D, E each appear in two reactions". But
-section 4.1 defines frontier width as species simultaneously *live*, not
-occurrences per species. Exhaustive search over all 24 reaction orderings gives a
-minimum achievable maximum frontier width of 3. Our min-fill ordering achieves
-that true optimum. See `test/CRN2DB/preprocessing-oscillator.mlir`.
+**The oscillator's treewidth was assumed to be 2; measurement gives 3.**
+Section 5.4 reasons that `W = 2` because "species A, B, D, E each appear in
+two reactions". Section 4.1 separately defines frontier width as species
+simultaneously *live*, not occurrences per species; measuring against that
+definition, exhaustive search over all 24 reaction orderings gives a minimum
+achievable maximum frontier width of 3. Our min-fill ordering achieves that
+measured optimum. See `test/CRN2DB/preprocessing-oscillator.mlir`.
 
-**Table 1's `rxn00003` is transcribed without flipping its arrow.** The source
-equation uses `<=`, a reverse reaction, so its reactants are Pyruvate and H+ —
-not the products the paper lists. The fixture uses the CSV-derived form.
+**Table 1's `rxn00003` assumed forward orientation; the source CSV's arrow
+shows otherwise.** The source equation uses `<=`, a reverse reaction, so its
+reactants are Pyruvate and H+ rather than the products Table 1 lists. The
+fixture uses the CSV-derived form.
 
-### Gaps the paper leaves open
+### Gaps left open
 
 **Species order to reaction order.** Min-fill runs over species but the DP
-consumes a reaction ordering, and the paper does not say how one becomes the
-other. A reaction is fully determined only once every species it touches has been
+consumes a reaction ordering, and how one becomes the other isn't specified.
+A reaction is fully determined only once every species it touches has been
 introduced, so reactions are keyed by the latest elimination position in their
 support, with deterministic tie-breaks.
 
-**Global injectivity is not representable in the paper's DP state.** Section 3.3
+**Global injectivity is not representable in the DP state.** Section 3.3
 requires an injective `phi`, but `trim()` drops a binding once its species leaves
-the frontier, after which the chemical can be rebound. The default is
-paper-faithful frontier-local injectivity **plus a warning** naming the reused
-chemicals. `global-injectivity=1` carries retired chemicals in the state key and
-is genuinely injective, at the cost of a state space exponential in the species
-count rather than the treewidth. `test/CRN2DB/dp-injectivity.mlir` runs one input
-through both modes.
+the frontier, after which the chemical can be rebound. The default matches
+the original algorithm: frontier-local injectivity **plus a warning** naming
+the reused chemicals. `global-injectivity=1` carries retired chemicals in the
+state key and is genuinely injective, at the cost of a state space exponential
+in the species count rather than the treewidth. `test/CRN2DB/dp-injectivity.mlir`
+runs one input through both modes.
 
 **Exact-signature indexing contradicts the coverage rule.** Section 3.2 permits
 `phi(supp(r)) ⊆ D_j`, so a motif with extra species legitimately matches — but it
 has a longer signature and exact-key lookup misses it. The default is a superset
-lookup; `strict-signature=1` restores paper-literal behaviour.
+lookup; `strict-signature=1` restores the original exact-match behaviour.
 
 **No tie-breaking rule is given**, yet results are compared by FileCheck. Imposed
 order: score, then match count, then motif-id sequence, then binding. Every
@@ -171,16 +175,16 @@ observable iteration runs over sorted vectors, never a raw hash map.
 
 **`kappa_j` has no scalar field** in the schema, only `rate_range`. The nominal
 rate is the geometric mean of that range, since `S_r` compares rates in log
-space. Absent range means unknown and scores 1.0, matching the paper's own
-convention for an unknown query rate.
+space. Absent range means unknown and scores 1.0, the same convention used for
+an unknown query rate.
 
-**Back-pointers versus the rolling table.** The paper stores back-pointers
-"alongside the DP table" while writing `dp <- new_dp`, which discards the
-predecessor layer reconstruction needs. Every step table is retained instead.
+**Back-pointers versus the rolling table.** Storing back-pointers "alongside
+the DP table" while writing `dp <- new_dp` discards the predecessor layer
+reconstruction needs. Every step table is retained instead.
 
 ### Not implemented
 
-**Thermodynamic scoring.** The paper fixes `w_g = w_u = 0`. `deltaG` and
+**Thermodynamic scoring.** `w_g = w_u = 0` by default. `deltaG` and
 `deltaGerr` are parsed and stored so the scorer can be enabled without a schema
 change, but no term uses them yet.
 
@@ -189,9 +193,10 @@ scientific-notation coefficients, including biomass reactions. `stoich_matrix` i
 integral, so `csv-to-json.py` skips them and reports the count.
 
 **`filter-source` is nearly single-valued.** `grep -c KEGG` returns 0 on both
-CSVs: the database has no cross-reference column, and the paper's
-`KEGG:...|ModelSEED:...` strings were hand-authored for its ten-record sample.
-Species filtering is the mechanism that actually reduces the database.
+CSVs: the database has no cross-reference column, and the
+`KEGG:...|ModelSEED:...` strings in Table 1 were hand-authored for its
+ten-record sample. Species filtering is the mechanism that actually reduces
+the database.
 
 ## Testing
 
@@ -204,10 +209,10 @@ cmake --build /workspaces/chemical-compiler/builds/chemcomp/build --target check
 | `db-loader-equivalence.mlir` | Both loaders produce identical databases |
 | `db-slices.mlir` | Slice selection and the three filters |
 | `db-errors.mlir` | Missing, malformed and inconsistent databases |
-| `preprocessing-oscillator.mlir` | Paper section 5.4; the treewidth correction |
+| `preprocessing-oscillator.mlir` | Section 5.4; the treewidth revision |
 | `preprocessing-order.mlir` | Min-fill beats input order on a chain |
 | `preprocessing-candidates.mlir` | Signature lookup modes; the truncation remark |
-| `dp-oscillator.mlir` | Reproduces the paper's reported assignment |
+| `dp-oscillator.mlir` | Reproduces the reported assignment from section 5.4 |
 | `dp-optimality.mlir` | The DP beats greedy where lookahead matters |
 | `dp-injectivity.mlir` | Both injectivity modes on one input |
 | `dp-determinism.mlir` | Tie-breaking and repeatability |

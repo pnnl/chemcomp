@@ -5,9 +5,9 @@
 // anchor records rather than every row, so adding motifs does not churn the
 // test, but a schema change or a corrupted record does fail it.
 
-// The paper's Table 1 records, transcribed from the source CSV. Note rxn00003
-// is stored reactant-first: its equation in reactions_reduced.csv uses a `<=`
-// arrow, which the paper transcribes without flipping.
+// CF26-CRN2DB Table 1 records, transcribed from the source CSV. Note rxn00003 is stored
+// reactant-first: Table 1 assumes forward orientation, but its equation in
+// reactions_reduced.csv uses a `<=` arrow, indicating otherwise.
 // CHECK-DAG: {"rxn00001", {"H2O", "PPi", "Phosphate", "H+"}, {-1, -1, 2, 1}, -3.46,
 // CHECK-DAG: {"rxn00003", {"Pyruvate", "H+", "CO2", "ALCTT"}, {-2, -1, 1, 1}, 8.27,
 // CHECK-DAG: {"rxn00006", {"H2O2", "H2O", "O2"}, {-2, 2, 1}, -46.06,
@@ -15,7 +15,7 @@
 // rxn00005 is genuinely absent from ModelSEED; the numbering gap is real.
 // CHECK-NOT: "rxn00005"
 
-// The oscillator motifs backing the paper's section 5.4 walkthrough.
+// The oscillator motifs backing the section 5.4 walkthrough.
 // CHECK-DAG: {"rxnosc01", {"ATP", "ADP", "AMP"}, {-1, -1, 1},
 // CHECK-DAG: {"rxnosc04", {"H+", "ADP", "H2O"}, {-1, 1, 1},
 

@@ -12,11 +12,11 @@
 // data file. The full ~43k-motif database lives outside the build and is
 // loaded from JSON at runtime (`db=<path>`); see MotifBase.td for why.
 //
-// Records 1-10 are the paper's Table 1, transcribed from
-// MotifsDB/reactions_reduced.csv rather than from the paper, because the paper
-// lists rxn00003 without flipping its `<=` (reverse) arrow. The CSV-derived
-// form used here has Pyruvate and H+ as reactants, which is the chemically
-// correct reading.
+// Records 1-10 are Table 1 from the CF26-CRN2DB paper, transcribed from
+// MotifsDB/reactions_reduced.csv rather than from the table itself: Table 1
+// assumes a forward orientation for rxn00003, but the source CSV's `<=`
+// (reverse) arrow indicates otherwise. The CSV-derived form used here has
+// Pyruvate and H+ as reactants.
 //
 // Species names come from MotifsDB/compounds_reduced.csv.
 //
@@ -28,7 +28,7 @@
 include "Standalone/CRN2DB/MotifBase.td"
 
 //===----------------------------------------------------------------------===//
-// Paper Table 1 -- the first ten ModelSEED motifs.
+// Table 1 -- the first ten ModelSEED motifs.
 //
 // rxn00005 is absent from the source database; the numbering gap is real.
 //===----------------------------------------------------------------------===//
@@ -111,7 +111,7 @@ def Rxn00011 : Motif<"rxn00011",
 //===----------------------------------------------------------------------===//
 // Oscillator motifs.
 //
-// The paper's section 5.4 walks through a four-reaction compiled oscillator
+// Section 5.4 walks through a four-reaction compiled oscillator
 //
 //     A + B -> C      C -> D      D + E -> A + F      F -> B + E
 //
@@ -119,10 +119,10 @@ def Rxn00011 : Motif<"rxn00011",
 // These motifs make that assignment reachable: each carries the signature of
 // one oscillator reaction over exactly those concrete species.
 //
-// The paper is candid that its own result is "a database-consistent assignment
-// achieving full coverage, though not enforcing stoichiometric or thermodynamic
-// feasibility". These records inherit that caveat -- they are structurally
-// faithful to the walkthrough, not curated biochemistry.
+// The source is candid that its own result is "a database-consistent
+// assignment achieving full coverage, though not enforcing stoichiometric or
+// thermodynamic feasibility". These records inherit that caveat -- they are
+// structurally faithful to the walkthrough, not curated biochemistry.
 //===----------------------------------------------------------------------===//
 
 // A + B -> C   =>   ATP + ADP -> AMP
@@ -208,10 +208,10 @@ def RxnAmb5 : Motif<"rxnamb05", ["NAD", "NADH", "FAD", "FADH2"],
 //===----------------------------------------------------------------------===//
 // Coverage-rule probes.
 //
-// The paper's match predicate allows a motif to carry species beyond the
-// query's support (`phi(supp(r)) subseteq D_j`), which exact-signature lookup
-// would miss. These pairs differ only by an extra participant, so a (-1,1)
-// query reaches RxnSub2 through superset lookup but not through exact lookup.
+// The match predicate allows a motif to carry species beyond the query's
+// support (`phi(supp(r)) subseteq D_j`), which exact-signature lookup would
+// miss. These pairs differ only by an extra participant, so a (-1,1) query
+// reaches RxnSub2 through superset lookup but not through exact lookup.
 //===----------------------------------------------------------------------===//
 
 def RxnSub1 : Motif<"rxnsub01", ["Glucose", "Fructose"], [-1, 1]> {
@@ -249,12 +249,12 @@ def TinySlice : Slice<"TinySlice", [
 def PaperTable1 : Slice<"PaperTable1", [
     Rxn00001, Rxn00002, Rxn00003, Rxn00004, Rxn00006, Rxn00007, Rxn00008,
     Rxn00009, Rxn00010, Rxn00011]> {
-  let Summary = "The paper's Table 1, for conformance tests.";
+  let Summary = "CF26-CRN2DB Table 1, for conformance tests.";
 }
 
 def OscillatorSlice : Slice<"OscillatorSlice", [
     RxnOsc1, RxnOsc2, RxnOsc3, RxnOsc4]> {
-  let Summary = "Exactly the motifs needed by the paper's section 5.4 walkthrough.";
+  let Summary = "Exactly the motifs needed by the section 5.4 walkthrough.";
 }
 
 def AmbiguousSlice : Slice<"AmbiguousSlice", [

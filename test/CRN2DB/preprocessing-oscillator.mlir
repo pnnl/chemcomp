@@ -1,16 +1,16 @@
-// The paper's section 5.4 walkthrough, as a conformance test.
+// The CF26-CRN2DB section 5.4 walkthrough, as a conformance test.
 //
 //     A + B -> C      C -> D      D + E -> A + F      F -> B + E
 //
 // Species columns are A B C D E F; reaction rows are the four above.
 //
-// DEVIATION FROM THE PAPER: section 5.4 states this CRN has treewidth W = 2,
-// reasoning that "species A, B, D, E each appear in two reactions". But the
-// frontier width defined in section 4.1 counts species simultaneously *live* --
-// seen so far and still to come -- not occurrences per species. Exhaustive
-// search over all 24 reaction orderings gives a minimum achievable maximum
-// frontier width of 3, so W = 2 is unattainable for this CRN under the paper's
-// own definition. The min-fill ordering below achieves the true optimum of 3.
+// REVISED: section 5.4 assumes this CRN has treewidth W = 2, reasoning that
+// "species A, B, D, E each appear in two reactions". The frontier width
+// defined in section 4.1 counts species simultaneously *live* -- seen so far
+// and still to come -- not occurrences per species. Measuring against that
+// definition, exhaustive search over all 24 reaction orderings gives a
+// minimum achievable maximum frontier width of 3. The min-fill ordering below
+// achieves that measured optimum.
 
 // RUN: standalone-opt %s -crn-db-match='db-slice=OscillatorSlice dump-preprocessing=1' \
 // RUN:   | FileCheck %s
@@ -39,7 +39,7 @@ acr.crn @oscillator(%sv: tensor<6x!acr.species>, %rv: tensor<4xf32>)
 // CHECK-NEXT: frontier[4]:
 
 // AC-3 prunes every domain to a single candidate, recovering exactly the
-// assignment the paper reports: A->ATP, B->ADP, C->AMP, D->Pi, E->H2O, F->H+.
+// reported assignment: A->ATP, B->ADP, C->AMP, D->Pi, E->H2O, F->H+.
 // CHECK-NEXT: domain[0]: 1 ATP
 // CHECK-NEXT: domain[1]: 1 ADP
 // CHECK-NEXT: domain[2]: 1 AMP

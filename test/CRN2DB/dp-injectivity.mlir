@@ -1,4 +1,4 @@
-// Documents a real gap between the paper's problem statement and its algorithm.
+// Documents a gap between the CF26-CRN2DB problem statement and its algorithm.
 //
 // Section 3.3 requires phi to be globally injective: no two abstract species
 // may map to one chemical. But the DP state of section 4.2 cannot express
@@ -9,8 +9,9 @@
 // This CRN triggers it. s1 leaves the frontier after r0, so when r1 binds s2
 // the DP no longer remembers that P is taken, and both s1 and s2 end up as P.
 //
-// Default behaviour is paper-faithful: frontier-local injectivity, with a
-// warning so the violation is visible rather than silent. global-injectivity=1
+// Default behaviour matches the original algorithm: frontier-local
+// injectivity, with a warning so the violation is visible rather than
+// silent. global-injectivity=1
 // carries retired chemicals in the state key and produces a genuinely injective
 // assignment, at the cost of a state space exponential in the species count
 // rather than the treewidth -- which is why it is not the default.
