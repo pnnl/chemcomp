@@ -14,7 +14,7 @@
 // lit tests, so they run without any external data file. The full ~43k-motif
 // ModelSEED database is loaded from JSON at runtime instead; compiling it in
 // would cost minutes of build time and make the build depend on the untracked
-// MotifsDB CSVs. Both paths produce the same chemcomp::MotifDatabase.
+// MotifsDB CSVs. Both paths produce the same mlir::cc::MotifDatabase.
 //
 //===----------------------------------------------------------------------===//
 

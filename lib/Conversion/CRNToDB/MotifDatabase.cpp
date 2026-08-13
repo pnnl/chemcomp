@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-using namespace chemcomp;
+using namespace mlir::cc;
 
 //===----------------------------------------------------------------------===//
 // SignatureKey

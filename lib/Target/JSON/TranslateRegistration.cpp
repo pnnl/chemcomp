@@ -15,18 +15,18 @@
 
 using namespace mlir;
 
-void mlir::acr::registerToJSONTranslation() {
+void mlir::cc::acr::registerToJSONTranslation() {
   TranslateFromMLIRRegistration reg(
       "mlir-to-json", "export ACR CRN to JSON format",
       [](Operation *op, raw_ostream &output) {
         return translateToJSON(op, output);
       },
       [](DialectRegistry &registry) {
-        registry.insert<acr::ACRDialect, arith::ArithDialect>();
+        registry.insert<cc::acr::ACRDialect, arith::ArithDialect>();
       });
 }
 
-void mlir::acr::registerFromJSONTranslation() {
+void mlir::cc::acr::registerFromJSONTranslation() {
   TranslateToMLIRRegistration reg(
       "json-to-mlir", "import JSON to ACR CRN MLIR",
       [](llvm::SourceMgr &sourceMgr,
@@ -34,6 +34,6 @@ void mlir::acr::registerFromJSONTranslation() {
         return translateFromJSON(sourceMgr, context);
       },
       [](DialectRegistry &registry) {
-        registry.insert<acr::ACRDialect, arith::ArithDialect>();
+        registry.insert<cc::acr::ACRDialect, arith::ArithDialect>();
       });
 }

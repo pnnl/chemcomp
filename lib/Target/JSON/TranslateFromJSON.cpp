@@ -21,7 +21,7 @@
 using namespace mlir;
 
 OwningOpRef<Operation *>
-mlir::acr::translateFromJSON(llvm::SourceMgr &sourceMgr, MLIRContext *context) {
+mlir::cc::acr::translateFromJSON(llvm::SourceMgr &sourceMgr, MLIRContext *context) {
   auto loc = FileLineColLoc::get(
       StringAttr::get(context,
                       sourceMgr.getMemoryBuffer(1)->getBufferIdentifier()),
@@ -112,21 +112,21 @@ mlir::acr::translateFromJSON(llvm::SourceMgr &sourceMgr, MLIRContext *context) {
   }
 
   // Build the MLIR module.
-  context->loadDialect<acr::ACRDialect, arith::ArithDialect>();
+  context->loadDialect<cc::acr::ACRDialect, arith::ArithDialect>();
   OpBuilder builder(context);
 
   auto module = ModuleOp::create(loc);
   builder.setInsertionPointToEnd(module.getBody());
 
   // Types.
-  auto speciesType = acr::SpeciesType::get(context);
+  auto speciesType = cc::acr::SpeciesType::get(context);
   auto speciesTensorType = RankedTensorType::get({S}, speciesType);
   auto rateTensorType = RankedTensorType::get({R}, builder.getF32Type());
   auto funcType = builder.getFunctionType({speciesTensorType, rateTensorType},
                                           {speciesTensorType});
 
   // Create acr.crn op.
-  auto crnOp = builder.create<acr::CRNOp>(loc, "crn", funcType,
+  auto crnOp = builder.create<cc::acr::CRNOp>(loc, "crn", funcType,
                                           /*sym_visibility=*/StringAttr{},
                                           /*arg_attrs=*/ArrayAttr{},
                                           /*res_attrs=*/ArrayAttr{});
@@ -143,12 +143,12 @@ mlir::acr::translateFromJSON(llvm::SourceMgr &sourceMgr, MLIRContext *context) {
   auto stoichAttr = DenseIntElementsAttr::get(matrixTensorType, matrixValues);
 
   // Create acr.crn_generic op (tensor form).
-  auto genericOp = builder.create<acr::CRNGenericOp>(
+  auto genericOp = builder.create<cc::acr::CRNGenericOp>(
       loc, TypeRange{speciesTensorType}, ValueRange{speciesArg, rateArg});
   genericOp->setAttr("stoich_matrix", stoichAttr);
 
   // Create acr.return.
-  builder.create<acr::ReturnOp>(loc, genericOp->getResults());
+  builder.create<cc::acr::ReturnOp>(loc, genericOp->getResults());
 
   return OwningOpRef<Operation *>(module.getOperation());
 }

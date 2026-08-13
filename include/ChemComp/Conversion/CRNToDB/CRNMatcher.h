@@ -20,7 +20,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/raw_ostream.h"
 
-namespace chemcomp {
+namespace mlir::cc {
 
 /// Index of an abstract species (a column of stoich_matrix).
 using AbstractSpecies = unsigned;
@@ -151,6 +151,6 @@ llvm::SmallVector<llvm::SmallVector<AbstractSpecies, 8>, 8>
 computeFrontiers(const QueryCRN &query,
                  llvm::ArrayRef<AbstractReaction> order);
 
-} // namespace chemcomp
+} // namespace mlir::cc
 
 #endif // CHEMCOMP_CONVERSION_CRNTODB_CRNMATCHER_H

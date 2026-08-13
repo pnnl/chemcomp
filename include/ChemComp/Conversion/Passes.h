@@ -12,11 +12,13 @@
 #include "ChemComp/Conversion/CRNToDB/CRNToDB.h"
 
 namespace mlir {
+namespace cc {
 
 /// Generate the code for registering conversion passes.
 #define GEN_PASS_REGISTRATION
 #include "ChemComp/Conversion/Passes.h.inc"
 
+} // namespace cc
 } // namespace mlir
 
 #endif // CHEMCOMP_CONVERSION_PASSES_H

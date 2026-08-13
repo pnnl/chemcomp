@@ -14,7 +14,7 @@
 
 #include "llvm/ADT/ArrayRef.h"
 
-namespace chemcomp {
+namespace mlir::cc {
 
 /// Weights of the objective in papers/cf26-crn2db section 3.4.
 ///
@@ -49,6 +49,6 @@ double localScore(const QueryCRN &query, AbstractReaction r, const Motif &motif,
                   llvm::ArrayRef<AbstractSpecies> support,
                   const ScoringWeights &weights);
 
-} // namespace chemcomp
+} // namespace mlir::cc
 
 #endif // CHEMCOMP_CONVERSION_CRNTODB_SCORING_H

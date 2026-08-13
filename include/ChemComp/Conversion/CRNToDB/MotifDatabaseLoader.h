@@ -22,7 +22,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
 
-namespace chemcomp {
+namespace mlir::cc {
 
 /// Populate `db` from the compiled-in TableGen fixture.
 ///
@@ -60,6 +60,6 @@ llvm::Error loadJSONDatabaseFromBuffer(llvm::StringRef json,
                                        const SliceSpec &spec,
                                        MotifDatabase &db);
 
-} // namespace chemcomp
+} // namespace mlir::cc
 
 #endif // CHEMCOMP_CONVERSION_CRNTODB_MOTIFDATABASELOADER_H

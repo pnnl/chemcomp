@@ -13,7 +13,7 @@
 
 #include "ChemComp/Dialect/ACR/ACRPasses.h"
 
-namespace mlir::acr {
+namespace mlir::cc::acr {
 #define GEN_PASS_DEF_ACRSWITCHBARFOO
 #include "ChemComp/Dialect/ACR/ACRPasses.h.inc"
 
@@ -43,4 +43,4 @@ public:
   }
 };
 } // namespace
-} // namespace mlir::acr
+} // namespace mlir::cc::acr

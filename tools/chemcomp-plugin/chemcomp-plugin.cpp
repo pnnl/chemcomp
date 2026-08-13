@@ -25,8 +25,8 @@ extern "C" LLVM_ATTRIBUTE_WEAK DialectPluginLibraryInfo
 mlirGetDialectPluginInfo() {
   return {MLIR_PLUGIN_API_VERSION, "ACR", LLVM_VERSION_STRING,
           [](DialectRegistry *registry) {
-            registry->insert<mlir::acr::ACRDialect>();
-            mlir::acr::registerPasses();
+            registry->insert<mlir::cc::acr::ACRDialect>();
+            mlir::cc::acr::registerPasses();
           }};
 }
 
@@ -34,5 +34,5 @@ mlirGetDialectPluginInfo() {
 /// Necessary symbol to register the pass plugin.
 extern "C" LLVM_ATTRIBUTE_WEAK PassPluginLibraryInfo mlirGetPassPluginInfo() {
   return {MLIR_PLUGIN_API_VERSION, "ACRPasses", LLVM_VERSION_STRING,
-          []() { mlir::acr::registerPasses(); }};
+          []() { mlir::cc::acr::registerPasses(); }};
 }

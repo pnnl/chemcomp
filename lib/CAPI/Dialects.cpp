@@ -11,4 +11,4 @@
 #include "ChemComp/Dialect/ACR/ACRDialect.h"
 #include "mlir/CAPI/Registration.h"
 
-MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(ACR, acr, mlir::acr::ACRDialect)
+MLIR_DEFINE_CAPI_DIALECT_REGISTRATION(ACR, acr, mlir::cc::acr::ACRDialect)

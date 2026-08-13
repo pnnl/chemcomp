@@ -30,9 +30,9 @@
 #include "llvm/Support/raw_ostream.h"
 
 using namespace mlir;
-using namespace chemcomp;
+using namespace mlir::cc;
 
-namespace mlir {
+namespace mlir::cc {
 #define GEN_PASS_DEF_CRNDBMATCH
 #include "ChemComp/Conversion/Passes.h.inc"
 
@@ -205,4 +205,4 @@ private:
 };
 
 } // namespace
-} // namespace mlir
+} // namespace mlir::cc

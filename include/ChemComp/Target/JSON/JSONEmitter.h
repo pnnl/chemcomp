@@ -18,6 +18,7 @@ namespace mlir {
 class MLIRContext;
 class Operation;
 
+namespace cc {
 namespace acr {
 
 /// Translate ACR CRN MLIR operations to CRN JSON format.
@@ -32,6 +33,7 @@ void registerToJSONTranslation();
 void registerFromJSONTranslation();
 
 } // namespace acr
+} // namespace cc
 } // namespace mlir
 
 #endif // CHEMCOMP_TARGET_JSON_JSONEMITTER_H

@@ -45,7 +45,7 @@ static void emitRate(llvm::json::OStream &J, const APFloat &val) {
 }
 
 /// Emit a single CRNGenericOp as JSON.
-static LogicalResult emitCRNGenericOp(acr::CRNGenericOp op,
+static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
                                       llvm::json::OStream &J) {
   auto stoichAttr = op->getAttrOfType<DenseIntElementsAttr>("stoich_matrix");
   if (!stoichAttr)
@@ -158,11 +158,11 @@ static LogicalResult emitCRNGenericOp(acr::CRNGenericOp op,
   return success();
 }
 
-LogicalResult mlir::acr::translateToJSON(Operation *op, llvm::raw_ostream &os) {
+LogicalResult mlir::cc::acr::translateToJSON(Operation *op, llvm::raw_ostream &os) {
   bool foundAny = false;
   LogicalResult result = success();
 
-  op->walk([&](acr::CRNGenericOp genericOp) {
+  op->walk([&](cc::acr::CRNGenericOp genericOp) {
     if (failed(result))
       return;
     if (foundAny)

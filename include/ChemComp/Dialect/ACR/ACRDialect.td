@@ -21,7 +21,7 @@ def ACR_Dialect : Dialect {
     let description = [{
         TODO
     }];
-    let cppNamespace = "::mlir::acr";
+    let cppNamespace = "::mlir::cc::acr";
 
     let useDefaultTypePrinterParser = 1;
     let extraClassDeclaration = [{

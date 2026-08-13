@@ -15,7 +15,7 @@
 
 #include <optional>
 
-namespace chemcomp {
+namespace mlir::cc {
 
 /// The outcome of matching one CRN.
 struct MatchResult {
@@ -78,6 +78,6 @@ struct DPOptions {
 MatchResult runFrontierDP(const QueryCRN &query, const MotifDatabase &db,
                           const Preprocessing &prep, const DPOptions &options);
 
-} // namespace chemcomp
+} // namespace mlir::cc
 
 #endif // CHEMCOMP_CONVERSION_CRNTODB_FRONTIERDP_H

@@ -26,7 +26,7 @@
 #define GET_MOTIF_DB
 #include "ChemComp/Conversion/CRNToDB/MotifsFixture.inc"
 
-using namespace chemcomp;
+using namespace mlir::cc;
 
 namespace {
 
@@ -63,7 +63,7 @@ const FixtureSlice *findSlice(llvm::StringRef name) {
 
 } // namespace
 
-llvm::SmallVector<llvm::StringRef, 8> chemcomp::getFixtureSliceNames() {
+llvm::SmallVector<llvm::StringRef, 8> mlir::cc::getFixtureSliceNames() {
   llvm::SmallVector<llvm::StringRef, 8> names;
   for (const FixtureSlice &slice : kFixtureSlices)
     names.push_back(slice.name);
@@ -73,7 +73,7 @@ llvm::SmallVector<llvm::StringRef, 8> chemcomp::getFixtureSliceNames() {
   return names;
 }
 
-llvm::Error chemcomp::loadFixtureDatabase(llvm::StringRef sliceName,
+llvm::Error mlir::cc::loadFixtureDatabase(llvm::StringRef sliceName,
                                           const SliceSpec &spec,
                                           MotifDatabase &db) {
   if (sliceName.empty()) {

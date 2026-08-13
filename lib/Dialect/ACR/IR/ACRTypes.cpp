@@ -13,7 +13,7 @@
 #include "mlir/IR/DialectImplementation.h"
 #include "llvm/ADT/TypeSwitch.h"
 
-using namespace mlir::acr;
+using namespace mlir::cc::acr;
 
 #define GET_TYPEDEF_CLASSES
 #include "ChemComp/Dialect/ACR/ACROpsTypes.cpp.inc"

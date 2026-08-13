@@ -13,7 +13,7 @@
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/MemoryBuffer.h"
 
-using namespace chemcomp;
+using namespace mlir::cc;
 
 namespace {
 
@@ -148,14 +148,14 @@ llvm::Error parseRecords(llvm::StringRef json, llvm::StringRef context,
 
 } // namespace
 
-llvm::Error chemcomp::loadJSONDatabaseFromBuffer(llvm::StringRef json,
+llvm::Error mlir::cc::loadJSONDatabaseFromBuffer(llvm::StringRef json,
                                                  llvm::StringRef context,
                                                  const SliceSpec &spec,
                                                  MotifDatabase &db) {
   return parseRecords(json, context, spec, db);
 }
 
-llvm::Error chemcomp::loadJSONDatabase(llvm::StringRef path,
+llvm::Error mlir::cc::loadJSONDatabase(llvm::StringRef path,
                                        const SliceSpec &spec,
                                        MotifDatabase &db) {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> buffer =

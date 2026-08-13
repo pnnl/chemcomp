@@ -14,6 +14,7 @@
 #include <memory>
 
 namespace mlir {
+namespace cc {
 namespace acr {
 #define GEN_PASS_DECL
 #include "ChemComp/Dialect/ACR/ACRPasses.h.inc"
@@ -21,6 +22,7 @@ namespace acr {
 #define GEN_PASS_REGISTRATION
 #include "ChemComp/Dialect/ACR/ACRPasses.h.inc"
 } // namespace acr
+} // namespace cc
 } // namespace mlir
 
 #endif

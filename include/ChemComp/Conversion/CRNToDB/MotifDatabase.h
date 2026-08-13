@@ -39,7 +39,7 @@
 #include <cstdint>
 #include <limits>
 
-namespace chemcomp {
+namespace mlir::cc {
 
 /// Dense index into MotifDatabase's species table.
 using SpeciesId = unsigned;
@@ -280,28 +280,28 @@ private:
   SignatureKey internSignature(llvm::ArrayRef<int32_t> coeffs);
 };
 
-} // namespace chemcomp
+} // namespace mlir::cc
 
 //===----------------------------------------------------------------------===//
 // DenseMapInfo for SignatureKey
 //===----------------------------------------------------------------------===//
 
 namespace llvm {
-template <> struct DenseMapInfo<chemcomp::SignatureKey> {
-  static inline chemcomp::SignatureKey getEmptyKey() {
-    return chemcomp::SignatureKey(ArrayRef<int32_t>(
+template <> struct DenseMapInfo<mlir::cc::SignatureKey> {
+  static inline mlir::cc::SignatureKey getEmptyKey() {
+    return mlir::cc::SignatureKey(ArrayRef<int32_t>(
         reinterpret_cast<const int32_t *>(~uintptr_t(0)), size_t(0)));
   }
-  static inline chemcomp::SignatureKey getTombstoneKey() {
-    return chemcomp::SignatureKey(ArrayRef<int32_t>(
+  static inline mlir::cc::SignatureKey getTombstoneKey() {
+    return mlir::cc::SignatureKey(ArrayRef<int32_t>(
         reinterpret_cast<const int32_t *>(~uintptr_t(1)), size_t(0)));
   }
-  static unsigned getHashValue(const chemcomp::SignatureKey &k) {
+  static unsigned getHashValue(const mlir::cc::SignatureKey &k) {
     return static_cast<unsigned>(
         hash_combine_range(k.coeffs.begin(), k.coeffs.end()));
   }
-  static bool isEqual(const chemcomp::SignatureKey &a,
-                      const chemcomp::SignatureKey &b) {
+  static bool isEqual(const mlir::cc::SignatureKey &a,
+                      const mlir::cc::SignatureKey &b) {
     // Empty/tombstone carry sentinel pointers that must not be dereferenced,
     // so compare identity before touching the payload.
     if (a.coeffs.data() == b.coeffs.data() &&

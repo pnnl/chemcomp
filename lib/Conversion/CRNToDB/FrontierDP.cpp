@@ -31,7 +31,7 @@
 
 #include <algorithm>
 
-using namespace chemcomp;
+using namespace mlir::cc;
 
 namespace {
 
@@ -230,7 +230,7 @@ void enumerateExtensions(
 
 } // namespace
 
-MatchResult chemcomp::runFrontierDP(const QueryCRN &query,
+MatchResult mlir::cc::runFrontierDP(const QueryCRN &query,
                                     const MotifDatabase &db,
                                     const Preprocessing &prep,
                                     const DPOptions &options) {

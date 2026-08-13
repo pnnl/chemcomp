@@ -14,7 +14,7 @@
 #include "mlir/Interfaces/FunctionImplementation.h"
 
 using namespace mlir;
-using namespace mlir::acr;
+using namespace mlir::cc::acr;
 
 //===----------------------------------------------------------------------===//
 // ACR_ReactionOp — custom parser/printer (function-like)
@@ -76,7 +76,7 @@ LogicalResult ReactOp::verify() {
     // --- Tensor form ---
     // Expected: (tensor<Nx!acr.species>, tensor<Nxf32>, f32)
     //        -> tensor<Nx!acr.species>
-    if (!isa<acr::SpeciesType>(speciesTensor.getElementType()))
+    if (!isa<SpeciesType>(speciesTensor.getElementType()))
       return emitOpError("tensor form requires first input to be "
                          "tensor<Nx!acr.species>");
     if (speciesTensor.getRank() != 1)
@@ -108,7 +108,7 @@ LogicalResult ReactOp::verify() {
       return emitOpError("tensor form expects exactly 1 result");
     auto resultTensor = dyn_cast<RankedTensorType>(results[0]);
     if (!resultTensor || resultTensor.getRank() != 1 ||
-        !isa<acr::SpeciesType>(resultTensor.getElementType()))
+        !isa<SpeciesType>(resultTensor.getElementType()))
       return emitOpError("tensor form result must be tensor<Nx!acr.species>");
     if (resultTensor.getDimSize(0) != N)
       return emitOpError("result tensor dimension must match species "
@@ -123,7 +123,7 @@ LogicalResult ReactOp::verify() {
     // Count leading species types.
     unsigned numSpecies = 0;
     for (auto ty : inputs) {
-      if (isa<acr::SpeciesType>(ty))
+      if (isa<SpeciesType>(ty))
         ++numSpecies;
       else
         break;
@@ -148,7 +148,7 @@ LogicalResult ReactOp::verify() {
       return emitOpError("scalar form expects ")
              << numSpecies << " results, got " << results.size();
     for (auto [i, ty] : llvm::enumerate(results))
-      if (!isa<acr::SpeciesType>(ty))
+      if (!isa<SpeciesType>(ty))
         return emitOpError("expected !acr.species result at index ") << i;
   }
 
@@ -184,7 +184,7 @@ LogicalResult CRNGenericOp::verify() {
     // --- Tensor form ---
     // Expected: (tensor<Sx!acr.species>, tensor<Rxf32>) ->
     // tensor<Sx!acr.species>
-    if (!isa<acr::SpeciesType>(speciesTensor.getElementType()) ||
+    if (!isa<SpeciesType>(speciesTensor.getElementType()) ||
         speciesTensor.getRank() != 1)
       return emitOpError("tensor form requires first input to be "
                          "tensor<Sx!acr.species>");
@@ -210,7 +210,7 @@ LogicalResult CRNGenericOp::verify() {
       return emitOpError("tensor form expects exactly 1 result");
     auto resultTensor = dyn_cast<RankedTensorType>(results[0]);
     if (!resultTensor || resultTensor.getRank() != 1 ||
-        !isa<acr::SpeciesType>(resultTensor.getElementType()))
+        !isa<SpeciesType>(resultTensor.getElementType()))
       return emitOpError("tensor form result must be "
                          "tensor<Sx!acr.species>");
     if (resultTensor.getDimSize(0) != S)
@@ -226,7 +226,7 @@ LogicalResult CRNGenericOp::verify() {
              << " rates), got " << inputs.size();
 
     for (int64_t i = 0; i < S; ++i)
-      if (!isa<acr::SpeciesType>(inputs[i]))
+      if (!isa<SpeciesType>(inputs[i]))
         return emitOpError("expected !acr.species for input #") << i;
     for (int64_t i = S; i < S + R; ++i)
       if (!inputs[i].isF32())
@@ -236,7 +236,7 @@ LogicalResult CRNGenericOp::verify() {
       return emitOpError("scalar form expects ")
              << S << " species results, got " << results.size();
     for (int64_t i = 0; i < S; ++i)
-      if (!isa<acr::SpeciesType>(results[i]))
+      if (!isa<SpeciesType>(results[i]))
         return emitOpError("expected !acr.species result at index ") << i;
   }
 

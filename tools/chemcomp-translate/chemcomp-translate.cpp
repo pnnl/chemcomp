@@ -23,8 +23,8 @@
 
 int main(int argc, char **argv) {
   mlir::registerAllTranslations();
-  mlir::acr::registerToJSONTranslation();
-  mlir::acr::registerFromJSONTranslation();
+  mlir::cc::acr::registerToJSONTranslation();
+  mlir::cc::acr::registerFromJSONTranslation();
 
   return failed(
       mlir::mlirTranslateMain(argc, argv, "MLIR Translation Testing Tool"));

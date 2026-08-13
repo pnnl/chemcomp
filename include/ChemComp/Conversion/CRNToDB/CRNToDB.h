@@ -16,10 +16,12 @@
 #include <memory>
 
 namespace mlir {
+namespace cc {
 
 #define GEN_PASS_DECL_CRNDBMATCH
 #include "ChemComp/Conversion/Passes.h.inc"
 
+} // namespace cc
 } // namespace mlir
 
 #endif // CHEMCOMP_CONVERSION_CRNTODB_CRNTODB_H

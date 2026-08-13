@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-using namespace chemcomp;
+using namespace mlir::cc;
 
 //===----------------------------------------------------------------------===//
 // QueryCRN
@@ -106,7 +106,7 @@ struct InteractionGraph {
 } // namespace
 
 llvm::SmallVector<AbstractSpecies, 8>
-chemcomp::computeMinFillOrder(const QueryCRN &query) {
+mlir::cc::computeMinFillOrder(const QueryCRN &query) {
   InteractionGraph graph(query);
   llvm::SmallBitVector live(query.numSpecies, true);
   llvm::SmallVector<AbstractSpecies, 8> order;
@@ -144,7 +144,7 @@ chemcomp::computeMinFillOrder(const QueryCRN &query) {
 }
 
 llvm::SmallVector<AbstractReaction, 8>
-chemcomp::deriveReactionOrder(const QueryCRN &query,
+mlir::cc::deriveReactionOrder(const QueryCRN &query,
                               llvm::ArrayRef<AbstractSpecies> speciesOrder) {
   // position[s] = when s is eliminated.
   llvm::SmallVector<unsigned, 8> position(query.numSpecies, 0);
@@ -189,7 +189,7 @@ chemcomp::deriveReactionOrder(const QueryCRN &query,
 }
 
 llvm::SmallVector<llvm::SmallVector<AbstractSpecies, 8>, 8>
-chemcomp::computeFrontiers(const QueryCRN &query,
+mlir::cc::computeFrontiers(const QueryCRN &query,
                            llvm::ArrayRef<AbstractReaction> order) {
   const unsigned m = static_cast<unsigned>(order.size());
 
@@ -396,7 +396,7 @@ void runArcConsistency(const QueryCRN &query, const MotifDatabase &db,
 
 } // namespace
 
-Preprocessing chemcomp::preprocess(const QueryCRN &query,
+Preprocessing mlir::cc::preprocess(const QueryCRN &query,
                                    const MotifDatabase &db,
                                    const PreprocessOptions &options) {
   Preprocessing result;

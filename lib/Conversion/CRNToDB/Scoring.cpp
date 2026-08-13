@@ -14,9 +14,9 @@
 
 #include <cmath>
 
-using namespace chemcomp;
+using namespace mlir::cc;
 
-double chemcomp::stoichSimilarity(const QueryCRN &query, AbstractReaction r,
+double mlir::cc::stoichSimilarity(const QueryCRN &query, AbstractReaction r,
                                   const Motif &motif,
                                   llvm::ArrayRef<SpeciesId> binding,
                                   llvm::ArrayRef<AbstractSpecies> support) {
@@ -44,7 +44,7 @@ double chemcomp::stoichSimilarity(const QueryCRN &query, AbstractReaction r,
   return dot / (std::sqrt(normQuery) * std::sqrt(normMotif));
 }
 
-double chemcomp::rateSimilarity(const QueryCRN &query, AbstractReaction r,
+double mlir::cc::rateSimilarity(const QueryCRN &query, AbstractReaction r,
                                 const Motif &motif, double sigma) {
   // S_r = exp(-(log kappa_j - log k_i)^2 / sigma^2), and 1.0 when either rate
   // is unknown -- the paper's convention for an unknown query rate, extended
@@ -64,7 +64,7 @@ double chemcomp::rateSimilarity(const QueryCRN &query, AbstractReaction r,
   return std::exp(-(delta * delta) / (sigma * sigma));
 }
 
-double chemcomp::localScore(const QueryCRN &query, AbstractReaction r,
+double mlir::cc::localScore(const QueryCRN &query, AbstractReaction r,
                             const Motif &motif,
                             llvm::ArrayRef<SpeciesId> binding,
                             llvm::ArrayRef<AbstractSpecies> support,

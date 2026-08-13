@@ -11,7 +11,7 @@
 #include "ChemComp/Dialect/ACR/ACRTypes.h"
 
 using namespace mlir;
-using namespace mlir::acr;
+using namespace mlir::cc::acr;
 
 #include "ChemComp/Dialect/ACR/ACROpsDialect.cpp.inc"
 
