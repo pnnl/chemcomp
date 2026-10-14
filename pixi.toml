@@ -1,0 +1,151 @@
+[workspace]
+name = "chemcomp"
+description = "ChemComp: MLIR-based chemical compiler and CRN reservoir emulator"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[activation.env]
+# Keep environments hermetic: ignore packages in ~/.local/lib/pythonX.Y.
+PYTHONNOUSERSITE = "1"
+
+################################################################################
+# compiler: out-of-tree MLIR build against the conda-forge LLVM/MLIR 18.1.2
+################################################################################
+# conda-forge only ships MLIR python bindings from 19.x, and that package strips
+# the python sources (MLIRPythonSources) that ChemComp's own bindings build on.
+# Pixi builds therefore use MLIR_ENABLE_BINDINGS_PYTHON=OFF; test/python is
+# reported as UNSUPPORTED by check-chemcomp. See README.md for the from-source
+# LLVM build that enables the mlir_chemcomp python package.
+[feature.compiler.dependencies]
+mlir = "==18.1.2"
+llvmdev = "==18.1.2"
+lit = "==18.1.2"
+cmake = ">=3.20"
+ninja = "*"
+cxx-compiler = "*"
+c-compiler = "*"
+python = "3.12.*"
+# Headers/CMake packages that LLVMConfig.cmake find_package()s: the conda LLVM
+# was built with zlib, zstd and libxml2 enabled.
+zlib = "*"
+zstd = "*"
+libxml2 = "*"
+
+[feature.compiler.activation.env]
+# One build tree per environment: CMake caches absolute toolchain paths.
+CHEMCOMP_BUILD_DIR = "$PIXI_PROJECT_ROOT/build/pixi-$PIXI_ENVIRONMENT_NAME"
+# Use the conda-forge toolchain (the one MLIR was built with) even when the host
+# exports CC/CXX (e.g. the devcontainer sets clang).
+CC = "$CONDA_PREFIX/bin/gcc"
+CXX = "$CONDA_PREFIX/bin/g++"
+
+[feature.compiler.tasks.link-llvm-utils]
+# llvmdev installs FileCheck, not, count and split-file under libexec/llvm, but
+# lit's default substitutions only search llvm_tools_dir ($CONDA_PREFIX/bin).
+cmd = """ln -sf \
+  "$CONDA_PREFIX/libexec/llvm/FileCheck" \
+  "$CONDA_PREFIX/libexec/llvm/not" \
+  "$CONDA_PREFIX/libexec/llvm/count" \
+  "$CONDA_PREFIX/libexec/llvm/split-file" \
+  "$CONDA_PREFIX/bin/""""
+description = "Expose the LLVM test utilities (FileCheck, not, ...) to lit"
+
+[feature.compiler.tasks.configure]
+cmd = """cmake -G Ninja -S "$PIXI_PROJECT_ROOT" -B "$CHEMCOMP_BUILD_DIR" \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_PREFIX_PATH="$CONDA_PREFIX" \
+  -DMLIR_DIR="$CONDA_PREFIX/lib/cmake/mlir" \
+  -DLLVM_DIR="$CONDA_PREFIX/lib/cmake/llvm" \
+  -DLLVM_EXTERNAL_LIT="$CONDA_PREFIX/bin/lit" \
+  -DMLIR_ENABLE_BINDINGS_PYTHON=OFF"""
+inputs = ["**/CMakeLists.txt", "test/lit.site.cfg.py.in"]
+outputs = ["build/pixi-*/build.ninja"]
+depends-on = ["link-llvm-utils"]
+description = "Configure the CMake build in build/pixi-<environment>"
+
+[feature.compiler.tasks.build]
+cmd = 'cmake --build "$CHEMCOMP_BUILD_DIR" --target chemcomp-opt'
+depends-on = ["configure"]
+description = "Build chemcomp-opt"
+
+[feature.compiler.tasks.check]
+cmd = 'cmake --build "$CHEMCOMP_BUILD_DIR" --target check-chemcomp'
+depends-on = ["configure"]
+description = "Build and run the lit regression tests (check-chemcomp)"
+
+[feature.compiler.tasks.chemcomp-opt]
+cmd = '"$CHEMCOMP_BUILD_DIR/bin/chemcomp-opt"'
+depends-on = ["build"]
+description = "Run chemcomp-opt, forwarding any extra arguments"
+
+################################################################################
+# emulator: pure-python CRN reservoir emulator (tools/chemcomp-reservoir-emulator)
+################################################################################
+[feature.emulator.dependencies]
+python = "3.12.*"
+numpy = ">=1.21"
+scipy = ">=1.7"
+scikit-learn = ">=1.0"
+matplotlib-base = ">=3.4"
+networkx = ">=2.6"
+pandas = ">=1.3"
+sympy = ">=1.10"
+pyyaml = ">=6.0"
+
+[feature.emulator.pypi-dependencies]
+chemcomp-emulation = { path = "tools/chemcomp-reservoir-emulator", editable = true }
+
+[feature.emulator.tasks.emulator]
+cmd = "python run_reservoir.py"
+cwd = "tools/chemcomp-reservoir-emulator"
+description = "Run the reservoir emulator CLI driver, forwarding any extra arguments"
+
+################################################################################
+# dev tooling
+################################################################################
+[feature.test.dependencies]
+pytest = ">=7.0"
+pytest-cov = "*"
+
+[feature.test.tasks.test-emulator]
+cmd = "pytest tests/"
+cwd = "tools/chemcomp-reservoir-emulator"
+description = "Run the emulator pytest suite"
+
+[feature.notebooks.dependencies]
+jupyterlab = ">=3.0"
+ipywidgets = ">=7.0"
+ipykernel = "*"
+
+[feature.lint.dependencies]
+ruff = "*"
+# Match the LLVM major version so formatting agrees with upstream MLIR style.
+clang-format = "18.*"
+
+[feature.lint.tasks.lint-py]
+cmd = "ruff check tools/chemcomp-reservoir-emulator"
+description = "Lint the emulator with ruff"
+
+[feature.lint.tasks.fmt-py]
+cmd = "ruff format tools/chemcomp-reservoir-emulator"
+description = "Format the emulator with ruff"
+
+[feature.lint.tasks.lint-cpp]
+cmd = "git ls-files '*.cpp' '*.h' '*.c' | xargs clang-format --dry-run --Werror"
+description = "Check C/C++ formatting against .clang-format"
+
+[feature.lint.tasks.fmt-cpp]
+cmd = "git ls-files '*.cpp' '*.h' '*.c' | xargs clang-format -i"
+description = "Format C/C++ sources in place"
+
+################################################################################
+# environments
+################################################################################
+[environments]
+# Development: everything.
+default = { features = ["compiler", "emulator", "test", "lint", "notebooks"], solve-group = "default" }
+# Production: only what is needed to build/run each component.
+compiler = { features = ["compiler"], solve-group = "default" }
+emulator = { features = ["emulator"], solve-group = "default" }
+# Lightweight environment for formatting/lint checks (e.g. CI).
+lint = { features = ["lint"], no-default-feature = true }
