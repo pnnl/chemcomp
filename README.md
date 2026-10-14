@@ -9,6 +9,24 @@ ChemComp is built out-of-tree against a specific MLIR revision. Use this commit 
 
 ChemComp is compiled and tested against that exact MLIR version. Other revisions may not build or may behave differently.
 
+## Build with Pixi (recommended)
+
+[Pixi](https://pixi.sh) installs the compiler toolchain, the prebuilt conda-forge LLVM/MLIR 18.1.2, `lit`, and the Python dependencies of the reservoir emulator, so no LLVM build is required:
+
+```sh
+pixi run build           # configure (build/pixi-<env>) and build chemcomp-opt
+pixi run check           # build and run check-chemcomp
+pixi run chemcomp-opt --help
+pixi run test-emulator   # pytest suite of tools/chemcomp-reservoir-emulator
+pixi run emulator --list-problems
+pixi run lint-py         # ruff;          fmt-py formats in place
+pixi run lint-cpp        # clang-format;  fmt-cpp formats in place
+```
+
+Environments: `default` (everything, for development), `compiler` and `emulator` (only what each component needs), and `lint`. Select one with `-e`, e.g. `pixi run -e emulator emulator --list-problems`.
+
+The conda-forge MLIR packages do not ship the sources needed to build ChemComp's Python bindings, so Pixi builds use `-DMLIR_ENABLE_BINDINGS_PYTHON=OFF` and the `test/python` tests are reported as unsupported. To build the `mlir_chemcomp` Python package, build LLVM/MLIR from source as described below.
+
 ## Build LLVM/MLIR
 
 Clone the llvm-project repository and check out the above commit. Then, build and install LLVM/MLIR with the following configuration:
