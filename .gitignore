@@ -5,3 +5,11 @@ specs/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Pixi
+.pixi/
+*.egg-info/
+
+# Reservoir emulator generated outputs
+tools/chemcomp-reservoir-emulator/test_results/
+tools/chemcomp-reservoir-emulator/results/
