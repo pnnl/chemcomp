@@ -2,6 +2,8 @@
 
 ChemComp is set to implement a compilation flow that converts mathematical operations to chemical/biological operations of well-known reaction behavior, providing translation of relevant classes of ODEs.
 
+ChemComp also includes a reservoir emulator in [tools/chemcomp-reservoir-emulator](tools/chemcomp-reservoir-emulator). It is a Python package that solves ODEs and PDEs by using chemical reaction networks as a reservoir-computing substrate. See its [README](tools/chemcomp-reservoir-emulator/README.md) for the algorithm overview, installation, and usage.
+
 # Build instructions
 
 ChemComp is built out-of-tree against a specific MLIR revision. Use this commit for llvm-project:
