@@ -68,7 +68,7 @@ the remark that tells you the result stopped being exact.
 ## Database
 
 Two sources, one in-memory representation, so the matcher cannot tell them
-apart. `test/CRN2DB/db-loader-equivalence.mlir` asserts that by running one set
+apart. `test/Conversion/CRNToDB/db-loader-equivalence.mlir` asserts that by running one set
 of expectations against both.
 
 **Compiled-in fixture** — ~50 curated motifs in
@@ -91,7 +91,7 @@ in the submodule, so a build-time dependency would break any fresh clone.
 ### Extending the schema
 
 Typed properties live on `Motif` subclasses, so a new column costs a subclass
-and one line in `chemcomp-tblgen/MotifDBGen.cpp` — nothing downstream changes.
+and one line in `tools/chemcomp-tblgen/MotifDBGen.cpp` — nothing downstream changes.
 `SolubleMotif` is the worked example:
 
 ```tablegen
@@ -106,6 +106,9 @@ TableGen has no float type, so real-valued fields are decimal strings parsed by
 the backend, and no set or map type, so species and coefficients are parallel
 lists that the generated C++ turns into a sorted set and a map. The empty string
 means unknown, which stays distinct from any numeric value.
+
+For a complete walkthrough of adding a real-valued column, including the
+scoring term, see [adding-db-columns.md](adding-db-columns.md).
 
 ## Algorithm
 
@@ -140,7 +143,7 @@ two reactions". Section 4.1 separately defines frontier width as species
 simultaneously *live*, not occurrences per species; measuring against that
 definition, exhaustive search over all 24 reaction orderings gives a minimum
 achievable maximum frontier width of 3. Our min-fill ordering achieves that
-measured optimum. See `test/CRN2DB/preprocessing-oscillator.mlir`.
+measured optimum. See `test/Conversion/CRNToDB/preprocessing-oscillator.mlir`.
 
 **Table 1's `rxn00003` assumed forward orientation; the source CSV's arrow
 shows otherwise.** The source equation uses `<=`, a reverse reaction, so its
@@ -161,7 +164,7 @@ the frontier, after which the chemical can be rebound. The default matches
 the original algorithm: frontier-local injectivity **plus a warning** naming
 the reused chemicals. `global-injectivity=1` carries retired chemicals in the
 state key and is genuinely injective, at the cost of a state space exponential
-in the species count rather than the treewidth. `test/CRN2DB/dp-injectivity.mlir`
+in the species count rather than the treewidth. `test/Conversion/CRNToDB/dp-injectivity.mlir`
 runs one input through both modes.
 
 **Exact-signature indexing contradicts the coverage rule.** Section 3.2 permits
