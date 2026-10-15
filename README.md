@@ -27,6 +27,8 @@ Environments: `default` (everything, for development), `compiler` and `emulator`
 
 The conda-forge MLIR packages do not ship the sources needed to build ChemComp's Python bindings, so Pixi builds use `-DMLIR_ENABLE_BINDINGS_PYTHON=OFF` and the `test/python` tests are reported as unsupported. To build the `mlir_chemcomp` Python package, build LLVM/MLIR from source as described below.
 
+To extend the motif database with a new column and use it in scoring, see [docs/adding-db-columns.md](docs/adding-db-columns.md).
+
 ## Build LLVM/MLIR
 
 Clone the llvm-project repository and check out the above commit. Then, build and install LLVM/MLIR with the following configuration:
