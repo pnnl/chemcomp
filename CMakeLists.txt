@@ -44,6 +44,16 @@ include_directories(${CHEMCOMP_BINARY_DIR}/include)
 link_directories(${LLVM_BUILD_LIBRARY_DIR})
 add_definitions(${LLVM_DEFINITIONS})
 
+# MARCO (https://github.com/marco-compiler/marco) provides the Base Modelica
+# dialect used as the ODE frontend. MARCO is LGPLv3: enabling this links its
+# libraries into chemcomp-opt.
+option(CHEMCOMP_ENABLE_MARCO "Enable the MARCO Base Modelica frontend" OFF)
+if(CHEMCOMP_ENABLE_MARCO)
+  find_package(MARCO REQUIRED CONFIG)
+  message(STATUS "Using MARCOConfig.cmake in: ${MARCO_DIR}")
+  include_directories(${MARCO_INCLUDE_DIRS})
+endif()
+
 # Must precede include/, whose custom commands invoke chemcomp-tblgen. The
 # remaining tools are added after lib/ instead, so tools/ is split rather than
 # added as a single subdirectory.

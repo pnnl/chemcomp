@@ -31,6 +31,19 @@ The conda-forge MLIR packages do not ship the sources needed to build ChemComp's
 
 To extend the motif database with a new column and use it in scoring, see [docs/adding-db-columns.md](docs/adding-db-columns.md).
 
+### ODE frontend (MARCO)
+
+The `default` environment also builds the ODE frontend, based on the Base Modelica (`bmodelica`) dialect of the [MARCO](https://github.com/marco-compiler/marco) Modelica compiler. Pixi builds MARCO from source (feature `marco`, a `pixi-build-cmake` source dependency) against the same LLVM/MLIR 22.1.8, and ChemComp is configured with `-DCHEMCOMP_ENABLE_MARCO=ON`. `chemcomp-opt` then parses `bmodelica` models, runs MARCO's passes, and provides `convert-bmodelica-to-acr`, which maps explicit polynomial ODE systems onto known reaction networks:
+
+```sh
+pixi run build
+build/pixi-default/bin/chemcomp-opt test/Conversion/BaseModelicaToACR/lotka-volterra.mlir \
+    --convert-bmodelica-to-acr \
+  | build/pixi-default/bin/chemcomp-opt -crn-db-match='db-slice=AllFixture'
+```
+
+The `compiler` environment builds ChemComp without MARCO; the MARCO tests are then reported as unsupported. MARCO is licensed under the LGPLv3: binaries built with `CHEMCOMP_ENABLE_MARCO=ON` link it statically.
+
 ## Build LLVM/MLIR
 
 Clone the llvm-project repository and check out the above commit. Then, build and install LLVM/MLIR with the following configuration:

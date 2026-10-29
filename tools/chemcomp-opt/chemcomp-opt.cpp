@@ -19,6 +19,8 @@
 
 #include "ChemComp/Conversion/Passes.h"
 
+#include "RegisterMarco.h"
+
 int main(int argc, char **argv) {
   mlir::registerAllPasses();
   mlir::cc::acr::registerPasses();
@@ -27,6 +29,7 @@ int main(int argc, char **argv) {
   mlir::DialectRegistry registry;
   registry.insert<mlir::arith::ArithDialect, mlir::func::FuncDialect,
                   mlir::cc::acr::ACRDialect>();
+  mlir::cc::registerMarco(registry);
   // Add the following to include *all* MLIR Core dialects, or selectively
   // include what you need like above. You only need to register dialects that
   // will be *parsed* by the tool, not the one generated

@@ -1,5 +1,6 @@
 llvm_canonicalize_cmake_booleans(
         MLIR_ENABLE_BINDINGS_PYTHON
+        CHEMCOMP_ENABLE_MARCO
 )
 
 configure_lit_site_cfg(

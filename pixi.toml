@@ -3,6 +3,8 @@ name = "chemcomp"
 description = "ChemComp: MLIR-based chemical compiler and CRN reservoir emulator"
 channels = ["conda-forge"]
 platforms = ["linux-64"]
+# MARCO is consumed as a source package built by pixi (see feature.marco).
+preview = ["pixi-build"]
 
 [activation.env]
 # Keep environments hermetic: ignore packages in ~/.local/lib/pythonX.Y.
@@ -57,7 +59,8 @@ cmd = """cmake -G Ninja -S "$PIXI_PROJECT_ROOT" -B "$CHEMCOMP_BUILD_DIR" \
   -DMLIR_DIR="$CONDA_PREFIX/lib/cmake/mlir" \
   -DLLVM_DIR="$CONDA_PREFIX/lib/cmake/llvm" \
   -DLLVM_EXTERNAL_LIT="$CONDA_PREFIX/bin/lit" \
-  -DMLIR_ENABLE_BINDINGS_PYTHON=OFF"""
+  -DMLIR_ENABLE_BINDINGS_PYTHON=OFF \
+  -DCHEMCOMP_ENABLE_MARCO=$CHEMCOMP_ENABLE_MARCO"""
 inputs = ["**/CMakeLists.txt", "test/lit.site.cfg.py.in"]
 outputs = ["build/pixi-*/build.ninja"]
 depends-on = ["link-llvm-utils"]
@@ -77,6 +80,22 @@ description = "Build and run the lit regression tests (check-chemcomp)"
 cmd = '"$CHEMCOMP_BUILD_DIR/bin/chemcomp-opt"'
 depends-on = ["build"]
 description = "Run chemcomp-opt, forwarding any extra arguments"
+
+################################################################################
+# marco: Base Modelica (ODE) frontend from the MARCO compiler (LGPLv3)
+################################################################################
+# MARCO is built from source by pixi (pixi-build-cmake) against the same
+# LLVM/MLIR 22.1.8 release, with its driver disabled. Until the fork is
+# published, the dependency points at the chemical-compiler checkout; for a
+# standalone ChemComp checkout use the git form instead:
+#   marco = { git = "https://github.com/<user>/marco", branch = "chemcomp-llvm22" }
+[feature.marco.dependencies]
+marco = { path = "../external/marco" }
+
+[feature.marco.activation.env]
+# Read by the configure task. Environments without this feature build
+# ChemComp without MARCO.
+CHEMCOMP_ENABLE_MARCO = "ON"
 
 ################################################################################
 # emulator: pure-python CRN reservoir emulator (tools/chemcomp-reservoir-emulator)
@@ -143,7 +162,7 @@ description = "Format C/C++ sources in place"
 ################################################################################
 [environments]
 # Development: everything.
-default = { features = ["compiler", "emulator", "test", "lint", "notebooks"], solve-group = "default" }
+default = { features = ["compiler", "marco", "emulator", "test", "lint", "notebooks"], solve-group = "default" }
 # Production: only what is needed to build/run each component.
 compiler = { features = ["compiler"], solve-group = "default" }
 emulator = { features = ["emulator"], solve-group = "default" }
