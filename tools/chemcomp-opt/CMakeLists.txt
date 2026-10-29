@@ -5,6 +5,7 @@ set(LIBS
         ${conversion_libs}
         MLIRArithDialect
         MLIROptLib
+        MLIRRegisterAllPasses
         MLIRACR
         )
 add_llvm_executable(chemcomp-opt chemcomp-opt.cpp)

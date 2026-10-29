@@ -9,7 +9,7 @@ platforms = ["linux-64"]
 PYTHONNOUSERSITE = "1"
 
 ################################################################################
-# compiler: out-of-tree MLIR build against the conda-forge LLVM/MLIR 18.1.2
+# compiler: out-of-tree MLIR build against the conda-forge LLVM/MLIR 22.1.8
 ################################################################################
 # conda-forge only ships MLIR python bindings from 19.x, and that package strips
 # the python sources (MLIRPythonSources) that ChemComp's own bindings build on.
@@ -17,9 +17,9 @@ PYTHONNOUSERSITE = "1"
 # reported as UNSUPPORTED by check-chemcomp. See README.md for the from-source
 # LLVM build that enables the mlir_chemcomp python package.
 [feature.compiler.dependencies]
-mlir = "==18.1.2"
-llvmdev = "==18.1.2"
-lit = "==18.1.2"
+mlir = "==22.1.8"
+llvmdev = "==22.1.8"
+lit = "==22.1.8"
 cmake = ">=3.20"
 ninja = "*"
 cxx-compiler = "*"
@@ -120,7 +120,7 @@ ipykernel = "*"
 [feature.lint.dependencies]
 ruff = "*"
 # Match the LLVM major version so formatting agrees with upstream MLIR style.
-clang-format = "18.*"
+clang-format = "22.*"
 
 [feature.lint.tasks.lint-py]
 cmd = "ruff check tools/chemcomp-reservoir-emulator"

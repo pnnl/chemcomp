@@ -63,7 +63,7 @@ void emitStringLiteral(raw_ostream &os, StringRef str) {
 /// Empty means "unknown", which is a distinct state from any numeric value:
 /// 43.1% of ModelSEED rows have no thermodynamic data, and treating that as 0
 /// would silently fabricate a measurement.
-void emitOptionalDouble(raw_ostream &os, StringRef field, Record *rec,
+void emitOptionalDouble(raw_ostream &os, StringRef field, const Record *rec,
                         StringRef fieldName) {
   if (field.empty()) {
     os << "kUnknown";
@@ -81,7 +81,7 @@ void emitOptionalDouble(raw_ostream &os, StringRef field, Record *rec,
 }
 
 /// Validate one motif record and emit its table row.
-void emitMotif(raw_ostream &os, Record *rec) {
+void emitMotif(raw_ostream &os, const Record *rec) {
   StringRef id = rec->getValueAsString("MotifId");
   std::vector<StringRef> species = rec->getValueAsListOfStrings("Species");
   std::vector<int64_t> stoich = rec->getValueAsListOfInts("Stoich");
@@ -169,19 +169,21 @@ void emitMotif(raw_ostream &os, Record *rec) {
 
 } // namespace
 
-bool emitMotifDB(raw_ostream &os, RecordKeeper &records) {
+bool emitMotifDB(raw_ostream &os, const RecordKeeper &records) {
   emitSourceFileHeader("Reaction motif fixture database", os);
 
-  std::vector<Record *> motifs = records.getAllDerivedDefinitions("Motif");
-  std::vector<Record *> slices = records.getAllDerivedDefinitions("Slice");
+  std::vector<const Record *> motifs =
+      records.getAllDerivedDefinitions("Motif").vec();
+  std::vector<const Record *> slices =
+      records.getAllDerivedDefinitions("Slice").vec();
 
   // Sort by motif id so the generated table is stable regardless of the order
   // definitions appear in the .td, and so it matches the id ordering
   // MotifDatabase::buildIndex() imposes.
-  sort(motifs, [](Record *a, Record *b) {
+  sort(motifs, [](const Record *a, const Record *b) {
     return a->getValueAsString("MotifId") < b->getValueAsString("MotifId");
   });
-  sort(slices, [](Record *a, Record *b) {
+  sort(slices, [](const Record *a, const Record *b) {
     return a->getValueAsString("Name") < b->getValueAsString("Name");
   });
 
@@ -232,17 +234,17 @@ bool emitMotifDB(raw_ostream &os, RecordKeeper &records) {
 
   os << "// Sorted by motif id.\n";
   os << "const FixtureMotif kFixtureMotifs[] = {\n";
-  for (Record *rec : motifs)
+  for (const Record *rec : motifs)
     emitMotif(os, rec);
   os << "};\n\n";
 
   os << "// Sorted by slice name; each membership list is sorted by motif id.\n";
   os << "const FixtureSlice kFixtureSlices[] = {\n";
-  for (Record *slice : slices) {
-    std::vector<Record *> members = slice->getValueAsListOfDefs("Motifs");
+  for (const Record *slice : slices) {
+    std::vector<const Record *> members = slice->getValueAsListOfDefs("Motifs");
     std::vector<StringRef> ids;
     ids.reserve(members.size());
-    for (Record *m : members)
+    for (const Record *m : members)
       ids.push_back(m->getValueAsString("MotifId"));
     sort(ids);
     ids.erase(std::unique(ids.begin(), ids.end()), ids.end());

@@ -7,13 +7,13 @@ ChemComp also includes a reservoir emulator in [tools/chemcomp-reservoir-emulato
 # Build instructions
 
 ChemComp is built out-of-tree against a specific MLIR revision. Use this commit for llvm-project:
-26a1d6601d727a96f4301d0d8647b5a42760ae0c (tag: llvmorg-18.1.2)
+ca7933e47d3a3451d81e72ac174dcb5aa28b59d1 (tag: llvmorg-22.1.8)
 
 ChemComp is compiled and tested against that exact MLIR version. Other revisions may not build or may behave differently.
 
 ## Build with Pixi (recommended)
 
-[Pixi](https://pixi.sh) installs the compiler toolchain, the prebuilt conda-forge LLVM/MLIR 18.1.2, `lit`, and the Python dependencies of the reservoir emulator, so no LLVM build is required:
+[Pixi](https://pixi.sh) installs the compiler toolchain, the prebuilt conda-forge LLVM/MLIR 22.1.8, `lit`, and the Python dependencies of the reservoir emulator, so no LLVM build is required:
 
 ```sh
 pixi run build           # configure (build/pixi-<env>) and build chemcomp-opt
@@ -37,7 +37,7 @@ Clone the llvm-project repository and check out the above commit. Then, build an
 
 ```sh
 LLVM_SRC_DIR=/path/to/llvm-project
-git clone --depth 1 --revision=26a1d6601d727a96f4301d0d8647b5a42760ae0c https://github.com/llvm/llvm-project.git "$LLVM_SRC_DIR"
+git clone --depth 1 --revision=ca7933e47d3a3451d81e72ac174dcb5aa28b59d1 https://github.com/llvm/llvm-project.git "$LLVM_SRC_DIR"
 
 LLVM_BUILD_DIR=/path/to/llvm-build
 LLVM_INSTALL_DIR=/path/to/llvm-install
