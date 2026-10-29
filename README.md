@@ -7,13 +7,13 @@ ChemComp also includes a reservoir emulator in [tools/chemcomp-reservoir-emulato
 # Build instructions
 
 ChemComp is built out-of-tree against a specific MLIR revision. Use this commit for llvm-project:
-26a1d6601d727a96f4301d0d8647b5a42760ae0c (tag: llvmorg-18.1.2)
+ca7933e47d3a3451d81e72ac174dcb5aa28b59d1 (tag: llvmorg-22.1.8)
 
 ChemComp is compiled and tested against that exact MLIR version. Other revisions may not build or may behave differently.
 
 ## Build with Pixi (recommended)
 
-[Pixi](https://pixi.sh) installs the compiler toolchain, the prebuilt conda-forge LLVM/MLIR 18.1.2, `lit`, and the Python dependencies of the reservoir emulator, so no LLVM build is required:
+[Pixi](https://pixi.sh) installs the compiler toolchain, the prebuilt conda-forge LLVM/MLIR 22.1.8, `lit`, and the Python dependencies of the reservoir emulator, so no LLVM build is required:
 
 ```sh
 pixi run build           # configure (build/pixi-<env>) and build chemcomp-opt
@@ -31,13 +31,26 @@ The conda-forge MLIR packages do not ship the sources needed to build ChemComp's
 
 To extend the motif database with a new column and use it in scoring, see [docs/adding-db-columns.md](docs/adding-db-columns.md).
 
+### ODE frontend (MARCO)
+
+The `default` environment also builds the ODE frontend, based on the Base Modelica (`bmodelica`) dialect of the [MARCO](https://github.com/marco-compiler/marco) Modelica compiler. Pixi builds MARCO from source (feature `marco`, a `pixi-build-cmake` source dependency) against the same LLVM/MLIR 22.1.8, and ChemComp is configured with `-DCHEMCOMP_ENABLE_MARCO=ON`. `chemcomp-opt` then parses `bmodelica` models, runs MARCO's passes, and provides `convert-bmodelica-to-acr`, which maps explicit polynomial ODE systems onto known reaction networks:
+
+```sh
+pixi run build
+build/pixi-default/bin/chemcomp-opt test/Conversion/BaseModelicaToACR/lotka-volterra.mlir \
+    --convert-bmodelica-to-acr \
+  | build/pixi-default/bin/chemcomp-opt -crn-db-match='db-slice=AllFixture'
+```
+
+The `compiler` environment builds ChemComp without MARCO; the MARCO tests are then reported as unsupported. MARCO is licensed under the LGPLv3: binaries built with `CHEMCOMP_ENABLE_MARCO=ON` link it statically.
+
 ## Build LLVM/MLIR
 
 Clone the llvm-project repository and check out the above commit. Then, build and install LLVM/MLIR with the following configuration:
 
 ```sh
 LLVM_SRC_DIR=/path/to/llvm-project
-git clone --depth 1 --revision=26a1d6601d727a96f4301d0d8647b5a42760ae0c https://github.com/llvm/llvm-project.git "$LLVM_SRC_DIR"
+git clone --depth 1 --revision=ca7933e47d3a3451d81e72ac174dcb5aa28b59d1 https://github.com/llvm/llvm-project.git "$LLVM_SRC_DIR"
 
 LLVM_BUILD_DIR=/path/to/llvm-build
 LLVM_INSTALL_DIR=/path/to/llvm-install

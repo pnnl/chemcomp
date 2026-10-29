@@ -126,10 +126,10 @@ mlir::cc::acr::translateFromJSON(llvm::SourceMgr &sourceMgr, MLIRContext *contex
                                           {speciesTensorType});
 
   // Create acr.crn op.
-  auto crnOp = builder.create<cc::acr::CRNOp>(loc, "crn", funcType,
-                                          /*sym_visibility=*/StringAttr{},
-                                          /*arg_attrs=*/ArrayAttr{},
-                                          /*res_attrs=*/ArrayAttr{});
+  auto crnOp = cc::acr::CRNOp::create(builder, loc, "crn", funcType,
+                                      /*sym_visibility=*/StringAttr{},
+                                      /*arg_attrs=*/ArrayAttr{},
+                                      /*res_attrs=*/ArrayAttr{});
 
   // Create the body block with arguments.
   Block *body = crnOp.addEntryBlock();
@@ -143,12 +143,13 @@ mlir::cc::acr::translateFromJSON(llvm::SourceMgr &sourceMgr, MLIRContext *contex
   auto stoichAttr = DenseIntElementsAttr::get(matrixTensorType, matrixValues);
 
   // Create acr.crn_generic op (tensor form).
-  auto genericOp = builder.create<cc::acr::CRNGenericOp>(
-      loc, TypeRange{speciesTensorType}, ValueRange{speciesArg, rateArg});
+  auto genericOp =
+      cc::acr::CRNGenericOp::create(builder, loc, TypeRange{speciesTensorType},
+                                    ValueRange{speciesArg, rateArg});
   genericOp->setAttr("stoich_matrix", stoichAttr);
 
   // Create acr.return.
-  builder.create<cc::acr::ReturnOp>(loc, genericOp->getResults());
+  cc::acr::ReturnOp::create(builder, loc, genericOp->getResults());
 
   return OwningOpRef<Operation *>(module.getOperation());
 }

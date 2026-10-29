@@ -87,11 +87,18 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
   bool isTensorForm =
       !inputs.empty() && isa<RankedTensorType>(inputs[0].getType());
 
+  // Rates recorded on the op (e.g. by convert-bmodelica-to-acr) take the place
+  // of a constant rate tensor.
+  auto rateValues = op->getAttrOfType<DenseF64ArrayAttr>("rate_values");
+
   if (isTensorForm) {
     // Tensor form: inputs[1] is tensor<Rxf32>.
     // Try to trace it to an arith.constant.
     if (inputs.size() >= 2) {
-      if (auto constOp = inputs[1].getDefiningOp<arith::ConstantOp>()) {
+      if (rateValues && static_cast<int64_t>(rateValues.size()) == R) {
+        for (int64_t r = 0; r < R; ++r)
+          rates[r] = APFloat(static_cast<float>(rateValues[r]));
+      } else if (auto constOp = inputs[1].getDefiningOp<arith::ConstantOp>()) {
         if (auto denseAttr =
                 dyn_cast<DenseFPElementsAttr>(constOp.getValue())) {
           unsigned idx = 0;

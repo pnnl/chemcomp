@@ -15,6 +15,6 @@ class RecordKeeper;
 } // namespace llvm
 
 /// Emit the static motif fixture table. Returns true on error.
-bool emitMotifDB(llvm::raw_ostream &os, llvm::RecordKeeper &records);
+bool emitMotifDB(llvm::raw_ostream &os, const llvm::RecordKeeper &records);
 
 #endif // CHEMCOMP_TBLGEN_MOTIFDBGEN_H

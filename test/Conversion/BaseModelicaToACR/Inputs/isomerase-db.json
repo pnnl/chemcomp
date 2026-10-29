@@ -1,0 +1,4 @@
+[
+ {"motif_id":"iso00001","species":["Glucose-6-phosphate","Fructose-6-phosphate"],"stoich":[-1,1],"deltaG":2.6,"deltaGerr":0.3,"rate_range":[0.1,10.0],"source":"test fixture: phosphoglucose isomerase, forward"},
+ {"motif_id":"iso00002","species":["Fructose-6-phosphate","Glucose-6-phosphate"],"stoich":[-1,1],"deltaG":-2.6,"deltaGerr":0.3,"rate_range":[0.1,10.0],"source":"test fixture: phosphoglucose isomerase, reverse"}
+]

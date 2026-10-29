@@ -183,8 +183,11 @@ def ACR_ReactionInstanceOp : ACR_Op<"reaction_instance", [
     as results.
   }];
 
+  // arg_attrs/res_attrs are required by CallOpInterface (as on func.call).
   let arguments = (ins FlatSymbolRefAttr:$callee,
-                       Variadic<AnyType>:$operands);
+                       Variadic<AnyType>:$operands,
+                       OptionalAttr<DictArrayAttr>:$arg_attrs,
+                       OptionalAttr<DictArrayAttr>:$res_attrs);
   let results = (outs Variadic<AnyType>:$results);
 
   let extraClassDeclaration = [{
@@ -196,7 +199,7 @@ def ACR_ReactionInstanceOp : ACR_Op<"reaction_instance", [
       return (*this)->getAttrOfType<SymbolRefAttr>("callee");
     }
     void setCalleeFromCallable(CallInterfaceCallable callee) {
-      (*this)->setAttr("callee", callee.get<SymbolRefAttr>());
+      (*this)->setAttr("callee", llvm::cast<SymbolRefAttr>(callee));
     }
   }];
 

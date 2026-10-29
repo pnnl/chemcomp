@@ -34,7 +34,7 @@ cl::opt<ActionType> action(
     cl::values(clEnumValN(GenMotifDB, "gen-motif-db",
                           "Generate the reaction motif fixture database")));
 
-bool chemcompTableGenMain(raw_ostream &os, RecordKeeper &records) {
+bool chemcompTableGenMain(raw_ostream &os, const RecordKeeper &records) {
   switch (action) {
   case GenMotifDB:
     return emitMotifDB(os, records);
