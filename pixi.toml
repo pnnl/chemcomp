@@ -85,12 +85,12 @@ description = "Run chemcomp-opt, forwarding any extra arguments"
 # marco: Base Modelica (ODE) frontend from the MARCO compiler (LGPLv3)
 ################################################################################
 # MARCO is built from source by pixi (pixi-build-cmake) against the same
-# LLVM/MLIR 22.1.8 release, with its driver disabled. Until the fork is
-# published, the dependency points at the chemical-compiler checkout; for a
-# standalone ChemComp checkout use the git form instead:
-#   marco = { git = "https://github.com/<user>/marco", branch = "chemcomp-llvm22" }
+# LLVM/MLIR 22.1.8 release, with its driver disabled. pixi.lock pins the
+# commit of the branch; `pixi update marco` moves to its latest commit.
+# To test local MARCO changes, temporarily use
+#   marco = { path = "../external/marco" }
 [feature.marco.dependencies]
-marco = { path = "../external/marco" }
+marco = { git = "https://github.com/agostini01/marco.git", branch = "chemcomp-llvm22" }
 
 [feature.marco.activation.env]
 # Read by the configure task. Environments without this feature build

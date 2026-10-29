@@ -320,7 +320,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/websocket-client-1.9.2-pyh5ded981_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/widgetsnbextension-4.0.16-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-4.1.1-pyh5ded981_0.conda
-      - conda_source: marco[ff336236] @ ../external/marco
+      - conda_source: marco[566bc775] @ git+https://github.com/agostini01/marco?branch=chemcomp-llvm22#15c115c089158fb461cf6e08f3f0282f6e5e9db6
       - pypi: ./tools/chemcomp-reservoir-emulator
   emulator:
     channels:
@@ -4914,7 +4914,10 @@ packages:
   run_exports: {}
   size: 24839
   timestamp: 1791091060207
-- conda_source: marco[ff336236] @ ../external/marco
+- conda_source: marco[566bc775] @ git+https://github.com/agostini01/marco?branch=chemcomp-llvm22#15c115c089158fb461cf6e08f3f0282f6e5e9db6
+  version: 0.0.1
+  build: ha35fb5c_0
+  subdir: linux-64
   variants:
     c_stdlib: sysroot
     c_stdlib_version: '2.28'
