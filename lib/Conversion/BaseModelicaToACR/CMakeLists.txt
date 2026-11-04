@@ -2,6 +2,7 @@
 # dialect (LGPLv3).
 add_mlir_library(MLIRBaseModelicaToACR
     BaseModelicaToACR.cpp
+    BaseModelicaToODE.cpp
     KnownCRNRules.cpp
     ODEPolynomial.cpp
 

@@ -361,9 +361,13 @@ FailureOr<ODESystem> mlir::cc::ode::extractODESystem(bmodelica::ModelOp model) {
         system.parameterValues[binding.getVariable().str()] = *value;
   for (auto start : model.getOps<bmodelica::StartOp>()) {
     StringRef name = start.getVariable().getRootReference().getValue();
-    if (isParameter.count(name) && !system.parameterValues.count(name.str()))
-      if (auto value = getRegionConstant(start->getRegion(0)))
-        system.parameterValues[name.str()] = *value;
+    std::optional<double> value = getRegionConstant(start->getRegion(0));
+    if (!value)
+      continue;
+    if (!isParameter.count(name))
+      system.initialValues[name.str()] = *value;
+    else if (!system.parameterValues.count(name.str()))
+      system.parameterValues[name.str()] = *value;
   }
 
   // Fold each dynamic equation into `der(x) = rhs`.

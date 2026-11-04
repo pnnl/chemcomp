@@ -10,6 +10,7 @@
 #define CHEMCOMP_CONVERSION_BASEMODELICATOACR_PASSES_H
 
 #include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ODE/ODEDialect.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/Pass/Pass.h"
 
@@ -17,6 +18,7 @@ namespace mlir {
 namespace cc {
 
 #define GEN_PASS_DECL_CONVERTBASEMODELICATOACR
+#define GEN_PASS_DECL_CONVERTBASEMODELICATOODE
 #define GEN_PASS_REGISTRATION
 #include "ChemComp/Conversion/BaseModelicaToACR/Passes.h.inc"
 

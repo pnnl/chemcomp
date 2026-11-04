@@ -87,6 +87,8 @@ struct ODESystem {
   std::vector<std::vector<ODETerm>> equations;
   /// Values of the parameters with a constant binding or start value.
   std::map<std::string, double> parameterValues;
+  /// Constant start values of the states.
+  std::map<std::string, double> initialValues;
 
   /// Human-readable form, e.g. "der(x) = -k*x".
   std::string str() const;
