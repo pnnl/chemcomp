@@ -86,13 +86,6 @@ std::optional<double> Polynomial::getConstantValue() const {
   return std::nullopt;
 }
 
-std::string mlir::cc::ode::formatNumber(double value) {
-  std::string result;
-  llvm::raw_string_ostream os(result);
-  os << llvm::format("%g", value);
-  return result;
-}
-
 static std::string formatMonomial(const Monomial &monomial) {
   std::string result;
   for (const auto &[symbol, exponent] : monomial) {
