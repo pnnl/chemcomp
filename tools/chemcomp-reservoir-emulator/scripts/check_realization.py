@@ -101,16 +101,22 @@ def main(argv=None):
     t_eval = np.linspace(0.0, args.t_end, args.points)
 
     y0 = np.array([s["initial"] for s in ode["states"]], dtype=float)
-    ref = solve_ivp(reference_rhs(ode), (0.0, args.t_end), y0, t_eval=t_eval,
-                    method="LSODA", rtol=RTOL, atol=ATOL)
+    ref = solve_ivp(
+        reference_rhs(ode),
+        (0.0, args.t_end),
+        y0,
+        t_eval=t_eval,
+        method="LSODA",
+        rtol=RTOL,
+        atol=ATOL,
+    )
     if not ref.success:
         print(f"reference ODE failed: {ref.message}", file=sys.stderr)
         return 2
 
     species, traj, species_map = simulate_network(args.crn, t_eval)
 
-    print(f"{ode['name']}: {len(species)} species, t in [0, {args.t_end:g}], "
-          f"{args.points} samples")
+    print(f"{ode['name']}: {len(species)} species, t in [0, {args.t_end:g}], {args.points} samples")
     print(f"  {'state':<12} {'species':<24} {'MSE':>10} {'max |err|':>10}")
     worst = 0.0
     for i, state in enumerate(ode["states"]):
