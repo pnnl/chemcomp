@@ -131,6 +131,11 @@ cmd = "pytest tests/"
 cwd = "tools/chemcomp-reservoir-emulator"
 description = "Run the emulator pytest suite"
 
+[feature.test.tasks.check-odes]
+cmd = "utils/check-odes.sh"
+depends-on = ["build"]
+description = "Compile the example ODEs to networks and report the emulator's MSE against the ODE solution"
+
 [feature.notebooks.dependencies]
 jupyterlab = ">=3.0"
 ipywidgets = ">=7.0"

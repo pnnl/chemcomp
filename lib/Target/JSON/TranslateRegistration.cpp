@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "ChemComp/Dialect/ACR/ACRDialect.h"
+#include "ChemComp/Dialect/ODE/ODEDialect.h"
 #include "ChemComp/Target/JSON/JSONEmitter.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/IR/BuiltinOps.h"
@@ -36,4 +37,13 @@ void mlir::cc::acr::registerFromJSONTranslation() {
       [](DialectRegistry &registry) {
         registry.insert<cc::acr::ACRDialect, arith::ArithDialect>();
       });
+}
+
+void mlir::cc::ode::registerODEToJSONTranslation() {
+  TranslateFromMLIRRegistration reg(
+      "ode-to-json", "export an ode.system as a reference ODE in JSON",
+      [](Operation *op, raw_ostream &output) {
+        return translateODEToJSON(op, output);
+      },
+      [](DialectRegistry &registry) { registry.insert<cc::ode::ODEDialect>(); });
 }

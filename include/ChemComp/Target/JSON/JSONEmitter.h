@@ -33,6 +33,17 @@ void registerToJSONTranslation();
 void registerFromJSONTranslation();
 
 } // namespace acr
+
+namespace ode {
+
+/// Write the single ode.system under `op` as the reference ODE used to check
+/// compiled networks (states, initial values, terms with parameter values
+/// folded in).
+LogicalResult translateODEToJSON(Operation *op, llvm::raw_ostream &os);
+
+void registerODEToJSONTranslation();
+
+} // namespace ode
 } // namespace cc
 } // namespace mlir
 
