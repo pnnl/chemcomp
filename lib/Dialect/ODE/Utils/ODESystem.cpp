@@ -14,6 +14,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <tuple>
 
 using namespace mlir;
@@ -30,13 +31,18 @@ std::string mlir::cc::ode::formatNumber(double value) {
 }
 
 std::string mlir::cc::ode::formatExact(double value) {
+  // The shortest "%.Ng" spelling that reads back exactly ("10" rather than
+  // "1e+01").
+  std::string best;
   char buffer[32];
   for (int precision = 1; precision <= 17; ++precision) {
     std::snprintf(buffer, sizeof(buffer), "%.*g", precision, value);
-    if (std::strtod(buffer, nullptr) == value)
-      break;
+    if (std::strtod(buffer, nullptr) != value)
+      continue;
+    if (best.empty() || std::strlen(buffer) < best.size())
+      best = buffer;
   }
-  return buffer;
+  return best;
 }
 
 void mlir::cc::ode::printNumber(OpAsmPrinter &printer, double value) {

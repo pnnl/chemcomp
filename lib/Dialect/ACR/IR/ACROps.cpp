@@ -16,6 +16,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <string>
 
 using namespace mlir;
@@ -255,13 +256,15 @@ LogicalResult CRNGenericOp::verify() {
 /// Print a double with the shortest spelling that reads back exactly, as an
 /// MLIR float literal ("2.0", "0.4", "1.0e-06").
 static void printNumber(OpAsmPrinter &p, double value) {
+  std::string text;
   char buffer[32];
   for (int precision = 1; precision <= 17; ++precision) {
     std::snprintf(buffer, sizeof(buffer), "%.*g", precision, value);
-    if (std::strtod(buffer, nullptr) == value)
-      break;
+    if (std::strtod(buffer, nullptr) != value)
+      continue;
+    if (text.empty() || std::strlen(buffer) < text.size())
+      text = buffer;
   }
-  std::string text = buffer;
   if (text.find_first_of(".ni") == std::string::npos) {
     size_t exponent = text.find('e');
     text.insert(exponent == std::string::npos ? text.size() : exponent, ".0");

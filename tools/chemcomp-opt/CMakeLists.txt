@@ -8,6 +8,7 @@ set(LIBS
         MLIRRegisterAllPasses
         MLIRACR
         MLIRODE
+        MLIRODEToACR
         )
 
 # The MARCO dialects and the conversions using them are only linked when

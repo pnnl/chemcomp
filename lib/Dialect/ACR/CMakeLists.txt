@@ -3,6 +3,7 @@ add_mlir_dialect_library(MLIRACR
         IR/ACRDialect.cpp
         IR/ACROps.cpp
         Transforms/ACRPasses.cpp
+        Transforms/NetworkPasses.cpp
 
         ADDITIONAL_HEADER_DIRS
         ${PROJECT_SOURCE_DIR}/include/ChemComp/Dialect/ACR
@@ -16,4 +17,6 @@ add_mlir_dialect_library(MLIRACR
         MLIRFunctionInterfaces
         MLIRCallInterfaces
         MLIRFuncDialect
+        MLIRPass
+        MLIRTransformUtils
         )

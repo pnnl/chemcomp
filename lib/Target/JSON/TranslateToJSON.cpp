@@ -92,6 +92,9 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
   // unbound. Without this the matched names would stop at the IR and never
   // reach the emulator.
   auto namesAttr = op->getAttrOfType<ArrayAttr>("species_names");
+  // Networks lowered from acr.network carry their species symbols.
+  if (!namesAttr)
+    namesAttr = op->getAttrOfType<ArrayAttr>("species_symbols");
   SmallVector<std::string> speciesNames;
   for (int64_t s = 0; s < S; ++s) {
     if (namesAttr && s < (int64_t)namesAttr.size()) {

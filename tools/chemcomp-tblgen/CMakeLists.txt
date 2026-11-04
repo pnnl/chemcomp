@@ -8,6 +8,7 @@ add_tablegen(chemcomp-tblgen CHEMCOMP
   EXPORT CHEMCOMP
   chemcomp-tblgen.cpp
   MotifDBGen.cpp
+  ODERulesGen.cpp
 )
 
 set_target_properties(chemcomp-tblgen PROPERTIES FOLDER "Tablegenning")

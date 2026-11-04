@@ -1,4 +1,5 @@
 add_subdirectory(CRNToDB)
+add_subdirectory(ODEToACR)
 
 # Conversion pass declarations are centralized here: every conversion's pass
 # def lives in Passes.td and shares a single IncGen target.

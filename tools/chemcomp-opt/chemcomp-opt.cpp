@@ -19,6 +19,7 @@
 #include "ChemComp/Dialect/ODE/ODEDialect.h"
 #include "ChemComp/Dialect/ODE/ODEPasses.h"
 
+#include "ChemComp/Conversion/ODEToACR/Passes.h"
 #include "ChemComp/Conversion/Passes.h"
 
 #include "RegisterMarco.h"
@@ -28,6 +29,8 @@ int main(int argc, char **argv) {
   mlir::cc::acr::registerPasses();
   mlir::cc::ode::registerPasses();
   mlir::cc::registerConversionPasses();
+  mlir::cc::registerODEToACRPasses();
+  mlir::cc::registerODEToCRNPipeline();
 
   mlir::DialectRegistry registry;
   registry.insert<mlir::arith::ArithDialect, mlir::func::FuncDialect,
