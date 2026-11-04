@@ -122,8 +122,8 @@ System splitStates(const System &system, const std::set<std::string> &split,
       // der(x) = der(x_p) - der(x_m): a term can be added to x_p as is, or
       // to x_m with the opposite sign. Pick the rail where it is either a
       // production or a degradation of that rail.
-      bool toMinus = coeff > 0 ? factors.count(r.minus) > 0
-                               : factors.count(r.plus) == 0;
+      bool toMinus =
+          coeff > 0 ? factors.count(r.minus) > 0 : factors.count(r.plus) == 0;
       result.terms.push_back({toMinus ? r.minus : r.plus,
                               toMinus ? -coeff : coeff, term.params, factors,
                               term.loc});
@@ -194,8 +194,9 @@ struct ODEDualRailPass
       size_t before = split.size();
       for (const CrossEffect &effect : effects) {
         const Term &term = encoded.terms[effect.termIndex];
-        split.insert(
-            encoded.states[encoded.stateIndex(term.state)].encodedState().str());
+        split.insert(encoded.states[encoded.stateIndex(term.state)]
+                         .encodedState()
+                         .str());
       }
       if (split.size() == before)
         return op.emitError("ode-dual-rail: could not remove the negative "

@@ -94,7 +94,8 @@ struct ODESystem {
   std::string str() const;
 };
 
-// formatNumber() is shared with the ode dialect (ChemComp/Dialect/ODE/ODESystem.h).
+// formatNumber() is shared with the ode dialect
+// (ChemComp/Dialect/ODE/ODESystem.h).
 
 /// Extract the ODE system of a model, or emit an error on the model and fail
 /// if its equations are not an explicit scalar polynomial ODE system.

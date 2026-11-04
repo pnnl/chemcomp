@@ -45,5 +45,7 @@ void mlir::cc::ode::registerODEToJSONTranslation() {
       [](Operation *op, raw_ostream &output) {
         return translateODEToJSON(op, output);
       },
-      [](DialectRegistry &registry) { registry.insert<cc::ode::ODEDialect>(); });
+      [](DialectRegistry &registry) {
+        registry.insert<cc::ode::ODEDialect>();
+      });
 }

@@ -334,8 +334,8 @@ static ParseResult parseComplex(OpAsmParser &parser, DictionaryAttr &complex) {
         if (entry.getName() == species.getAttr())
           return parser.emitError(loc, "species listed twice in a complex; "
                                        "write its count instead");
-      entries.push_back(builder.getNamedAttr(
-          species.getValue(), builder.getI64IntegerAttr(count)));
+      entries.push_back(builder.getNamedAttr(species.getValue(),
+                                             builder.getI64IntegerAttr(count)));
     } while (succeeded(parser.parseOptionalPlus()));
   }
   complex = builder.getDictionaryAttr(entries);
@@ -400,9 +400,8 @@ LogicalResult RxnOp::verify() {
                << entry.getName().getValue() << "' must be a positive integer";
       if (!isa_and_nonnull<SpeciesOp>(
               SymbolTable::lookupSymbolIn(network, entry.getName())))
-        return emitOpError("'@")
-               << entry.getName().getValue()
-               << "' is not an acr.species of this network";
+        return emitOpError("'@") << entry.getName().getValue()
+                                 << "' is not an acr.species of this network";
     }
   }
   if (getReactants() == getProducts())

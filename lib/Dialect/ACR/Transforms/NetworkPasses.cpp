@@ -37,7 +37,8 @@ using Complex = std::map<std::string, int64_t>;
 Complex readComplex(DictionaryAttr dict) {
   Complex complex;
   for (NamedAttribute entry : dict)
-    complex[entry.getName().str()] = cast<IntegerAttr>(entry.getValue()).getInt();
+    complex[entry.getName().str()] =
+        cast<IntegerAttr>(entry.getValue()).getInt();
   return complex;
 }
 
@@ -268,14 +269,14 @@ struct ACRNetworkToCRNPass
     Block *body = crn.addEntryBlock();
     OpBuilder::InsertionGuard guard(builder);
     builder.setInsertionPointToStart(body);
-    auto generic =
-        CRNGenericOp::create(builder, loc, TypeRange{speciesType},
-                             ValueRange{body->getArgument(0),
-                                        body->getArgument(1)});
+    auto generic = CRNGenericOp::create(
+        builder, loc, TypeRange{speciesType},
+        ValueRange{body->getArgument(0), body->getArgument(1)});
 
     auto matrixType =
         RankedTensorType::get({numReactions, numSpecies}, builder.getI32Type());
-    generic->setAttr("stoich_matrix", DenseIntElementsAttr::get(matrixType, net));
+    generic->setAttr("stoich_matrix",
+                     DenseIntElementsAttr::get(matrixType, net));
     generic->setAttr("reactant_matrix",
                      DenseIntElementsAttr::get(matrixType, reactantMatrix));
     generic->setAttr("product_matrix",

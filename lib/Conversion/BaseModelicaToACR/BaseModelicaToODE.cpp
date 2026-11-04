@@ -69,8 +69,8 @@ struct ConvertBaseModelicaToODEPass
     std::set<std::string> params;
     for (size_t i = 0; i < in.states.size(); ++i) {
       for (const ode::ODETerm &term : in.equations[i]) {
-        ode::Term t{in.states[i], term.coefficient, term.parameters, {},
-                    std::nullopt};
+        ode::Term t{
+            in.states[i], term.coefficient, term.parameters, {}, std::nullopt};
         for (size_t j = 0; j < in.states.size(); ++j)
           if (term.stateExponents[j])
             t.states[in.states[j]] = term.stateExponents[j];

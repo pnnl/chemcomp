@@ -139,9 +139,8 @@ private:
   /// An unclaimed term of der(state) with the given monomial and, optionally,
   /// parameters and coefficient.
   std::optional<size_t> findTerm(const std::string &state,
-                                 const Factors &monomial,
-                                 const Factors *params, double coeff,
-                                 size_t from = 0) const {
+                                 const Factors &monomial, const Factors *params,
+                                 double coeff, size_t from = 0) const {
     for (size_t i = from; i < system.terms.size(); ++i) {
       const Term &term = system.terms[i];
       if (claimed[i] || term.state != state || term.states != monomial)
@@ -175,7 +174,8 @@ private:
       ++first;
     for (std::optional<size_t> lead =
              findTerm(stateOf(first), monomial, nullptr, 0);
-         lead; lead = findTerm(stateOf(first), monomial, nullptr, 0, *lead + 1)) {
+         lead;
+         lead = findTerm(stateOf(first), monomial, nullptr, 0, *lead + 1)) {
       const Term &leadTerm = system.terms[*lead];
       double k = leadTerm.coeff / change[first];
       if (k <= 0)
@@ -261,10 +261,9 @@ struct ConvertODEToACRPass
     if (!canonicalFallback) {
       std::vector<size_t> leftover = composer.unclaimed();
       if (!leftover.empty()) {
-        InFlightDiagnostic diag = op.emitError()
-                                  << "no composable rule covers "
-                                  << leftover.size() << " term(s) of system '"
-                                  << system.name << "': ";
+        InFlightDiagnostic diag =
+            op.emitError() << "no composable rule covers " << leftover.size()
+                           << " term(s) of system '" << system.name << "': ";
         llvm::interleave(
             leftover, diag,
             [&](size_t i) {
@@ -283,9 +282,8 @@ struct ConvertODEToACRPass
     auto network = acr::NetworkOp::create(builder, op.getLoc(), system.name);
     builder.setInsertionPointToStart(&network.getBody().front());
     for (const State &state : system.states) {
-      auto species =
-          acr::SpeciesOp::create(builder, op.getLoc(), state.name, nullptr,
-                                 nullptr, nullptr);
+      auto species = acr::SpeciesOp::create(builder, op.getLoc(), state.name,
+                                            nullptr, nullptr, nullptr);
       if (state.initial)
         species.setInitialAttr(builder.getF64FloatAttr(*state.initial));
       if (state.railOf) {
@@ -309,8 +307,8 @@ struct ConvertODEToACRPass
       }
       if (rate)
         rxn.setRateAttr(builder.getF64FloatAttr(*rate));
-      rxn.setRateNameAttr(builder.getStringAttr(
-          rateName(reaction.magnitude, reaction.params)));
+      rxn.setRateNameAttr(
+          builder.getStringAttr(rateName(reaction.magnitude, reaction.params)));
       rxn.setRuleAttr(builder.getStringAttr(reaction.rule));
       rxn.setFromAttr(builder.getStringAttr(reaction.from));
     }

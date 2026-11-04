@@ -34,8 +34,7 @@ struct ODEToCRNOptions : public PassPipelineOptions<ODEToCRNOptions> {
       llvm::cl::desc("Cover terms no rule claims with the canonical "
                      "Hungarian-Lemma reaction"),
       llvm::cl::init(true)};
-  Option<bool> merge{*this, "merge",
-                     llvm::cl::desc("Run acr-network-merge"),
+  Option<bool> merge{*this, "merge", llvm::cl::desc("Run acr-network-merge"),
                      llvm::cl::init(true)};
 };
 

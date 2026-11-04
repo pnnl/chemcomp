@@ -57,9 +57,13 @@ std::string complexString(const Rule &rule, const std::vector<unsigned> &c) {
 }
 
 Rule readRule(const Record *rec) {
-  Rule rule{rec, rec->getValueAsString("Name").str(),
+  Rule rule{rec,
+            rec->getValueAsString("Name").str(),
             rec->getValueAsInt("Priority"),
-            rec->getValueAsString("Summary").str(), {}, {}, {}};
+            rec->getValueAsString("Summary").str(),
+            {},
+            {},
+            {}};
   std::vector<StringRef> reactants = rec->getValueAsListOfStrings("Reactants");
   std::vector<StringRef> products = rec->getValueAsListOfStrings("Products");
   // Species in order of first appearance, reactants first.

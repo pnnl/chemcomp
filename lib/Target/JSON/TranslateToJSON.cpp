@@ -73,7 +73,8 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
   // +1, which reads back as 0 -> X), so prefer the full matrices when the
   // producer recorded them; otherwise split the net matrix by sign.
   SmallVector<int32_t> reactants(R * S), products(R * S);
-  auto reactantAttr = op->getAttrOfType<DenseIntElementsAttr>("reactant_matrix");
+  auto reactantAttr =
+      op->getAttrOfType<DenseIntElementsAttr>("reactant_matrix");
   auto productAttr = op->getAttrOfType<DenseIntElementsAttr>("product_matrix");
   if (reactantAttr && productAttr &&
       reactantAttr.getType().getShape() == stoichType.getShape() &&

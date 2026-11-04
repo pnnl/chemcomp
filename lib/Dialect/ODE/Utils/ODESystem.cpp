@@ -207,8 +207,8 @@ void System::normalize() {
     if (std::fabs(sum.value) <= 1e-12 * sum.scale)
       continue;
     const auto &[index, monomial, product] = key;
-    result.push_back({states[index].name, sum.value, product, monomial,
-                      sum.loc});
+    result.push_back(
+        {states[index].name, sum.value, product, monomial, sum.loc});
   }
   terms = std::move(result);
 }
