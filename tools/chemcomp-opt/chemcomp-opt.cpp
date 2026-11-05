@@ -24,6 +24,8 @@
 
 #include "RegisterMarco.h"
 
+#include <vector>
+
 int main(int argc, char **argv) {
   mlir::registerAllPasses();
   mlir::cc::acr::registerPasses();
@@ -41,6 +43,15 @@ int main(int argc, char **argv) {
   // will be *parsed* by the tool, not the one generated
   // registerAllDialects(registry);
 
+  // Stoichiometry matrices are meant to be read: print them as numbers even
+  // past MLIR's default hex limit of 100 elements (e.g. 21 reactions x 6
+  // species). An explicit --mlir-print-elementsattrs-with-hex-if-larger on the
+  // command line comes later and wins.
+  std::vector<char *> args(argv, argv + argc);
+  char noHex[] = "--mlir-print-elementsattrs-with-hex-if-larger=-1";
+  args.insert(args.begin() + 1, noHex);
+
   return mlir::asMainReturnCode(
-      mlir::MlirOptMain(argc, argv, "ChemComp optimizer driver\n", registry));
+      mlir::MlirOptMain(static_cast<int>(args.size()), args.data(),
+                        "ChemComp optimizer driver\n", registry));
 }

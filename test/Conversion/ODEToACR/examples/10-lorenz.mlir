@@ -8,6 +8,7 @@
 // RUN:   --acr-network-merge | FileCheck %s
 // RUN: not chemcomp-opt %s --ode-to-crn=canonical-fallback=false 2>&1 \
 // RUN:   | FileCheck %s --check-prefix=ONLY
+// RUN: chemcomp-opt %s --ode-to-crn | FileCheck %s --check-prefix=CRN
 // RUN: chemcomp-opt %s --ode-to-crn | chemcomp-translate -mlir-to-json > %t.crn.json
 // RUN: chemcomp-translate -ode-to-json %s > %t.ode.json
 // RUN: %if emulator %{ %chemcomp_python %check_realization --ode %t.ode.json \
@@ -28,6 +29,14 @@ ode.system @Lorenz {
   ode.term @z += 1.0 states [@x, @y]
   ode.term @z += -1.0 params [@beta] states [@z]
 }
+
+// 21 reactions x 6 species is past MLIR's 100-element hex limit; chemcomp-opt
+// still prints the matrices as numbers.
+// CRN:     acr.crn_generic
+// CRN-NOT: 0x
+// CRN-SAME: product_matrix = dense<{{\[\[}}
+// CRN-SAME: reactant_matrix = dense<{{\[\[}}
+// CRN-SAME: stoich_matrix = dense<{{\[\[}}
 
 // CHECK-LABEL: acr.network @Lorenz {
 // CHECK-NEXT:    acr.species @x_p initial 1.0 {ode_state = "x", rail_sign = 1 : i64}
