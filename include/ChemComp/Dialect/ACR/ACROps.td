@@ -15,6 +15,7 @@ include "mlir/Interfaces/CallInterfaces.td"
 include "mlir/Interfaces/ControlFlowInterfaces.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 include "mlir/IR/SymbolInterfaces.td"
+include "mlir/IR/RegionKindInterface.td"
 
 //===----------------------------------------------------------------------===//
 // acr.stoich_coeff
@@ -338,6 +339,83 @@ def ACR_ReturnOp : ACR_Op<"return", [Pure, ReturnLike, Terminator]> {
 
   let arguments = (ins Variadic<AnyType>:$operands);
   let assemblyFormat = "($operands^ `:` type($operands))? attr-dict";
+}
+
+//===----------------------------------------------------------------------===//
+// Graph form: acr.network / acr.species / acr.rxn
+//
+// A reaction network as a graph: species are symbols, reactions are edges
+// between complexes. Passes that build or reshape networks (convert-ode-to-acr,
+// acr-network-merge) work on this form; acr-network-to-crn lowers it to an
+// acr.crn holding an acr.crn_generic, which crn-db-match and mlir-to-json use.
+//===----------------------------------------------------------------------===//
+
+def ACR_NetworkOp : ACR_Op<"network", [
+    Symbol, SymbolTable, IsolatedFromAbove, NoTerminator, SingleBlock,
+    NoRegionArguments, GraphRegionNoTerminator
+]> {
+  let summary = "A reaction network as a graph of species and reactions";
+  let description = [{
+    ```mlir
+    acr.network @LotkaVolterra {
+      acr.species @x initial 2.0
+      acr.species @y initial 2.0
+      acr.rxn @x -> 2 @x rate 1.1 {rate_name = "a", rule = "autocatalysis"}
+      acr.rxn @x + @y -> 2 @y rate 0.4 {rate_name = "b", rule = "predation"}
+      acr.rxn @y -> none rate 0.4 {rate_name = "c", rule = "degradation"}
+    }
+    ```
+  }];
+
+  let arguments = (ins SymbolNameAttr:$sym_name);
+  let regions = (region SizedRegion<1>:$body);
+  let assemblyFormat = "$sym_name attr-dict-with-keyword $body";
+
+  let skipDefaultBuilders = 1;
+  let builders = [OpBuilder<(ins "::llvm::StringRef":$name)>];
+  let hasRegionVerifier = 1;
+}
+
+def ACR_SpeciesOp : ACR_Op<"species", [Symbol, HasParent<"NetworkOp">]> {
+  let summary = "A species of a reaction network";
+  let description = [{
+    Optional attributes: the initial amount; the ODE state the species stands
+    for (`ode_state`) and, for a dual-rail pair, its sign (`rail_sign`).
+
+    ```mlir
+    acr.species @x_p initial 1.0 {ode_state = "x", rail_sign = 1 : i64}
+    ```
+  }];
+
+  let arguments = (ins SymbolNameAttr:$sym_name,
+                       OptionalAttr<F64Attr>:$initial,
+                       OptionalAttr<StrAttr>:$ode_state,
+                       OptionalAttr<I64Attr>:$rail_sign);
+  let hasCustomAssemblyFormat = 1;
+}
+
+def ACR_RxnOp : ACR_Op<"rxn", [HasParent<"NetworkOp">]> {
+  let summary = "A mass-action reaction between two complexes";
+  let description = [{
+    `reactants` and `products` map species to their stoichiometric counts.
+    An empty side is spelled `none`. `rate` is the numeric rate constant, when
+    known; `rate_name` its expression (e.g. `"b"`, `"0.5*k"`), `rule` the rule
+    that produced the reaction and `from` the ODE terms it accounts for.
+
+    ```mlir
+    acr.rxn @x + @y -> 2 @y rate 0.4 {rate_name = "b", rule = "predation"}
+    acr.rxn none -> @x rate 2.0
+    ```
+  }];
+
+  let arguments = (ins DictionaryAttr:$reactants,
+                       DictionaryAttr:$products,
+                       OptionalAttr<F64Attr>:$rate,
+                       OptionalAttr<StrAttr>:$rate_name,
+                       OptionalAttr<StrAttr>:$rule,
+                       OptionalAttr<StrAttr>:$from);
+  let hasCustomAssemblyFormat = 1;
+  let hasVerifier = 1;
 }
 
 #endif // ACR_OPS

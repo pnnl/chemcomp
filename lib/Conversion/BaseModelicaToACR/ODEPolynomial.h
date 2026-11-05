@@ -19,6 +19,8 @@
 #ifndef CHEMCOMP_LIB_CONVERSION_BASEMODELICATOACR_ODEPOLYNOMIAL_H
 #define CHEMCOMP_LIB_CONVERSION_BASEMODELICATOACR_ODEPOLYNOMIAL_H
 
+#include "ChemComp/Dialect/ODE/ODESystem.h"
+
 #include "mlir/IR/Location.h"
 #include "mlir/Support/LLVM.h"
 #include "llvm/ADT/StringRef.h"
@@ -85,13 +87,15 @@ struct ODESystem {
   std::vector<std::vector<ODETerm>> equations;
   /// Values of the parameters with a constant binding or start value.
   std::map<std::string, double> parameterValues;
+  /// Constant start values of the states.
+  std::map<std::string, double> initialValues;
 
   /// Human-readable form, e.g. "der(x) = -k*x".
   std::string str() const;
 };
 
-/// Format a number compactly, as printf "%g" does ("2", "0.5", "1e-06").
-std::string formatNumber(double value);
+// formatNumber() is shared with the ode dialect
+// (ChemComp/Dialect/ODE/ODESystem.h).
 
 /// Extract the ODE system of a model, or emit an error on the model and fail
 /// if its equations are not an explicit scalar polynomial ODE system.

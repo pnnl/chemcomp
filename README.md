@@ -44,6 +44,15 @@ build/pixi-default/bin/chemcomp-opt test/Conversion/BaseModelicaToACR/lotka-volt
 
 The `compiler` environment builds ChemComp without MARCO; the MARCO tests are then reported as unsupported. MARCO is licensed under the LGPLv3: binaries built with `CHEMCOMP_ENABLE_MARCO=ON` link it statically.
 
+### Composing networks from ODEs
+
+Any polynomial ODE system can be compiled into a reaction network whose mass-action kinetics are exactly those equations. The `ode` dialect holds the system; `--ode-to-crn` dual-rail encodes the states that need it, composes reactions from a fixed set of motif rules (binding, predation, conversion, ...), covers the remaining terms with the Hungarian-Lemma construction, and lowers to `acr.crn`. It needs no MARCO; `convert-bmodelica-to-ode` brings Modelica models in. See [docs/ode-to-crn.md](docs/ode-to-crn.md) for the math and the passes.
+
+```sh
+build/pixi-default/bin/chemcomp-opt test/Conversion/ODEToACR/examples/05-lotka-volterra.mlir --ode-to-crn
+pixi run check-odes      # simulate the example networks and compare with the ODEs (MSE)
+```
+
 ## Build LLVM/MLIR
 
 Clone the llvm-project repository and check out the above commit. Then, build and install LLVM/MLIR with the following configuration:

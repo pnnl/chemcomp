@@ -14,6 +14,7 @@ target_link_libraries(chemcomp-translate
   ${dialect_libs}
   ${translation_libs}
   MLIRACR
+  MLIRODE
   MLIRIR
   MLIRParser
   MLIRPass

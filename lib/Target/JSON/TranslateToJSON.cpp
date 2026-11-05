@@ -44,6 +44,15 @@ static void emitRate(llvm::json::OStream &J, const APFloat &val) {
   J.rawValue(buf);
 }
 
+/// Emit a double compactly ("2", "0.5", "1.1") with up to 15 significant
+/// digits, so values recorded as f64 reach the emulator unchanged.
+static void emitDouble(llvm::json::OStream &J, double d) {
+  SmallString<32> buf;
+  llvm::raw_svector_ostream os(buf);
+  os << llvm::format("%.15g", d);
+  J.rawValue(buf);
+}
+
 /// Emit a single CRNGenericOp as JSON.
 static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
                                       llvm::json::OStream &J) {
@@ -60,11 +69,33 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
   for (auto val : stoichAttr.getValues<int32_t>())
     matrix.push_back(val);
 
+  // Reactants and products. The net matrix loses catalysts (X -> 2X has net
+  // +1, which reads back as 0 -> X), so prefer the full matrices when the
+  // producer recorded them; otherwise split the net matrix by sign.
+  SmallVector<int32_t> reactants(R * S), products(R * S);
+  auto reactantAttr =
+      op->getAttrOfType<DenseIntElementsAttr>("reactant_matrix");
+  auto productAttr = op->getAttrOfType<DenseIntElementsAttr>("product_matrix");
+  if (reactantAttr && productAttr &&
+      reactantAttr.getType().getShape() == stoichType.getShape() &&
+      productAttr.getType().getShape() == stoichType.getShape()) {
+    llvm::copy(reactantAttr.getValues<int32_t>(), reactants.begin());
+    llvm::copy(productAttr.getValues<int32_t>(), products.begin());
+  } else {
+    for (int64_t i = 0; i < R * S; ++i) {
+      reactants[i] = matrix[i] < 0 ? -matrix[i] : 0;
+      products[i] = matrix[i] > 0 ? matrix[i] : 0;
+    }
+  }
+
   // Prefer the concrete names attached by the crn-db-match pass; fall back to
   // generic S0, S1, ... where the CRN was never matched or a species was left
   // unbound. Without this the matched names would stop at the IR and never
   // reach the emulator.
   auto namesAttr = op->getAttrOfType<ArrayAttr>("species_names");
+  // Networks lowered from acr.network carry their species symbols.
+  if (!namesAttr)
+    namesAttr = op->getAttrOfType<ArrayAttr>("species_symbols");
   SmallVector<std::string> speciesNames;
   for (int64_t s = 0; s < S; ++s) {
     if (namesAttr && s < (int64_t)namesAttr.size()) {
@@ -83,6 +114,8 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
   auto inputs = op.getInputs();
   APFloat zeroF32(0.0f);
   SmallVector<APFloat> rates(R, zeroF32);
+  // Rates from `rate_values` keep their double precision.
+  std::optional<SmallVector<double>> exactRates;
 
   bool isTensorForm =
       !inputs.empty() && isa<RankedTensorType>(inputs[0].getType());
@@ -96,8 +129,7 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
     // Try to trace it to an arith.constant.
     if (inputs.size() >= 2) {
       if (rateValues && static_cast<int64_t>(rateValues.size()) == R) {
-        for (int64_t r = 0; r < R; ++r)
-          rates[r] = APFloat(static_cast<float>(rateValues[r]));
+        exactRates.emplace(rateValues.asArrayRef());
       } else if (auto constOp = inputs[1].getDefiningOp<arith::ConstantOp>()) {
         if (auto denseAttr =
                 dyn_cast<DenseFPElementsAttr>(constOp.getValue())) {
@@ -137,29 +169,61 @@ static LogicalResult emitCRNGenericOp(cc::acr::CRNGenericOp op,
               J.value(speciesNames[s]);
           });
           J.attributeArray("reactants", [&] {
-            for (int64_t s = 0; s < S; ++s) {
-              int32_t val = matrix[r * S + s];
-              J.value(val < 0 ? -val : 0);
-            }
+            for (int64_t s = 0; s < S; ++s)
+              J.value(reactants[r * S + s]);
           });
           J.attributeArray("products", [&] {
-            for (int64_t s = 0; s < S; ++s) {
-              int32_t val = matrix[r * S + s];
-              J.value(val > 0 ? val : 0);
-            }
+            for (int64_t s = 0; s < S; ++s)
+              J.value(products[r * S + s]);
           });
           J.attributeBegin("rate");
-          emitRate(J, rates[r]);
+          if (exactRates)
+            emitDouble(J, (*exactRates)[r]);
+          else
+            emitRate(J, rates[r]);
           J.attributeEnd();
           J.attribute("name", ("R" + Twine(r + 1)).str());
         });
       }
     });
+    // Initial amounts, when the producer recorded them (e.g. ODE start
+    // values); 1 otherwise.
+    auto initialValues = op->getAttrOfType<DenseF64ArrayAttr>("initial_values");
+    bool haveInitial =
+        initialValues && static_cast<int64_t>(initialValues.size()) == S;
     J.attributeObject("populations", [&] {
-      for (int64_t s = 0; s < S; ++s)
-        J.attribute(speciesNames[s], 1);
+      for (int64_t s = 0; s < S; ++s) {
+        if (!haveInitial) {
+          J.attribute(speciesNames[s], 1);
+          continue;
+        }
+        J.attributeBegin(speciesNames[s]);
+        emitDouble(J, initialValues[s]);
+        J.attributeEnd();
+      }
     });
     J.attributeArray("tracked_species", [&] {});
+
+    // Which ODE state each species stands for, and with which sign: a
+    // dual-rail pair x = x+ - x- maps both rails to x, with signs +1 and -1.
+    auto stateNames = op->getAttrOfType<ArrayAttr>("ode_state_names");
+    auto stateSigns = op->getAttrOfType<DenseI64ArrayAttr>("ode_state_signs");
+    if (stateNames && static_cast<int64_t>(stateNames.size()) == S) {
+      J.attributeObject("species_map", [&] {
+        for (int64_t s = 0; s < S; ++s) {
+          auto state = dyn_cast<StringAttr>(stateNames[s]);
+          if (!state)
+            continue;
+          int64_t sign = 1;
+          if (stateSigns && static_cast<int64_t>(stateSigns.size()) == S)
+            sign = stateSigns[s];
+          J.attributeObject(speciesNames[s], [&] {
+            J.attribute("state", state.getValue());
+            J.attribute("sign", sign);
+          });
+        }
+      });
+    }
   });
 
   return success();

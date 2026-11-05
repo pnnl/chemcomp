@@ -58,4 +58,24 @@ def ConvertBaseModelicaToACR
   ];
 }
 
+def ConvertBaseModelicaToODE
+    : Pass<"convert-bmodelica-to-ode", "::mlir::ModuleOp"> {
+  let summary = "Convert Base Modelica ODE models to ode.system";
+  let description = [{
+    Converts each `bmodelica.model` whose dynamic equations form an explicit,
+    scalar, polynomial ODE system (the same subset as
+    `convert-bmodelica-to-acr`) into an `ode.system`: one `ode.state` per
+    state with its constant start value, one `ode.param` per parameter used,
+    with its constant binding or start value, and one `ode.term` per
+    monomial. The `ode-to-crn` pipeline then composes a network for it.
+  }];
+
+  let dependentDialects = ["::mlir::cc::ode::ODEDialect"];
+
+  let options = [
+    Option<"keepModel", "keep-model", "bool", /*default=*/"false",
+           "Keep the converted bmodelica.model operations">,
+  ];
+}
+
 #endif // CHEMCOMP_CONVERSION_BASEMODELICATOACR_PASSES

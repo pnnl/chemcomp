@@ -86,13 +86,6 @@ std::optional<double> Polynomial::getConstantValue() const {
   return std::nullopt;
 }
 
-std::string mlir::cc::ode::formatNumber(double value) {
-  std::string result;
-  llvm::raw_string_ostream os(result);
-  os << llvm::format("%g", value);
-  return result;
-}
-
 static std::string formatMonomial(const Monomial &monomial) {
   std::string result;
   for (const auto &[symbol, exponent] : monomial) {
@@ -368,9 +361,13 @@ FailureOr<ODESystem> mlir::cc::ode::extractODESystem(bmodelica::ModelOp model) {
         system.parameterValues[binding.getVariable().str()] = *value;
   for (auto start : model.getOps<bmodelica::StartOp>()) {
     StringRef name = start.getVariable().getRootReference().getValue();
-    if (isParameter.count(name) && !system.parameterValues.count(name.str()))
-      if (auto value = getRegionConstant(start->getRegion(0)))
-        system.parameterValues[name.str()] = *value;
+    std::optional<double> value = getRegionConstant(start->getRegion(0));
+    if (!value)
+      continue;
+    if (!isParameter.count(name))
+      system.initialValues[name.str()] = *value;
+    else if (!system.parameterValues.count(name.str()))
+      system.parameterValues[name.str()] = *value;
   }
 
   // Fold each dynamic equation into `der(x) = rhs`.

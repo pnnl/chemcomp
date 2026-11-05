@@ -22,22 +22,27 @@
 #include "llvm/TableGen/Record.h"
 
 #include "MotifDBGen.h"
+#include "ODERulesGen.h"
 
 using namespace llvm;
 
 namespace {
 
-enum ActionType { GenMotifDB };
+enum ActionType { GenMotifDB, GenODERules };
 
 cl::opt<ActionType> action(
     cl::desc("Action to perform:"),
     cl::values(clEnumValN(GenMotifDB, "gen-motif-db",
-                          "Generate the reaction motif fixture database")));
+                          "Generate the reaction motif fixture database"),
+               clEnumValN(GenODERules, "gen-ode-rules",
+                          "Generate the composable ODE-to-reaction rules")));
 
 bool chemcompTableGenMain(raw_ostream &os, const RecordKeeper &records) {
   switch (action) {
   case GenMotifDB:
     return emitMotifDB(os, records);
+  case GenODERules:
+    return emitODERules(os, records);
   }
   llvm_unreachable("unhandled action");
 }

@@ -1,6 +1,7 @@
 add_mlir_translation_library(MLIRTargetJSON
     TranslateToJSON.cpp
     TranslateFromJSON.cpp
+    TranslateODEToJSON.cpp
     TranslateRegistration.cpp
 
     ADDITIONAL_HEADER_DIRS
@@ -8,6 +9,7 @@ add_mlir_translation_library(MLIRTargetJSON
 
     LINK_LIBS PUBLIC
     MLIRACR
+    MLIRODE
     MLIRArithDialect
     MLIRIR
     MLIRSupport

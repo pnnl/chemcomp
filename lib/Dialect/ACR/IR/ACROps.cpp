@@ -12,6 +12,12 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/Interfaces/FunctionImplementation.h"
+#include "llvm/ADT/STLExtras.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string>
 
 using namespace mlir;
 using namespace mlir::cc::acr;
@@ -240,6 +246,168 @@ LogicalResult CRNGenericOp::verify() {
         return emitOpError("expected !acr.species result at index ") << i;
   }
 
+  return success();
+}
+
+//===----------------------------------------------------------------------===//
+// Graph form: acr.network / acr.species / acr.rxn
+//===----------------------------------------------------------------------===//
+
+/// Print a double with the shortest spelling that reads back exactly, as an
+/// MLIR float literal ("2.0", "0.4", "1.0e-06").
+static void printNumber(OpAsmPrinter &p, double value) {
+  std::string text;
+  char buffer[32];
+  for (int precision = 1; precision <= 17; ++precision) {
+    std::snprintf(buffer, sizeof(buffer), "%.*g", precision, value);
+    if (std::strtod(buffer, nullptr) != value)
+      continue;
+    if (text.empty() || std::strlen(buffer) < text.size())
+      text = buffer;
+  }
+  if (text.find_first_of(".ni") == std::string::npos) {
+    size_t exponent = text.find('e');
+    text.insert(exponent == std::string::npos ? text.size() : exponent, ".0");
+  }
+  p << text;
+}
+
+void NetworkOp::build(OpBuilder &builder, OperationState &state,
+                      StringRef name) {
+  state.addAttribute(getSymNameAttrName(state.name),
+                     builder.getStringAttr(name));
+  state.addRegion()->emplaceBlock();
+}
+
+LogicalResult NetworkOp::verifyRegions() {
+  for (Operation &op : getBody().front())
+    if (!isa<SpeciesOp, RxnOp>(op))
+      return op.emitOpError("is not allowed in an acr.network; expected "
+                            "acr.species or acr.rxn");
+  return success();
+}
+
+// acr.species @x [initial <number>] attr-dict
+ParseResult SpeciesOp::parse(OpAsmParser &parser, OperationState &result) {
+  StringAttr name;
+  if (parser.parseSymbolName(name, getSymNameAttrName(result.name),
+                             result.attributes))
+    return failure();
+  if (succeeded(parser.parseOptionalKeyword("initial"))) {
+    double value;
+    if (parser.parseFloat(value))
+      return failure();
+    result.addAttribute(getInitialAttrName(result.name),
+                        parser.getBuilder().getF64FloatAttr(value));
+  }
+  return parser.parseOptionalAttrDict(result.attributes);
+}
+
+void SpeciesOp::print(OpAsmPrinter &p) {
+  p << ' ';
+  p.printSymbolName(getSymName());
+  if (FloatAttr initial = getInitialAttr()) {
+    p << " initial ";
+    printNumber(p, initial.getValueAsDouble());
+  }
+  p.printOptionalAttrDict((*this)->getAttrs(),
+                          {getSymNameAttrName(), getInitialAttrName()});
+}
+
+// A complex: `none`, or `[n] @s (+ [n] @s)*`.
+static ParseResult parseComplex(OpAsmParser &parser, DictionaryAttr &complex) {
+  Builder &builder = parser.getBuilder();
+  SmallVector<NamedAttribute> entries;
+  if (failed(parser.parseOptionalKeyword("none"))) {
+    do {
+      int64_t count = 1;
+      OptionalParseResult hasCount = parser.parseOptionalInteger(count);
+      if (hasCount.has_value() && failed(*hasCount))
+        return failure();
+      SMLoc loc = parser.getCurrentLocation();
+      FlatSymbolRefAttr species;
+      if (parser.parseAttribute(species))
+        return failure();
+      if (count <= 0)
+        return parser.emitError(loc, "stoichiometric counts must be positive");
+      for (NamedAttribute &entry : entries)
+        if (entry.getName() == species.getAttr())
+          return parser.emitError(loc, "species listed twice in a complex; "
+                                       "write its count instead");
+      entries.push_back(builder.getNamedAttr(species.getValue(),
+                                             builder.getI64IntegerAttr(count)));
+    } while (succeeded(parser.parseOptionalPlus()));
+  }
+  complex = builder.getDictionaryAttr(entries);
+  return success();
+}
+
+static void printComplex(OpAsmPrinter &p, DictionaryAttr complex) {
+  if (complex.empty()) {
+    p << "none";
+    return;
+  }
+  llvm::interleave(
+      complex,
+      [&](NamedAttribute entry) {
+        int64_t count = cast<IntegerAttr>(entry.getValue()).getInt();
+        if (count != 1)
+          p << count << ' ';
+        p.printSymbolName(entry.getName().getValue());
+      },
+      [&] { p << " + "; });
+}
+
+// acr.rxn <complex> -> <complex> [rate <number>] attr-dict
+ParseResult RxnOp::parse(OpAsmParser &parser, OperationState &result) {
+  DictionaryAttr reactants, products;
+  if (parseComplex(parser, reactants) || parser.parseArrow() ||
+      parseComplex(parser, products))
+    return failure();
+  result.addAttribute(getReactantsAttrName(result.name), reactants);
+  result.addAttribute(getProductsAttrName(result.name), products);
+  if (succeeded(parser.parseOptionalKeyword("rate"))) {
+    double rate;
+    if (parser.parseFloat(rate))
+      return failure();
+    result.addAttribute(getRateAttrName(result.name),
+                        parser.getBuilder().getF64FloatAttr(rate));
+  }
+  return parser.parseOptionalAttrDict(result.attributes);
+}
+
+void RxnOp::print(OpAsmPrinter &p) {
+  p << ' ';
+  printComplex(p, getReactants());
+  p << " -> ";
+  printComplex(p, getProducts());
+  if (FloatAttr rate = getRateAttr()) {
+    p << " rate ";
+    printNumber(p, rate.getValueAsDouble());
+  }
+  p.printOptionalAttrDict(
+      (*this)->getAttrs(),
+      {getReactantsAttrName(), getProductsAttrName(), getRateAttrName()});
+}
+
+LogicalResult RxnOp::verify() {
+  Operation *network = (*this)->getParentOp();
+  for (DictionaryAttr complex : {getReactants(), getProducts()}) {
+    for (NamedAttribute entry : complex) {
+      auto count = dyn_cast<IntegerAttr>(entry.getValue());
+      if (!count || count.getInt() <= 0)
+        return emitOpError("stoichiometric count of '")
+               << entry.getName().getValue() << "' must be a positive integer";
+      if (!isa_and_nonnull<SpeciesOp>(
+              SymbolTable::lookupSymbolIn(network, entry.getName())))
+        return emitOpError("'@") << entry.getName().getValue()
+                                 << "' is not an acr.species of this network";
+    }
+  }
+  if (getReactants() == getProducts())
+    return emitOpError("reactants and products are the same complex");
+  if (FloatAttr rate = getRateAttr(); rate && rate.getValueAsDouble() < 0)
+    return emitOpError("rate constants must not be negative");
   return success();
 }
 

@@ -4,6 +4,7 @@ import os
 import platform
 import re
 import subprocess
+import sys
 import tempfile
 
 import lit.formats
@@ -74,3 +75,31 @@ llvm_config.with_environment(
     ],
     append_path=True,
 )
+
+# The ODE-to-network examples check their networks numerically with the
+# reservoir emulator when its Python package is importable (the default pixi
+# environment). %chemcomp_python runs the interpreter lit itself runs under,
+# with -s: lit does not pass PYTHONNOUSERSITE on, and packages in
+# ~/.local must not shadow the environment's.
+config.substitutions.append(("%chemcomp_python", sys.executable + " -s"))
+config.substitutions.append(
+    (
+        "%check_realization",
+        os.path.join(
+            os.path.dirname(config.test_source_root),
+            "tools",
+            "chemcomp-reservoir-emulator",
+            "scripts",
+            "check_realization.py",
+        ),
+    )
+)
+if (
+    subprocess.run(
+        [sys.executable, "-s", "-c", "import chemical_reservoir, scipy"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    ).returncode
+    == 0
+):
+    config.available_features.add("emulator")

@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
   mlir::registerAllTranslations();
   mlir::cc::acr::registerToJSONTranslation();
   mlir::cc::acr::registerFromJSONTranslation();
+  mlir::cc::ode::registerODEToJSONTranslation();
 
   return failed(
       mlir::mlirTranslateMain(argc, argv, "MLIR Translation Testing Tool"));
